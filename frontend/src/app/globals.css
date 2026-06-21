@@ -1,0 +1,40 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Tokens do design system — hero violet, 60-30-10, light + dark.
+   Ver docs/design-system.md. */
+:root {
+  color-scheme: light;
+  --bg: #F8FAFC;
+  --surface: #FFFFFF;
+  --surface-alt: #F1F5F9;
+  --border: #E2E8F0;
+  --text: #0F172A;
+  --text-muted: #64748B;
+  --primary: #7C3AED;        /* botão primary (texto branco, AA) */
+  --primary-hover: #6D28D9;
+  --primary-on: #FFFFFF;
+  --accent-surface: #F5F3FF;
+  --focus-ring: #A78BFA;
+}
+
+.dark {
+  color-scheme: dark;
+  --bg: #0B1220;
+  --surface: #1E293B;
+  --surface-alt: #334155;
+  --border: #2A3852;
+  --text: #F8FAFC;
+  --text-muted: #94A3B8;
+  --primary: #A78BFA;
+  --primary-hover: #C4B5FD;
+  --primary-on: #0B1220;
+  --accent-surface: #2E1065;
+  --focus-ring: #C4B5FD;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+}

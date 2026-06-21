@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ProductSearcher — Paleta</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  :root{ --bg:#F8FAFC; --surface:#FFFFFF; --border:#E2E8F0; --text:#0F172A; --muted:#64748B; --primary:#7C3AED; --primary-hover:#6D28D9; }
+  *{box-sizing:border-box}
+  body{font-family:Inter,system-ui,sans-serif;margin:0;background:var(--bg);color:var(--text);padding:32px}
+  h1{font-size:28px;margin:0 0 4px}
+  .sub{color:var(--muted);margin:0 0 28px}
+  h2{font-size:18px;margin:28px 0 12px}
+  .row{display:flex;flex-wrap:wrap;gap:10px}
+  .sw{width:120px;border:1px solid var(--border);border-radius:10px;overflow:hidden;background:var(--surface)}
+  .chip{height:64px}
+  .lbl{padding:8px 10px;font-size:12px;line-height:1.4}
+  .lbl b{display:block;font-weight:600}
+  .lbl span{color:var(--muted)}
+  .panel{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px}
+  .demo{border:1px solid var(--border);border-radius:14px;overflow:hidden}
+  .demo .nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--d-border)}
+  .demo .body{padding:16px;display:flex;flex-direction:column;gap:12px}
+  .card{border:1px solid var(--d-border);border-radius:10px;padding:12px;display:flex;align-items:center;gap:12px;background:var(--d-surface)}
+  .rank{font-weight:700;color:var(--d-primary)}
+  .thumb{width:44px;height:44px;border-radius:8px;background:var(--d-altsurface)}
+  .grow{flex:1}
+  .price{font-weight:700}
+  .btn{background:var(--d-primary);color:var(--d-on);border:none;border-radius:8px;padding:8px 14px;font-weight:600;font-family:inherit;font-size:13px}
+  .badge{display:inline-block;background:var(--d-accent);color:var(--d-accenttext);border-radius:12px;padding:3px 8px;font-size:11px;font-weight:600}
+  .light{--d-border:#E2E8F0;--d-surface:#FFFFFF;--d-altsurface:#F1F5F9;--d-primary:#7C3AED;--d-on:#fff;--d-accent:#F5F3FF;--d-accenttext:#6D28D9;background:#F8FAFC;color:#0F172A}
+  .dark{--d-border:#2A3852;--d-surface:#1E293B;--d-altsurface:#334155;--d-primary:#A78BFA;--d-on:#0B1220;--d-accent:#2E1065;--d-accenttext:#C4B5FD;background:#0B1220;color:#F8FAFC}
+  .tag{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px}
+</style>
+</head>
+<body>
+  <h1>ProductSearcher — Paleta de cores</h1>
+  <p class="sub">Hero <b>Roxo/Lilás (Violet)</b> · aplicação 60-30-10 · light + dark · Inter</p>
+
+  <h2>Escala Violet (hero)</h2>
+  <div class="row" id="violet"></div>
+
+  <h2>Neutros</h2>
+  <div class="row" id="neutral"></div>
+
+  <h2>Semânticas</h2>
+  <div class="row" id="sem"></div>
+
+  <h2>Pré-visualização (mesma UI nos dois temas)</h2>
+  <div class="panel">
+    <div>
+      <div class="tag">Light</div>
+      <div class="demo light">
+        <div class="nav"><b style="color:#7C3AED">🔎 ProductSearcher</b><button class="btn">Buscar</button></div>
+        <div class="body">
+          <div class="card"><span class="rank">#1</span><div class="thumb"></div><div class="grow"><b>Dell Inspiron 15</b><div style="font-size:12px;opacity:.7">i7 · 16GB · 512GB</div></div><span class="badge">melhor preço</span><span class="price">R$ 4.799</span></div>
+          <div class="card"><span class="rank">#2</span><div class="thumb"></div><div class="grow"><b>Lenovo IdeaPad 3</b><div style="font-size:12px;opacity:.7">i5 · 16GB · 512GB</div></div><span class="price">R$ 3.999</span></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="tag">Dark</div>
+      <div class="demo dark">
+        <div class="nav"><b style="color:#A78BFA">🔎 ProductSearcher</b><button class="btn">Buscar</button></div>
+        <div class="body">
+          <div class="card"><span class="rank">#1</span><div class="thumb"></div><div class="grow"><b>Dell Inspiron 15</b><div style="font-size:12px;opacity:.7">i7 · 16GB · 512GB</div></div><span class="badge">melhor preço</span><span class="price">R$ 4.799</span></div>
+          <div class="card"><span class="rank">#2</span><div class="thumb"></div><div class="grow"><b>Lenovo IdeaPad 3</b><div style="font-size:12px;opacity:.7">i5 · 16GB · 512GB</div></div><span class="price">R$ 3.999</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const violet={50:'#F5F3FF',100:'#EDE9FE',200:'#DDD6FE',300:'#C4B5FD',400:'#A78BFA',500:'#8B5CF6',600:'#7C3AED',700:'#6D28D9',800:'#5B21B6',900:'#4C1D95'};
+  const neutral={0:'#FFFFFF',50:'#F8FAFC',100:'#F1F5F9',200:'#E2E8F0',300:'#CBD5E1',400:'#94A3B8',500:'#64748B',600:'#475569',700:'#334155',800:'#1E293B',900:'#0F172A',950:'#0B1220'};
+  const sem={Success:'#16A34A',Warning:'#F59E0B',Error:'#DC2626',Info:'#2563EB','Accent (opcional)':'#EC4899'};
+  function render(id,obj,prefix){const el=document.getElementById(id);Object.entries(obj).forEach(([k,v])=>{const d=document.createElement('div');d.className='sw';d.innerHTML=`<div class="chip" style="background:${v}"></div><div class="lbl"><b>${prefix?prefix+'-'+k:k}</b><span>${v}</span></div>`;el.appendChild(d);});}
+  render('violet',violet,'violet');render('neutral',neutral,'neutral');render('sem',sem,'');
+</script>
+</body>
+</html>
