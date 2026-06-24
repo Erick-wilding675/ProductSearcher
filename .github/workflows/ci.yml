@@ -5,6 +5,9 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  contents: write
+
 jobs:
   api:
     runs-on: ubuntu-latest
@@ -13,12 +16,18 @@ jobs:
         working-directory: api
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       - run: pip install --upgrade pip && pip install ".[dev]"
-      - run: ruff check .
-      - run: ruff format --check .
+      - run: ruff check --fix .
+      - run: ruff format .
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style(api): auto-fix linting and formatting issues"
+          
       - run: pytest -q
 
   worker:
@@ -32,8 +41,12 @@ jobs:
         with:
           python-version: "3.11"
       - run: pip install --upgrade pip && pip install ".[dev]"
-      - run: ruff check .
-      - run: ruff format --check .
+      - run: ruff check --fix .
+      - run: ruff format .
+      
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style(worker): auto-fix linting and formatting issues"
 
   frontend:
     runs-on: ubuntu-latest
@@ -46,6 +59,11 @@ jobs:
         with:
           node-version: "20"
       - run: npm install
-      - run: npm run lint --if-present
-      - run: npm run format:check --if-present
+      - run: npm run lint --if-present -- --fix
+      - run: npm run format --if-present 
+      
+      - uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "style(frontend): auto-fix linting and formatting issues"
+          
       - run: npm run build --if-present
