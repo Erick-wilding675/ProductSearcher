@@ -6,11 +6,7 @@ export const metadata: Metadata = {
   description: "Descoberta, comparação e análise inteligente de produtos.",
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR">
       <body className="font-sans">{children}</body>
