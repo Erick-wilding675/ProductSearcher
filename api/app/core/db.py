@@ -2,6 +2,7 @@
 
 TODO Fase 2/3: revisar pool, migrations (Alembic) e registro de tipos pgvector.
 """
+
 from collections.abc import Iterator
 
 from sqlalchemy import create_engine

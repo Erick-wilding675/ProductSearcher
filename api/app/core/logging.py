@@ -2,6 +2,7 @@
 
 TODO Fase 3: adicionar correlação por requisição (request id) via middleware.
 """
+
 import logging
 
 

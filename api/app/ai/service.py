@@ -2,6 +2,7 @@
 
 Com AI_ENABLED=false, usa-se a implementação determinística.
 """
+
 from typing import Protocol
 
 

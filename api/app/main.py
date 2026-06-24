@@ -3,6 +3,7 @@
 Clientes (web app e extensão) consomem esta mesma API.
 Ver docs/architecture.md e ADR-0003.
 """
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 

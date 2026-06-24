@@ -1,4 +1,5 @@
 """Testes do IntentParser (Fase 3, RF-11). Placeholder até a implementação."""
+
 import pytest
 
 from app.search.intent import RuleBasedIntentParser

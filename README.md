@@ -31,6 +31,19 @@ cd frontend && npm install && npm run dev
 - API: http://localhost:8000 (`/health`)
 - Web: http://localhost:3000
 
+### Sem Docker (venv local, Python 3.11+)
+
+Para rodar/lint/test o backend fora do Docker, use um virtualenv único na raiz:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate          # Windows PowerShell: .\.venv\Scripts\Activate.ps1
+python -m pip install --upgrade pip
+pip install -e "./api[dev]" -e "./worker[dev]"
+```
+
+`.venv/` está no `.gitignore`. Atalhos de qualidade na raiz: `make lint` / `make format` / `make test`.
+
 ## Documentação
 
 - Visão geral e contexto: [`.ai/ai.md`](.ai/ai.md)

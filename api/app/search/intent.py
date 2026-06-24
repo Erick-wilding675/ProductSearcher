@@ -3,6 +3,7 @@
 Default determinístico (regras/regex) — princípio: o sistema funciona sem IA.
 LLM pode reforçar no futuro (RF-16), atrás da mesma interface.
 """
+
 from dataclasses import dataclass, field
 from typing import Protocol
 

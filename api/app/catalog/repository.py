@@ -2,6 +2,7 @@
 
 TODO Fase 3: implementar contra o Postgres.
 """
+
 from typing import Protocol
 
 

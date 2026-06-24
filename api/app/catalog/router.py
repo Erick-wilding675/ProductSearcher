@@ -1,4 +1,5 @@
 """Endpoints do catálogo: GET /categories, GET /products/{id}."""
+
 from fastapi import APIRouter, HTTPException
 
 router = APIRouter(tags=["catalog"])

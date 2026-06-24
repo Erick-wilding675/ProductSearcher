@@ -3,6 +3,7 @@
 MVP: FtsSearchProvider (Postgres FTS) + pgvector via VectorProvider.
 Evolução: OpenSearch / Qdrant atrás das mesmas interfaces.
 """
+
 from typing import Protocol
 
 from app.search.intent import Intent

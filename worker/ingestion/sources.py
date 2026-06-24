@@ -2,6 +2,7 @@
 
 MVP: SeedSource (arquivos versionados). Futuro: APIFY/APIs sob a mesma interface.
 """
+
 from pathlib import Path
 from typing import Protocol
 

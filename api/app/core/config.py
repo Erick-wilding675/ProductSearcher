@@ -1,4 +1,5 @@
 """Configuração via variáveis de ambiente (sem segredos no repositório)."""
+
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
