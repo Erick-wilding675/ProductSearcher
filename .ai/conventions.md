@@ -5,14 +5,15 @@
 ## Geral
 
 - Idioma da documentação: **português**. Código e identificadores em **inglês**.
-- Tudo reprodutível via `docker compose up`.
+- Tudo reprodutível via `docker compose up` (ou `make up`).
 - Sem segredos no repositório (usar `.env`, `.env.example` versionado).
+- Comandos unificados na raiz via `Makefile`: `make lint`, `make format`, `make test`, `make ci`.
 
 ## Backend (Python / FastAPI)
 
 - Monólito modular: módulos `catalog`, `search`, `ai`, `core` com fronteiras claras.
 - Dependências externas (busca, vetor, IA, ingestão) **atrás de interfaces**.
-- Estilo/lint: `ruff` + `black` (ou equivalente); tipagem com type hints.
+- Estilo/lint: `ruff` para lint **e** format (`ruff format` substitui o black — uma só ferramenta); tipagem com type hints.
 - Testes: `pytest`; cobrir lógica crítica (parser de intenção, ranking).
 
 ## Frontend (Next.js / TS)

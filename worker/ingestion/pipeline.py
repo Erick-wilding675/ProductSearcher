@@ -1,4 +1,5 @@
 """Orquestra a ingestão: fetch -> normalize -> validate -> load (RF-70). TODO Fase 2."""
+
 from pathlib import Path
 
 from ingestion.load import load

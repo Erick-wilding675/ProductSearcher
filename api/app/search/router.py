@@ -1,4 +1,5 @@
 """Endpoints de busca/comparação: GET /search, POST /compare."""
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 

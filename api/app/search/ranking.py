@@ -1,4 +1,5 @@
 """Ranking determinístico e explicável (RF-30/31)."""
+
 from typing import Protocol
 
 from app.search.intent import Intent
