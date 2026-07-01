@@ -59,3 +59,9 @@ Next.js · FastAPI · PostgreSQL (FTS + pgvector, Supabase) · Docker · free-ti
 ## Status
 
 Scaffold inicial. Backlog de construção por fases no Notion (Tasks Tracker).
+
+## Licença
+
+Distribuído sob a **Business Source License 1.1 (BUSL-1.1)** — ver [`LICENSE`](LICENSE).
+
+Resumo (não substitui o texto da licença): uso **não-produção** (avaliação, desenvolvimento, teste) é livre; uso em **produção** é permitido apenas de forma **não-comercial**. Em **2030-07-01** (Change Date), converte automaticamente para **Apache License 2.0**. Para uso comercial antes dessa data, contate o Licensor. A BUSL **não** é uma licença OSI open-source. Motivação e trade-offs em [ADR-0006](adr/0006-licenciamento-busl.md).
