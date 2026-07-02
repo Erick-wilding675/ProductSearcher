@@ -4,14 +4,14 @@ from pathlib import Path
 
 from ingestion.load import load
 from ingestion.normalize import normalize
-from ingestion.sources import SeedSource
+from ingestion.sources import SeedIngestionSource
 from ingestion.validate import validate
 
 SEED_DIR = Path(__file__).resolve().parent.parent / "seed"
 
 
-def run() -> dict:
-    source = SeedSource(SEED_DIR)
+def run(seed_dir: Path = SEED_DIR) -> dict:
+    source = SeedIngestionSource(seed_dir)
     raw = source.fetch()
     normalized = normalize(raw)
     valid, rejected = validate(normalized)
