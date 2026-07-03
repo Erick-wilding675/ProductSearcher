@@ -54,6 +54,7 @@ def upgrade() -> None:
         sa.Column("attribute_key", sa.Text(), nullable=False),
         sa.Column("label", sa.Text(), nullable=False),
         sa.Column("data_type", sa.Text(), nullable=False),
+        sa.Column("allowed_values",JSONB(),nullable=True),
         sa.Column("unit", sa.Text(), nullable=True),
         sa.Column("required", sa.Boolean(), nullable=False),
     )
