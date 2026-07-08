@@ -33,3 +33,14 @@ class RawProduct(BaseModel):
     description: str | None = None
     specs: dict[str, Any] = Field(default_factory=dict)  # atributos crus, sem validar
     offers: list[RawOffer] = Field(default_factory=list)
+
+
+class AttributeSpec(BaseModel):
+    """Uma regra do category_attribute_schema (ADR-005 D4)."""
+
+    attribute_key: str
+    label: str
+    data_type: str  # "text" | "number" | "boolean" | "enum"
+    unit: str | None = None
+    required: bool = False
+    allowed_values: list[str] | None = None  # só para enum
