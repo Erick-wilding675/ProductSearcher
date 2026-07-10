@@ -7,9 +7,9 @@ Ver docs/architecture.md e ADR-0003.
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.catalog.router import router as catalog_router
 from app.core.config import settings
 from app.core.logging import configure_logging
-from app.catalog.router import router as catalog_router
 from app.search.router import router as search_router
 
 configure_logging()

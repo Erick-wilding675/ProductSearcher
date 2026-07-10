@@ -4,8 +4,10 @@ Version: 0.1.0
 Summary: ProductSearcher — worker de ingestão do catálogo seed
 Requires-Python: >=3.11
 Requires-Dist: pydantic>=2.7
+Requires-Dist: pyyaml>=6.0
 Requires-Dist: sqlalchemy>=2.0
 Requires-Dist: psycopg[binary]>=3.1
+Requires-Dist: python-dotenv>=1.0
 Provides-Extra: dev
 Requires-Dist: pytest>=8; extra == "dev"
 Requires-Dist: ruff>=0.5; extra == "dev"

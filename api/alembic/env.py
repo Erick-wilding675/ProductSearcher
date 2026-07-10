@@ -1,9 +1,26 @@
+import os
 from logging.config import fileConfig
+from pathlib import Path
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
+
+# Carrega .env (api/.env ou raiz do repo) se python-dotenv existir — evita exportar
+# DATABASE_URL na mão (e o footgun de aspas/`$` no PowerShell).
+try:
+    from dotenv import load_dotenv
+
+    _candidates = (
+        Path(__file__).resolve().parents[1] / ".env",
+        Path(__file__).resolve().parents[2] / ".env",
+    )
+    for _candidate in _candidates:
+        if _candidate.exists():
+            load_dotenv(_candidate)
+            break
+except ModuleNotFoundError:
+    pass
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -13,6 +30,12 @@ config = context.config
 # This line sets up loggers basically.
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
+# Prioriza a URL do ambiente (produção/Supabase ou dev fora do Docker); o
+# alembic.ini fica apenas como fallback local. Evita credencial versionada.
+_db_url = os.environ.get("DATABASE_URL")
+if _db_url:
+    config.set_main_option("sqlalchemy.url", _db_url)
 
 # add your model's MetaData object here
 # for 'autogenerate' support
@@ -64,9 +87,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

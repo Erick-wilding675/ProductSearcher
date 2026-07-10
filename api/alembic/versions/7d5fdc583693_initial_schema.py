@@ -1,30 +1,31 @@
 """initial_schema
 
 Revision ID: 7d5fdc583693
-Revises: 
+Revises:
 Create Date: 2026-06-30 22:44:10.811088
 
 """
-from typing import Sequence, Union
 
-from alembic import op
+from collections.abc import Sequence
+
 import sqlalchemy as sa
 from pgvector.sqlalchemy import Vector
-from sqlalchemy.dialects.postgresql import TSVECTOR
-from sqlalchemy.dialects.postgresql import JSONB
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
-revision: str = '7d5fdc583693'
-down_revision: Union[str, Sequence[str], None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+revision: str = "7d5fdc583693"
+down_revision: str | Sequence[str] | None = None
+branch_labels: str | Sequence[str] | None = None
+depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
     """Upgrade schema."""
 
-    # Habilita as extensôes do pgcrypto e pgvector
+    # Habilita a extensão pgvector (coluna embedding). Os UUIDs são gerados na
+    # aplicação (ADR-0005 D7), então pgcrypto/gen_random_uuid() não é necessário.
     op.execute("CREATE EXTENSION IF NOT EXISTS vector")
 
     # Cria a tabela categories
@@ -54,11 +55,11 @@ def upgrade() -> None:
         sa.Column("attribute_key", sa.Text(), nullable=False),
         sa.Column("label", sa.Text(), nullable=False),
         sa.Column("data_type", sa.Text(), nullable=False),
-        sa.Column("allowed_values",JSONB(),nullable=True),
+        sa.Column("allowed_values", JSONB(), nullable=True),
         sa.Column("unit", sa.Text(), nullable=True),
         sa.Column("required", sa.Boolean(), nullable=False),
     )
-    
+
     op.create_table(
         "brands",
         sa.Column("id", sa.UUID(), primary_key=True, nullable=False),
@@ -70,59 +71,49 @@ def upgrade() -> None:
     op.create_table(
         "products",
         sa.Column("id", sa.UUID(), primary_key=True, nullable=False),
-
         sa.Column(
             "category_id",
             sa.UUID(),
             sa.ForeignKey("categories.id"),
             nullable=False,
         ),
-
         sa.Column(
             "brand_id",
             sa.UUID(),
             sa.ForeignKey("brands.id"),
             nullable=False,
         ),
-
         sa.Column("slug", sa.Text(), nullable=False),
         sa.Column("name", sa.Text(), nullable=False),
         sa.Column("model", sa.Text(), nullable=True),
         sa.Column("description", sa.Text(), nullable=True),
-
         sa.Column("search_vector", TSVECTOR()),
-
         sa.Column("embedding", Vector(768)),
-
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
             nullable=False,
             server_default=sa.func.now(),
         ),
-
         sa.UniqueConstraint("slug", name="uq_products_slug"),
     )
 
     op.create_table(
         "product_specs",
         sa.Column("id", sa.UUID(), primary_key=True, nullable=False),
-
         sa.Column(
             "product_id",
             sa.UUID(),
             sa.ForeignKey("products.id"),
             nullable=False,
         ),
-
         sa.Column("attributes", JSONB(), nullable=False),
-
         sa.Column(
             "updated_at",
             sa.DateTime(timezone=True),
             nullable=False,
             server_default=sa.func.now(),
-    ),
+        ),
     )
 
     op.create_table(
@@ -131,32 +122,27 @@ def upgrade() -> None:
         sa.Column("slug", sa.Text(), nullable=False),
         sa.Column("name", sa.Text(), nullable=False),
         sa.Column("url", sa.Text(), nullable=False),
-
         sa.UniqueConstraint("slug", name="uq_stores_slug"),
     )
 
     op.create_table(
         "offers",
         sa.Column("id", sa.UUID(), primary_key=True, nullable=False),
-
         sa.Column(
             "product_id",
             sa.UUID(),
             sa.ForeignKey("products.id"),
             nullable=False,
         ),
-
         sa.Column(
             "store_id",
             sa.UUID(),
             sa.ForeignKey("stores.id"),
             nullable=False,
         ),
-
         sa.Column("price", sa.Numeric(), nullable=False),
         sa.Column("currency", sa.Text(), nullable=False),
         sa.Column("url", sa.Text(), nullable=False),
-
         sa.Column(
             "captured_at",
             sa.DateTime(timezone=True),
@@ -168,16 +154,13 @@ def upgrade() -> None:
     op.create_table(
         "price_history",
         sa.Column("id", sa.UUID(), primary_key=True, nullable=False),
-
         sa.Column(
             "offer_id",
             sa.UUID(),
             sa.ForeignKey("offers.id"),
             nullable=False,
         ),
-
         sa.Column("price", sa.Numeric(), nullable=False),
-
         sa.Column(
             "captured_at",
             sa.DateTime(timezone=True),
@@ -189,14 +172,12 @@ def upgrade() -> None:
     op.create_table(
         "reviews",
         sa.Column("id", sa.UUID(), primary_key=True, nullable=False),
-
         sa.Column(
             "product_id",
             sa.UUID(),
             sa.ForeignKey("products.id"),
             nullable=False,
         ),
-
         sa.Column("source", sa.Text(), nullable=False),
         sa.Column("rating", sa.Numeric(), nullable=False),
         sa.Column("rating_count", sa.Integer(), nullable=False),
@@ -209,7 +190,6 @@ def upgrade() -> None:
         sa.Column("query_text", sa.Text(), nullable=False),
         sa.Column("parsed_intent", JSONB(), nullable=True),
         sa.Column("result_count", sa.Integer(), nullable=False),
-
         sa.Column(
             "created_at",
             sa.DateTime(timezone=True),
