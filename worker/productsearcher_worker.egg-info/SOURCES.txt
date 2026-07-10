@@ -2,8 +2,10 @@ README.md
 pyproject.toml
 ingestion/__init__.py
 ingestion/load.py
+ingestion/models.py
 ingestion/normalize.py
 ingestion/pipeline.py
+ingestion/schema.py
 ingestion/sources.py
 ingestion/validate.py
 productsearcher_worker.egg-info/PKG-INFO
@@ -11,3 +13,9 @@ productsearcher_worker.egg-info/SOURCES.txt
 productsearcher_worker.egg-info/dependency_links.txt
 productsearcher_worker.egg-info/requires.txt
 productsearcher_worker.egg-info/top_level.txt
+tests/test_load.py
+tests/test_ml_auth.py
+tests/test_normalize.py
+tests/test_seedbuilder.py
+tests/test_sources.py
+tests/test_validate.py

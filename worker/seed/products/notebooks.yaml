@@ -1,0 +1,1916 @@
+- source: apify:mercadolivre
+  external_id: MLB45574031
+  name: Notebook Gamer Lenovo Loq 15irx9 Intel Core I5-13450hx Rtx 3050 8gb 512gb
+    Ssd Windows 11 Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13450HX
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+  offers:
+  - store: Mercado Livre
+    price: '5794'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB52721936
+  name: Notebook Asus Tuf Gaming F16, Nvidia Rtx 3050, Intel Core 5 210h 2,2 Ghz,
+    8gb Ram, 512gb Ssd, Keepos Linux, Tela 16  Fhd+ Nível Ips 144hz, Mecha Gray -
+    Fx607vj-rl002 Cinza
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core 5 210H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 16.0
+  offers:
+  - store: Mercado Livre
+    price: '4914'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB65809062
+  name: Notebook Gamer Dell Alienware C7 16gb Rtx 4050 W11 - A35 Azul-escuro
+  brand: Dell
+  category: notebooks
+  specs:
+    ram_gb: 16
+  offers:
+  - store: Dell
+    price: '10998'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB65833925
+  name: Notebook Dell Alienware 16 Aurora Ac16250 Intel Core I7 240h 16gb De Ram Geforce
+    Rtx 3050 Windows 11 Azul Escuro
+  brand: Dell
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-240H
+    ram_gb: 16
+  offers:
+  - store: Dell
+    price: '8644'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB51233304
+  name: Notebook Lenovo IdeaPad Slim 3 15IRH10 Intel Core i5-13420H 8GB 512GB SSD
+    Windows 11 15.3" - 83NS0002BR Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.3
+  offers:
+  - store: Eshop
+    price: '3989'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-slim-3-15irh10-intel-core-i5-13420h-8gb-512gb-ssd-windows-11-153-83ns0002br-luna-grey/p/MLB51233304
+- source: apify:mercadolivre
+  external_id: MLB53429614
+  name: Notebook Lenovo Ideapad I5-13420h 8gb 1tb Ssd15.3 Fhd Linux Cinza
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 8
+  offers:
+  - store: Mercado Livre
+    price: '3419'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-i5-13420h-8gb-1tb-ssd153-fhd-linux-cinza/p/MLB53429614
+- source: apify:mercadolivre
+  external_id: MLB67549457
+  name: Notebook Gamer Acer Nitro V 16 Core i7 RTX 5060 32GB RAM e SSD 512GB com Tela
+    16" WUXGA 180Hz
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i7
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 32
+    screen_in: 16.0
+  offers:
+  - store: Mercado Livre
+    price: '7386'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-nitro-v-16-core-i7-rtx-5060-32gb-ram-e-ssd-512gb-com-tela-16-wuxga-180hz/p/MLB67549457
+- source: apify:mercadolivre
+  external_id: MLB68344553
+  name: Notebook Acer Gamer Nitro V15 Ryzen 7 7735hs 16gb Rtx4050 1tb Ssd Linux Tela
+    165hz Full Hd 15.6 Anv15-41-r8zp
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7 7735HS
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 16.0
+  offers:
+  - store: Vikings
+    price: '6304'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-gamer-nitro-v15-ryzen-7-7735hs-16gb-rtx4050-1tb-ssd-linux-tela-165hz-full-hd-156-anv15-41-r8zp/p/MLB68344553
+- source: apify:mercadolivre
+  external_id: MLB52934530
+  name: Notebook Acer Aspire Go 15 AG15-71P-5939 - Intel Core i5-13420H 13ª Geração
+    • 8GB DDR5 • 256GB SSD NVMe • Tela 15,6' • Windows 11 Home
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '3699'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-aspire-go-15-ag15-71p-5939-intel-core-i5-13420h-13-geraco-8gb-ddr5-256gb-ssd-nvme-tela-156-windows-11-home/p/MLB52934530
+- source: apify:mercadolivre
+  external_id: MLB53547163
+  name: Notebook Acer Aspire GO 15 AG15-71P-58MD Intel® Core™ i5-13420H 13ªGeração
+    512SSD 8GB RAM DDR5 15.6” Full HD (1920 x 1080) Windows 11 Home
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '3799'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-aspire-go-15-ag15-71p-58md-intel-core-i5-13420h-13geraco-512ssd-8gb-ram-ddr5-156-full-hd-1920-x-1080-windows-11-home/p/MLB53547163
+- source: apify:mercadolivre
+  external_id: MLB54176209
+  name: Notebook Gamer Acer Nitro V15 ANV15-52-737P Intel® Core™ i7-13620H 13ªG 16GB
+    RAM 512GB SSD RTX4050 FHD 15.6”
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-13620H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.6
+  offers:
+  - store: Acer
+    price: '6999'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-nitro-v15-anv15-52-737p-intel-core-i7-13620h-13g-16gb-ram-512gb-ssd-rtx4050-fhd-156/p/MLB54176209
+- source: apify:mercadolivre
+  external_id: MLB63112463
+  name: Notebook Gamer Predator Helios Neo 16 Phn16-73-76TF Com IA Intel® Core Ultra
+    7 255HX 16GB 512SSD RTX5070 WQXGA 16
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core Ultra 7 255HX
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Acer
+    price: '11199'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-predator-helios-neo-16-phn16-73-76tf-com-ia-intel-core-ultra-7-255hx-16gb-512ssd-rtx5070-wqxga-16/p/MLB63112463
+- source: apify:mercadolivre
+  external_id: MLB60407347
+  name: Notebook Acer Nitro V15 Anv155251e4  Intel Core I5-13420h 13ª Geração 16gb
+    Ddr5 Nvidia Geforce Rtx 4050 512ssd Tela 15,6 165 Hz Windows 11 Home Teclado Retroiluminado
+    Wi-fi 6 Preto
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '6981'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB29126536
+  name: Notebook Asus Vivobook Go 15 E1504, Amd Ryzen 5 7520u 2,8 Ghz, 8gb Ram, 256gb
+    Ssd, Windows 11 Home, Tela 15,6  Fhd, Black - E1504fa-nj825w Preto
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 5 7520U
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '3894'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB65030699
+  name: Notebook Gamer Asus Tuf Gaming A15, Amd Ryzen 7, Rtx 3050, 8gb Ram, 512gb
+    Ssd, Linux Keepos, Graphite Black - Fa506ncg-hn216 Preto Grafite
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+  offers:
+  - store: Mercado Livre
+    price: '4590'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB50302787
+  name: Notebook Asus Vivobook 15 X1504va Intel Core I5 1334u 4 Gb Ram 256gb Ssd Windows
+    11 Home Tela 15,6 Led Fhd Silver - Nj1723w Prateado
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-1334U
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 4
+    screen_in: 15.6
+  offers:
+  - store: Gamer Place
+    price: '3530'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB73480206
+  name: Notebook Gamer ASUS TUF Gaming A16, AMD Ryzen 7, RTX 4050, 16GB RAM, 512GB
+    SSD, Linux KeepOS, Tela 16" IPS 144Hz, Mecha Gray - FA607NUQ-RL167
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 16.0
+  offers:
+  - store: Asus
+    price: '7499'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-asus-tuf-gaming-a16-amd-ryzen-7-rtx-4050-16gb-ram-512gb-ssd-linux-keepos-tela-16-ips-144hz-mecha-gray-fa607nuq-rl167/p/MLB73480206
+- source: apify:mercadolivre
+  external_id: MLB56952040
+  name: HP Pavilion Gamer Core 5 120U 16GB RAM 1TB SSD Intel Graphics Windows 11 Instalado
+    Laptop 17-CN4153 Com Presente
+  brand: HP
+  category: notebooks
+  specs:
+    cpu: Intel Core 5 120U
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Mercado Livre
+    price: '4834'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/hp-pavilion-gamer-core-5-120u-16gb-ram-1tb-ssd-intel-graphics-windows-11-instalado-laptop-17-cn4153-com-presente/p/MLB56952040
+- source: apify:mercadolivre
+  external_id: MLB67492952
+  name: Notebook Lenovo ThinkBook 16 G7 com Ryzen 7, 16GB de RAM e SSD de 512GB
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Mercado Livre
+    price: '6179'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-thinkbook-16-g7-com-ryzen-7-16gb-de-ram-e-ssd-de-512gb/p/MLB67492952
+- source: apify:mercadolivre
+  external_id: MLB2095745144
+  name: Nimo 15.6  Ips Fhd-gaming-laptop,amd Ryzen 5 6600h
+  brand: Nimo
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 5 6600H
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '4823'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/nimo-156-ips-fhd-gaming-laptopamd-ryzen-5-6600h/p/MLB2095745144
+- source: apify:mercadolivre
+  external_id: MLB51234660
+  name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i5-13420h 8gb 256gb Ssd
+    Windows 11 15.3 - 83ns0003br Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.3
+  offers:
+  - store: Mercado Livre
+    price: '3599'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-slim-3-15irh10-intel-core-i5-13420h-8gb-256gb-ssd-windows-11-153-83ns0003br-luna-grey/p/MLB51234660
+- source: apify:mercadolivre
+  external_id: MLB70158724
+  name: Notebook Asus Gaming V16 V3607vh Nvidia Rtx 5050 Intel Core 5 16gb Ram 512gb
+    Ssd Windows 11 Home 16  Lcd Led Fhd Nível Ips Rp106w Matte Black
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core 5 16GB
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Asus
+    price: '7688'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB70421874
+  name: Notebook Asus Tuf Gamer F16 Fx607vu Nvidia Rtx 4050 Intel Core 5 210h 16gb
+    Ram 512gb Ssd Linux 16  Lcd Led Fhd Nível Ips 144 Hz Rl385 Mecha Gray
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core 5 210H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Asus
+    price: '6834'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB59293588
+  name: Notebook Asus Vivobook S14 Ai Pc, Intel Core Ultra 5, 32gb Ram, 1tb Ssd, Windows
+    11 Home, Tela 14  Ips, Matte Gray - S3407ca-ly115w
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core Ultra 5
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 32
+    screen_in: 14.0
+  offers:
+  - store: Mercado Livre
+    price: '7054'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB68481578
+  name: Notebook Gamer Acer Predator Helios Neo 16 PHN16-72-75TX • Intel Core i7-14700HX
+    14ª Geração • 32GB RAM DDR5 • SSD 512GB • RTX 4070 8GB • Windows 11 Home • Tela
+    16” WQXGA 240Hz
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-14700HX
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 32
+    screen_in: 16.0
+  offers:
+  - store: Acer
+    price: '9499'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-predator-helios-neo-16-phn16-72-75tx-intel-core-i7-14700hx-14-geraco-32gb-ram-ddr5-ssd-512gb-rtx-4070-8gb-windows-11-home-tela-16-wqxga-240hz/p/MLB68481578
+- source: apify:mercadolivre
+  external_id: MLB51233306
+  name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i5-13420h 16gb 512gb Ssd
+    Windows 11 15.3 - 83ns0001br Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.3
+  offers:
+  - store: Lenovo
+    price: '4819'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-slim-3-15irh10-intel-core-i5-13420h-16gb-512gb-ssd-windows-11-153-83ns0001br-luna-grey/p/MLB51233306
+- source: apify:mercadolivre
+  external_id: MLB43497024
+  name: Notebook Gamer Predator Helios Neo / Phn16-72-74vx / Intel® Core I7-14700hx
+    De 14ªgeração / 16gb / 512ssd / Windows 11 Home / Nvidia Geforce Rtx 4070 Gddr6
+    / Tela 16
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-14700HX
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 16.0
+  offers:
+  - store: Vikings
+    price: '9214'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-predator-helios-neo-phn16-72-74vx-intel-core-i7-14700hx-de-14geraco-16gb-512ssd-windows-11-home-nvidia-geforce-rtx-4070-gddr6-tela-16/p/MLB43497024
+- source: apify:mercadolivre
+  external_id: MLB51332653
+  name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i7-13620h 16gb 512gb Ssd
+    Linux 15.3 - 83nss00100 Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-13620H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.3
+  offers:
+  - store: Mercado Livre
+    price: '4899'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-slim-3-15irh10-intel-core-i7-13620h-16gb-512gb-ssd-linux-153-83nss00100-luna-grey/p/MLB51332653
+- source: apify:mercadolivre
+  external_id: MLB73480193
+  name: Notebook ASUS TUF Gamer A16 FA607NUQ NVIDIA RTX 4050 AMD Ryzen 7 8GB RAM 512GB
+    SSD Linux 16" LCD LED IPS FHD 144Hz RL035
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 16.0
+  offers:
+  - store: Asus
+    price: '5979'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-asus-tuf-gamer-a16-fa607nuq-nvidia-rtx-4050-amd-ryzen-7-8gb-ram-512gb-ssd-linux-16-lcd-led-ips-fhd-144hz-rl035/p/MLB73480193
+- source: apify:mercadolivre
+  external_id: MLB70538747
+  name: Notebook Gamer Acer Nitro V15 ANV15-41-R6J0 AMD Ryzen 7 7735HS 8GB RAM 512GB
+    SSD RTX 4050 Linux 15.6”
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7 7735HS
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Acer
+    price: '5414'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-nitro-v15-anv15-41-r6j0-amd-ryzen-7-7735hs-8gb-ram-512gb-ssd-rtx-4050-linux-156/p/MLB70538747
+- source: apify:mercadolivre
+  external_id: MLB42265058
+  name: Notebook Lenovo Yoga Slim 7i Intel Core Ultra 5 125H 16gb RAM 512gb SSD Windows
+    11 Home Tela 14" 83GM0003BR
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core Ultra 5 125H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 14.0
+  offers:
+  - store: 2Eletro
+    price: '6525'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-yoga-slim-7i-intel-core-ultra-5-125h-16gb-ram-512gb-ssd-windows-11-home-tela-14-83gm0003br/p/MLB42265058
+- source: apify:mercadolivre
+  external_id: MLB46180713
+  name: Notebook Gamer Predator Helios Neo 16 PHN16-73-96SW Com IA Intel® Core™ Ultra
+    9 275HX 32GB 1TB SSD Nvidia RTX5070 GDDR7 WQXGA 16 Windows 11 Home
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core Ultra 9 275HX
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 32
+  offers:
+  - store: Acer
+    price: '13999'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-predator-helios-neo-16-phn16-73-96sw-com-ia-intel-core-ultra-9-275hx-32gb-1tb-ssd-nvidia-rtx5070-gddr7-wqxga-16-windows-11-home/p/MLB46180713
+- source: apify:mercadolivre
+  external_id: MLB52934844
+  name: Notebook Acer Aspire Go 15 AG15-71PT-58SX | Intel Core i5-13420H 13ª Geração
+    | 8GB DDR5 | 512GB SSD | Tela Touch 15,6" FHD IPS | Windows 11 Home | Wi-Fi 6
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '4199'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-aspire-go-15-ag15-71pt-58sx-intel-core-i5-13420h-13-geraco-8gb-ddr5-512gb-ssd-tela-touch-156-fhd-ips-windows-11-home-wi-fi-6/p/MLB52934844
+- source: apify:mercadolivre
+  external_id: MLB44296157
+  name: Acer Predator Helios Neo PHN16-72-99MY Intel Ci9 14ªGeração 32GB 1TB SSD RTX4070
+    Windows11 Cor Preto
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i9
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 32
+  offers:
+  - store: Acer
+    price: '10999'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/acer-predator-helios-neo-phn16-72-99my-intel-ci9-14geraco-32gb-1tb-ssd-rtx4070-windows11-cor-preto/p/MLB44296157
+- source: apify:mercadolivre
+  external_id: MLB55558763
+  name: Notebook Acer Gamer Nitro V15 Core I7 13ª Ger. 32gb 512ssd Rtx4050 6gb Nvidia
+    Geforce Tela 15.6 165hz Full Hd Linux Anv15-52-7127
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i7
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 32
+    screen_in: 15.6
+  offers:
+  - store: Vikings
+    price: '7759'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-gamer-nitro-v15-core-i7-13-ger-32gb-512ssd-rtx4050-6gb-nvidia-geforce-tela-156-165hz-full-hd-linux-anv15-52-7127/p/MLB55558763
+- source: apify:mercadolivre
+  external_id: MLB72018722
+  name: Notebook Gamer Acer Nitro V15 Anv15-52-778t Intel Core I7-13620h De 13ªg 8gb
+    Ram 512gb Ssd Rtx4050 15.6 Linux
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-13620H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Acer
+    price: '6999'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-nitro-v15-anv15-52-778t-intel-core-i7-13620h-de-13g-8gb-ram-512gb-ssd-rtx4050-156-linux/p/MLB72018722
+- source: apify:mercadolivre
+  external_id: MLB63144634
+  name: Notebook ASUS Vivobook IA PC S14 S3407CA Intel Core Ultra 5 225H 16GB Ram
+    1TB SSD Windows 11 Tela 14" LED FHD Gray - LY114W
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core Ultra 5 225H
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 14.0
+  offers:
+  - store: Asus
+    price: '5730'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-asus-vivobook-ia-pc-s14-s3407ca-intel-core-ultra-5-225h-16gb-ram-1tb-ssd-windows-11-tela-14-led-fhd-gray-ly114w/p/MLB63144634
+- source: apify:mercadolivre
+  external_id: MLB37396835
+  name: Notebook Gamer Acer Nitro V ANV15-51-57WS Intel® Core™ i5-13420H 13ªGeração
+    512SSD 8GB Nvidia® GeForce® RTX 3050 GDDR6 Linux Gutta 15,6'
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: 2Eletro
+    price: '5605'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-nitro-v-anv15-51-57ws-intel-core-i5-13420h-13geraco-512ssd-8gb-nvidia-geforce-rtx-3050-gddr6-linux-gutta-156/p/MLB37396835
+- source: apify:mercadolivre
+  external_id: MLB51233295
+  name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i7-13620h 8gb 512gb Ssd
+    Windows 11 15.3 - 83ns0004br Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-13620H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.3
+  offers:
+  - store: Mercado Livre
+    price: '4370'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-slim-3-15irh10-intel-core-i7-13620h-8gb-512gb-ssd-windows-11-153-83ns0004br-luna-grey/p/MLB51233295
+- source: apify:mercadolivre
+  external_id: MLB52907398
+  name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i5-13420h 8gb 512gb Ssd
+    Linux 15.3 - 83nss00000 Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.3
+  offers:
+  - store: Lenovo
+    price: '3999'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-slim-3-15irh10-intel-core-i5-13420h-8gb-512gb-ssd-linux-153-83nss00000-luna-grey/p/MLB52907398
+- source: apify:mercadolivre
+  external_id: MLB17828535
+  name: Apple Macbook Pro (16 polegadas, Intel Core i7, 512 GB de SSD) - Cinza-espacial
+  brand: Apple
+  category: notebooks
+  specs:
+    cpu: Intel Core i7
+    storage_gb: 512
+    storage_type: SSD
+    screen_in: 16.0
+  offers:
+  - store: Mercado Livre
+    price: '7129'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/apple-macbook-pro-16-polegadas-intel-core-i7-512-gb-de-ssd-cinza-espacial/p/MLB17828535
+- source: apify:mercadolivre
+  external_id: MLB46010329
+  name: Notebook Gamer Lenovo LOQ 15irx9 Intel Core i5-13450HX 16gb 512gb SSD RTX
+    3050 Windows 11 - 83kh0006br Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13450HX
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Mobcom
+    price: '5600'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-lenovo-loq-15irx9-intel-core-i5-13450hx-16gb-512gb-ssd-rtx-3050-windows-11-83kh0006br-luna-grey/p/MLB46010329
+- source: apify:mercadolivre
+  external_id: MLB66416759
+  name: Notebook Lenovo Ideapad Slim 3 15arp10 Amd Ryzen 7 7735hs 24gb 512gb Ssd Windows
+    11 15.3 - 83mm0003bo Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7 7735HS
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 24
+    screen_in: 15.3
+  offers:
+  - store: Lenovo
+    price: '5299'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-slim-3-15arp10-amd-ryzen-7-7735hs-24gb-512gb-ssd-windows-11-153-83mm0003bo-luna-grey/p/MLB66416759
+- source: apify:mercadolivre
+  external_id: MLB62320878
+  name: Notebook Lenovo Slim3 R7 8gb 256GB Ssd 15.3 Fhd Linux
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.3
+  offers:
+  - store: Mercado Livre
+    price: '3519'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-slim3-r7-8gb-256gb-ssd-153-fhd-linux/p/MLB62320878
+- source: apify:mercadolivre
+  external_id: MLB52935778
+  name: Notebook Acer Aspire Go 15 AG15-71P-5405 – Intel Core i5-13420H 13ª Geração
+    • 16GB DDR5 • 512GB SSD • Tela 15,6" Full HD • Linux • Wi-Fi 6
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '4941'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-aspire-go-15-ag15-71p-5405-intel-core-i5-13420h-13-geraco-16gb-ddr5-512gb-ssd-tela-156-full-hd-linux-wi-fi-6/p/MLB52935778
+- source: apify:mercadolivre
+  external_id: MLB62305743
+  name: Notebook Ideapad Slim 3 Ryzen 7 7735hs 8gb 512gb Ssd Amd Radeon Graphics 15.3
+    (1920x1200) Linux 83mms00100
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7 7735HS
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.3
+  offers:
+  - store: Mobcom
+    price: '3939'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-ideapad-slim-3-ryzen-7-7735hs-8gb-512gb-ssd-amd-radeon-graphics-153-1920x1200-linux-83mms00100/p/MLB62305743
+- source: apify:mercadolivre
+  external_id: MLB46018205
+  name: Notebook Gamer Lenovo LOQ-e 15iax9e Intel Core i5-12450hx 16gb 512gb Ssd Rtx
+    3050 Windows 11 15.6 - 83me0007br Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-12450HX
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.6
+  offers:
+  - store: 2Eletro
+    price: '6322'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-lenovo-loq-e-15iax9e-intel-core-i5-12450hx-16gb-512gb-ssd-rtx-3050-windows-11-156-83me0007br-luna-grey/p/MLB46018205
+- source: apify:mercadolivre
+  external_id: MLB54279932
+  name: Notebook Gamer Acer Nitro V15 ANV15-52-790M Intel® Core™ i7-13620H 13ªG 16GB
+    RAM 512GB SSD RTX4060 15.6”
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-13620H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.6
+  offers:
+  - store: Acer
+    price: '7899'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-nitro-v15-anv15-52-790m-intel-core-i7-13620h-13g-16gb-ram-512gb-ssd-rtx4060-156/p/MLB54279932
+- source: apify:mercadolivre
+  external_id: MLB54468742
+  name: Notebook Acer Aspire Go 15 AG15-71P-53D9 Intel® Core I5-13420h 13ªg 16GB Ram
+    512SSD Linux 15.6 Full HD (1920 x 1080)
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.6
+  offers:
+  - store: Acer
+    price: '4499'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-aspire-go-15-ag15-71p-53d9-intel-core-i5-13420h-13g-16gb-ram-512ssd-linux-156-full-hd-1920-x-1080/p/MLB54468742
+- source: apify:mercadolivre
+  external_id: MLB73480457
+  name: Notebook ASUS TUF Gamer A16 FA607NUQ NVIDIA RTX 4050 AMD Ryzen 7 16GB RAM
+    512GB SSD Windows 11 Home 16" LCD LED 144Hz IPS RL019W
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 16.0
+  offers:
+  - store: Asus
+    price: '7261'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-asus-tuf-gamer-a16-fa607nuq-nvidia-rtx-4050-amd-ryzen-7-16gb-ram-512gb-ssd-windows-11-home-16-lcd-led-144hz-ips-rl019w/p/MLB73480457
+- source: apify:mercadolivre
+  external_id: MLB51764304
+  name: Notebook Gamer Rog Strix G16 G615jpr Nvidia Rtx 5070 Intel Core I9 14900hx
+    32gb Ram 1tb Ssd Windows 11 Home Tela 16 240hz Led Cinza - S5001w
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core i9-14900HX
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 32
+    screen_in: 16.0
+  offers:
+  - store: Asus
+    price: '14523'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-rog-strix-g16-g615jpr-nvidia-rtx-5070-intel-core-i9-14900hx-32gb-ram-1tb-ssd-windows-11-home-tela-16-240hz-led-cinza-s5001w/p/MLB51764304
+- source: apify:mercadolivre
+  external_id: MLB51232872
+  name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i7-13620h 24gb 512gb Ssd
+    Windows 11 15.3 - 83ns0008br Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-13620H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 24
+    screen_in: 15.3
+  offers:
+  - store: 2Eletro
+    price: '6399'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-slim-3-15irh10-intel-core-i7-13620h-24gb-512gb-ssd-windows-11-153-83ns0008br-luna-grey/p/MLB51232872
+- source: apify:mercadolivre
+  external_id: MLB60328685
+  name: Notebook Acer Aspire Go 15 AG15-71P-76Z8 | Intel Core i7-13620H 13ª Geração
+    • 16GB RAM DDR5 • 512GB SSD NVMe • Tela 15,6″ Full HD • Intel UHD Graphics • Linux
+    • Wi-Fi 6
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-13620H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '5099'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-aspire-go-15-ag15-71p-76z8-intel-core-i7-13620h-13-geraco-16gb-ram-ddr5-512gb-ssd-nvme-tela-156-full-hd-intel-uhd-graphics-linux-wi-fi-6/p/MLB60328685
+- source: apify:mercadolivre
+  external_id: MLB67323478
+  name: Notebook Gamer Acer Nitro V15 com Intel Core i5-13420H, 8GB RAM e RTX 4050
+    de 6GB, SSD 512GB e Tela de 15.6" Full HD 165Hz
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Mobcom
+    price: '5599'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-nitro-v15-com-intel-core-i5-13420h-8gb-ram-e-rtx-4050-de-6gb-ssd-512gb-e-tela-de-156-full-hd-165hz/p/MLB67323478
+- source: apify:mercadolivre
+  external_id: MLB52361455
+  name: Notebook Acer Nitro V15 Anv15-52-96aq Intel® Core I9-13900h De 13° G 16gb
+    512gb Ssd Rtx4060 Windows 11 Home 15.6
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i9-13900H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.6
+  offers:
+  - store: Acer
+    price: '8999'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-nitro-v15-anv15-52-96aq-intel-core-i9-13900h-de-13-g-16gb-512gb-ssd-rtx4060-windows-11-home-156/p/MLB52361455
+- source: apify:mercadolivre
+  external_id: MLB62785722
+  name: Notebook VAIO FH15 Intel Core i7 - 13ª Gen RTX 4050 Linux - 32GB RAM DDR5
+    1TB SSD Wi-Fi 6 Tela 15,6 Full HD WVA 144Hz - 200 Nits - Antirreflexo - Permite
+    Upgrade De RAM E SSD - VJFH52F11X-B2821H Cinza
+  brand: Vaio
+  category: notebooks
+  specs:
+    cpu: Intel Core i7
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 32
+    screen_in: 15.6
+  offers:
+  - store: Vaio
+    price: '8599'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-vaio-fh15-intel-core-i7-13-gen-rtx-4050-linux-32gb-ram-ddr5-1tb-ssd-wi-fi-6-tela-156-full-hd-wva-144hz-200-nits-antirreflexo-permite-upgrade-de-ram-e-ssd-vjfh52f11x-b2821h-cinza/p/MLB62785722
+- source: apify:mercadolivre
+  external_id: MLB67258163
+  name: Notebook Lenovo V14 G5 Irl Intel Core i5-13420h 8gb 256gb SSD Windows 11 14
+    - 83uv000fbo Preto
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 8
+  offers:
+  - store: Lenovo
+    price: '4589'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-v14-g5-irl-intel-core-i5-13420h-8gb-256gb-ssd-windows-11-14-83uv000fbo-preto/p/MLB67258163
+- source: apify:mercadolivre
+  external_id: MLB67142027
+  name: Notebook Lenovo V14 G5 Irl Intel Core I5-13420h 16gb 512gb Ssd Windows 11
+    14 - 83uv000pbo Preto
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Lenovo
+    price: '5679'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-v14-g5-irl-intel-core-i5-13420h-16gb-512gb-ssd-windows-11-14-83uv000pbo-preto/p/MLB67142027
+- source: apify:mercadolivre
+  external_id: MLB54358498
+  name: Notebook Gamer Acer Nitro V15 ANV15-52-52VN Intel® Core™ i5-13420H 13ªG 512
+    GB SSD 16 GB RAM RTX 4060 15.6”
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.6
+  offers:
+  - store: Acer
+    price: '7999'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-nitro-v15-anv15-52-52vn-intel-core-i5-13420h-13g-512-gb-ssd-16-gb-ram-rtx-4060-156/p/MLB54358498
+- source: apify:mercadolivre
+  external_id: MLB67084809
+  name: NOTEBOOK ACER ASPIRE GO 15 I5-13420H, RAM 8GB, SSD 256GB, 15,6" FULL HD, LINUX
+    – AG15-71P-54J6
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: 2Eletro
+    price: '3873'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-aspire-go-15-i5-13420h-ram-8gb-ssd-256gb-156-full-hd-linux-ag15-71p-54j6/p/MLB67084809
+- source: apify:mercadolivre
+  external_id: MLB52134575
+  name: Notebook Asus Tuf Gaming F16 Fx607vu Rtx4050 Intel Core 5 210h 8gb Ram 512gb
+    Ssd Linux Keepos Tela Nível Ips 16 Led 144hz Gray - Rl054
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core 5 210H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+  offers:
+  - store: Nvidia
+    price: '6407'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-asus-tuf-gaming-f16-fx607vu-rtx4050-intel-core-5-210h-8gb-ram-512gb-ssd-linux-keepos-tela-nivel-ips-16-led-144hz-gray-rl054/p/MLB52134575
+- source: apify:mercadolivre
+  external_id: MLB52690298
+  name: Notebook Asus V16 V3607vu Nvidia Rtx 4050 Intel Core 5 210h 16gb Ram 512gb
+    Ssd Windows 11 Home Tela 16 Led Fhd 144hz Nível Ips Black - Rp306w
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core 5 210H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 16.0
+  offers:
+  - store: Mercado Livre
+    price: '6799'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-asus-v16-v3607vu-nvidia-rtx-4050-intel-core-5-210h-16gb-ram-512gb-ssd-windows-11-home-tela-16-led-fhd-144hz-nivel-ips-black-rp306w/p/MLB52690298
+- source: apify:mercadolivre
+  external_id: MLB5772091782
+  name: Notebook Lenovo Intel I5 Ideapad Slim 3 Tela 15.3 83ns0002br
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5
+    screen_in: 15.3
+  offers:
+  - store: 2Eletro
+    price: '4384'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-intel-i5-ideapad-slim-3-tela-153-83ns0002br/up/MLBU3475193768
+- source: apify:mercadolivre
+  external_id: MLB6254159734
+  name: Notebook Asus Tuf Gaming A15 3050 Ryzen 7 16gb 512gb Linux
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Asus
+    price: '5214'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-asus-tuf-gaming-a15-3050-ryzen-7-16gb-512gb-linux/up/MLBU3787624031
+- source: apify:mercadolivre
+  external_id: MLB51341327
+  name: Notebook Lenovo Yoga Slim 7 14imh9 14 Intel Core Ultra 7 155h 16gb 512gb Ssd
+    Windows 11 - 83gm0005br Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core Ultra 7 155H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Lenovo
+    price: '7449'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-yoga-slim-7-14imh9-14-intel-core-ultra-7-155h-16gb-512gb-ssd-windows-11-83gm0005br-luna-grey/p/MLB51341327
+- source: apify:mercadolivre
+  external_id: MLB6550556370
+  name: Notebook Gamer Lenovo  Loq Ci5 Rtx3050 512gb 16gb W11 +ubook
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Mobcom
+    price: '5518'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-lenovo--loq-ci5-rtx3050-512gb-16gb-w11-ubook/up/MLBU3882664762
+- source: apify:mercadolivre
+  external_id: MLB61937659
+  name: Notebook Gamer Acer Nitro V15 ANV15-41-R2GT AMD Ryzen™ 7 7735HS RTX 4050 16
+    GB RAM 512 GB SSD Full HD 15.6”
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7 7735HS
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '9889'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-nitro-v15-anv15-41-r2gt-amd-ryzen-7-7735hs-rtx-4050-16-gb-ram-512-gb-ssd-full-hd-156/p/MLB61937659
+- source: apify:mercadolivre
+  external_id: MLB67147530
+  name: Notebook Lenovo V15 G5 Irl Intel Core I5-13420h 8gb 256gb Ssd Windows 11 Pro
+    15.6 - 83uw0001bo Preto
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '5699'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-v15-g5-irl-intel-core-i5-13420h-8gb-256gb-ssd-windows-11-pro-156-83uw0001bo-preto/p/MLB67147530
+- source: apify:mercadolivre
+  external_id: MLB54140205
+  name: Notebook Asus Vivobook S14 S3407va Intel Core I7 13620h 8gb Ram 512gb Ssd
+    Linux Keepos Tela 14 Vips Fhd 60hz Cool Silver - Ly055
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-13620H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 14.0
+  offers:
+  - store: Asus
+    price: '4271'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-asus-vivobook-s14-s3407va-intel-core-i7-13620h-8gb-ram-512gb-ssd-linux-keepos-tela-14-vips-fhd-60hz-cool-silver-ly055/p/MLB54140205
+- source: apify:mercadolivre
+  external_id: MLB66848323
+  name: Notebook Gamer Acer Predator Helios Neo PHN16-73-76H8 | Intel Core Ultra 7
+    255HX • 32GB DDR5 • 512GB SSD • NVIDIA RTX 5070 8GB • Tela 16” WQXGA 240Hz • Windows
+    11
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core Ultra 7 255HX
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 32
+    screen_in: 16.0
+  offers:
+  - store: Acer
+    price: '11699'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-predator-helios-neo-phn16-73-76h8-intel-core-ultra-7-255hx-32gb-ddr5-512gb-ssd-nvidia-rtx-5070-8gb-tela-16-wqxga-240hz-windows-11/p/MLB66848323
+- source: apify:mercadolivre
+  external_id: MLB2044750881
+  name: Notebook Gamer Acer Nitro V15 ANV15-41-R8ZP | Ryzen 7 7735HS • RTX 4050 6GB
+    • 16GB RAM • SSD 1TB • Tela 15,6” 144Hz • Windows 11 (Novo com caixa aberta)
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7 7735HS
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.6
+  offers:
+  - store: Vikings
+    price: '7199'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-acer-nitro-v15-anv15-41-r8zp-ryzen-7-7735hs-rtx-4050-6gb-16gb-ram-ssd-1tb-tela-156-144hz-windows-11-novo-com-caixa-aberta/p/MLB2044750881
+- source: apify:mercadolivre
+  external_id: MLB4465709369
+  name: Notebook Acer Gadget E10 Intel I5-12450h 16gb 512gb 2k Win11
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-12450H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Chuwi
+    price: '2833'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-4465709369-notebook-acer-gadget-e10-intel-i5-12450h-16gb-512gb-2k-win11-_JM
+- source: apify:mercadolivre
+  external_id: MLB68405958
+  name: Notebook ASUS ExpertBook B1, Intel Core i7 13620H 2,4 GHz, 8GB RAM, 512GB
+    SSD, Tela 15.6" FHD, Windows 11 Pro, Gentle Grey - B1503CVA_BR-S70007X
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-13620H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Asus
+    price: '5729'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-asus-expertbook-b1-intel-core-i7-13620h-24-ghz-8gb-ram-512gb-ssd-tela-156-fhd-windows-11-pro-gentle-grey-b1503cvabr-s70007x/p/MLB68405958
+- source: apify:mercadolivre
+  external_id: MLB4690311585
+  name: Notebook Lenovo V15 G5 I5-13420h 16gb 512gb Ssd W11 Pro
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-13420H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Mercado Livre
+    price: '6499'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-v15-g5-i513420h-16gb-512gb-ssd-w11-pro/up/MLBU3971068905
+- source: apify:mercadolivre
+  external_id: MLB51868622
+  name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i7-13620h 16gb 512gb Ssd
+    Windows 11 15.3 - 83ns0000br Luna Grey
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-13620H
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 15.3
+  offers:
+  - store: Lenovo
+    price: '5589'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-slim-3-15irh10-intel-core-i7-13620h-16gb-512gb-ssd-windows-11-153-83ns0000br-luna-grey/p/MLB51868622
+- source: apify:mercadolivre
+  external_id: MLB70420780
+  name: Notebook ASUS V16 Gamer V3607VM NVIDIA RTX 5060 Intel Core 5 16GB RAM 512GB
+    SSD Windows 11 Home 16" LCD LED FHD nível IPS 144Hz RP138W
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core 5 16GB
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+    screen_in: 16.0
+  offers:
+  - store: Asus
+    price: '8543'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-asus-v16-gamer-v3607vm-nvidia-rtx-5060-intel-core-5-16gb-ram-512gb-ssd-windows-11-home-16-lcd-led-fhd-nivel-ips-144hz-rp138w/p/MLB70420780
+- source: apify:mercadolivre
+  external_id: MLB46213020
+  name: Notebook Gamer Lenovo Legion Go S Branco, Ryzen 7, 32GB RAM, SSD 1TB, Tela
+    Touch 8" WUXGA 120Hz
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: AMD Ryzen 7
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 32
+  offers:
+  - store: Mercado Livre
+    price: '3850'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-gamer-lenovo-legion-go-s-branco-ryzen-7-32gb-ram-ssd-1tb-tela-touch-8-wuxga-120hz/p/MLB46213020
+- source: apify:mercadolivre
+  external_id: MLB4655192689
+  name: Dell Latitude 5531, I7, 16gb Ram, 1tb Ssd, Nvidia Mx550
+  brand: Dell
+  category: notebooks
+  specs:
+    cpu: Intel Core i7
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Mercado Livre
+    price: '3494'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-4655192689-dell-latitude-5531-i7-16gb-ram-1tb-ssd-nvidia-mx550-_JM
+- source: apify:mercadolivre
+  external_id: MLB66470408
+  name: Notebook Lenovo Yoga Book 9 14iah10 Intel Core Ultra 9 285h 32gb 1tb Ssd Windows
+    11 14 Touch Screen - 83kj001vbr Tidal Teal
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core Ultra 9 285H
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 32
+  offers:
+  - store: Lenovo
+    price: '21639'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-yoga-book-9-14iah10-intel-core-ultra-9-285h-32gb-1tb-ssd-windows-11-14-touch-screen-83kj001vbr-tidal-teal/p/MLB66470408
+- source: apify:mercadolivre
+  external_id: MLB4856838319
+  name: Notebook Vaio Fe16 Core I5 Linux 16gb 512gb Ssd 16  Wuxga
+  brand: Vaio
+  category: notebooks
+  specs:
+    cpu: Intel Core i5
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Vaio
+    price: '6899'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-vaio-fe16-core-i5-linux-16gb-512gb-ssd-16--wuxga/up/MLBU4246658006
+- source: apify:mercadolivre
+  external_id: MLB5719114500
+  name: Notebook Positivo Vision C14 8gb 128gb 14 Hd Windows 11
+  brand: Positivo
+  category: notebooks
+  specs:
+    storage_gb: 128
+    storage_type: SSD
+    ram_gb: 8
+  offers:
+  - store: Positivo
+    price: '2099'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-positivo-vision-c14-8gb-128gb-14-hd-windows-11/up/MLBU3431557068
+- source: apify:mercadolivre
+  external_id: MLB4519808536
+  name: Notebook Samsung Galaxy Book Go + Pacote Office Personal 365
+  brand: Samsung
+  category: notebooks
+  specs: {}
+  offers:
+  - store: Mercado Livre
+    price: '4999'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-samsung-galaxy-book-go--pacote-office-personal-365/up/MLBU1747038123
+- source: apify:mercadolivre
+  external_id: MLB4220540073
+  name: Notebook Dell Precision 14 5480 I7-13700h 16gb Ram 256gbssd (Novo com caixa
+    aberta)
+  brand: Dell
+  category: notebooks
+  specs:
+    cpu: Intel Core i7-13700H
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Mercado Livre
+    price: '19579'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-dell-precision-14-5480-i713700h-16gb-ram-256gbssd/up/MLBU3438665513
+- source: apify:mercadolivre
+  external_id: MLB70040558
+  name: Notebook Dell Dc15-c3100-a20 15.6 Fhd Core3 8gb 512gb W11 Preto
+  brand: Dell
+  category: notebooks
+  specs:
+    cpu: Intel Core 3
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Dell
+    price: '4212'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB70040749
+  name: Notebook Dell Dc15-i51334u-a50 15.6 Fhd I5 8gb 512gb Win 11 Preto
+  brand: Dell
+  category: notebooks
+  specs:
+    cpu: Intel Core i5-1334U
+    storage_gb: 512
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Dell
+    price: '4816'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB54103769
+  name: Notebook Positivo Vision C15m Intel Celeron N4500 Windows 11 Home 4gb Ram
+    128gb Emmc Tela 15  Full Hd Ips Antirreflexo - Minitela E Tecla Copilot - Cinza
+  brand: Positivo
+  category: notebooks
+  specs:
+    cpu: Intel Celeron N4500
+    storage_gb: 128
+    storage_type: eMMC
+    ram_gb: 4
+    screen_in: 15.0
+  offers:
+  - store: Positivo
+    price: '1804'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB54096680
+  name: Notebook Positivo Vision C15m Para Produtividade Com Intel Celeron, 8gb Ram
+    E Ssd De 128gb Cinza
+  brand: Positivo
+  category: notebooks
+  specs:
+    cpu: Intel Celeron
+    storage_gb: 128
+    storage_type: SSD
+    ram_gb: 8
+  offers:
+  - store: Positivo
+    price: '2059'
+    currency: BRL
+    url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+- source: apify:mercadolivre
+  external_id: MLB4220839621
+  name: Notebook Dell Precision 15 3571 I7-12th 16gb Ram 256gb Ssd (Novo com caixa
+    aberta)
+  brand: Dell
+  category: notebooks
+  specs:
+    cpu: Intel Core i7
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 16
+  offers:
+  - store: Mercado Livre
+    price: '14328'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-dell-precision-15-3571-i712th-16gb-ram-256gb-ssd/up/MLBU3446049702
+- source: apify:mercadolivre
+  external_id: MLB4794366345
+  name: Lenovo Laptop Computer For Home And Office With
+  brand: Lenovo
+  category: notebooks
+  specs: {}
+  offers:
+  - store: Mercado Livre
+    price: '7252'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/lenovo-laptop-computer-for-home-and-office-with/up/MLBU4132628912
+- source: apify:mercadolivre
+  external_id: MLB2080425737
+  name: Computador Portátil Lenovo Ideapad 1i 14 Home Office 8 Gb Ra
+  brand: Lenovo
+  category: notebooks
+  specs:
+    ram_gb: 8
+  offers:
+  - store: nocnoc USA
+    price: '4517'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/laptop-lenovo-ideapad-1i-14-home-office-8gb-ram-128gb-ssd/p/MLB2080425737
+- source: apify:mercadolivre
+  external_id: MLB4087972789
+  name: Notebook Lenovo Thinkpad | Core I5 | 8gb Ram | Ssd 120gb (Recondicionado)
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5
+    ram_gb: 8
+  offers:
+  - store: Mercado Livre
+    price: '1784'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-thinkpad--core-i5--8gb-ram--ssd-120gb/up/MLBU3221173563
+- source: apify:mercadolivre
+  external_id: MLB7036072954
+  name: Notebook Windows 11 Pro 14 Polegadas Celeron N4500 8gb Ssd
+  brand: null
+  category: notebooks
+  specs:
+    cpu: Intel Celeron N4500
+    storage_gb: 8
+    storage_type: SSD
+    screen_in: 14.0
+  offers:
+  - store: Mercado Livre
+    price: '4299'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-windows-11-pro-14-polegadas-celeron-n4500-8gb-ssd/up/MLBU4147695863
+- source: apify:mercadolivre
+  external_id: MLB4439269709
+  name: Notebook Dell 15,6 | Core I5 10a Ger | Ssd 256 Gb | Ram 8 Gb (Recondicionado)
+  brand: Dell
+  category: notebooks
+  specs:
+    cpu: Intel Core i5
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 8
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '2898'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-dell-156--core-i5-10a-ger--ssd-256-gb--ram-8-gb/up/MLBU3755365572
+- source: apify:mercadolivre
+  external_id: MLB7036071432
+  name: Notebook Windows 11 Pro 14 Polegadas 8gb Ssd Celeron N4500
+  brand: null
+  category: notebooks
+  specs:
+    cpu: Intel Celeron N4500
+    storage_gb: 8
+    storage_type: SSD
+    screen_in: 14.0
+  offers:
+  - store: Mercado Livre
+    price: '4299'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-windows-11-pro-14-polegadas-8gb-ssd-celeron-n4500/up/MLBU4164745808
+- source: apify:mercadolivre
+  external_id: MLB4796851735
+  name: Lenovo Laptop Computer For Home Office &
+  brand: Lenovo
+  category: notebooks
+  specs: {}
+  offers:
+  - store: Mercado Livre
+    price: '10789'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/lenovo-laptop-computer-for-home-office-/up/MLBU4136654034
+- source: apify:mercadolivre
+  external_id: MLB2041055877
+  name: Notebook Hp 17, Tela Hd+ De 43,9 Cm, Intel Core 8 Silver.
+  brand: HP
+  category: notebooks
+  specs:
+    cpu: Intel Core 8
+  offers:
+  - store: Mercado Livre
+    price: '3877'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/hp-173-i3-8gb-256gb-ssd/p/MLB2041055877
+- source: apify:mercadolivre
+  external_id: MLB2080169965
+  name: Laptop Hp Pavilion 17  Tela De 17,3''  Intel Core I3 N305
+  brand: HP
+  category: notebooks
+  specs:
+    cpu: Intel Core i3
+    screen_in: 17.3
+  offers:
+  - store: Mercado Livre
+    price: '4703'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/laptop-hp-pavilion-17-173-display-intel-core-i3-n305/p/MLB2080169965
+- source: apify:mercadolivre
+  external_id: MLB5785005390
+  name: Notebook Lenovo Ideapad Intel Celeron 82vx0001br
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Celeron
+  offers:
+  - store: Mercado Livre
+    price: '1300'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-5785005390-notebook-lenovo-ideapad-intel-celeron-82vx0001br-_JM
+- source: apify:mercadolivre
+  external_id: MLB4467458143
+  name: Notebook Hp Probook 4430s Core I5 4gb 120gb Ssd /sem Bateria
+  brand: HP
+  category: notebooks
+  specs:
+    cpu: Intel Core i5
+    storage_gb: 120
+    storage_type: SSD
+    ram_gb: 4
+  offers:
+  - store: Mercado Livre
+    price: '980'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-hp-probook-4430s-core-i5-4gb-120gb-ssd-sem-bateria/up/MLBU3786540854
+- source: apify:mercadolivre
+  external_id: MLB6310766442
+  name: Notebook Samsung Rv415 Core I5 4gb 500gb 2°ger /sem Bateria
+  brand: Samsung
+  category: notebooks
+  specs:
+    cpu: Intel Core i5
+    storage_gb: 500
+    storage_type: SSD
+    ram_gb: 4
+  offers:
+  - store: Mercado Livre
+    price: '820'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-samsung-rv415-core-i5-4gb-500gb-2ger-sem-bateria/up/MLBU3810283795
+- source: apify:mercadolivre
+  external_id: MLB4511352221
+  name: Notebook Hp 15 Ba009ax Amd A6-7310 4gb 500gb Hd /sem Bateria
+  brand: HP
+  category: notebooks
+  specs:
+    storage_gb: 500
+    storage_type: HDD
+    ram_gb: 4
+  offers:
+  - store: Mercado Livre
+    price: '500'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-hp-15-ba009ax-amd-a67310-4gb-500gb-hd-sem-bateria/up/MLBU3834542648
+- source: apify:mercadolivre
+  external_id: MLB4667619493
+  name: Notebook Acer Es1-572 Core I3 4gb 1tb 6°ger /sem Bateria
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i3
+    storage_gb: 1024
+    storage_type: SSD
+    ram_gb: 4
+  offers:
+  - store: Mercado Livre
+    price: '1150'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-es1572-core-i3-4gb-1tb-6ger-sem-bateria/up/MLBU3961597842
+- source: apify:mercadolivre
+  external_id: MLB4582556921
+  name: Notebook Acer E1-531 Dual Core 4gb 500gb 3°ger 15pol
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core 4
+    storage_gb: 500
+    storage_type: SSD
+    ram_gb: 4
+    screen_in: 15.0
+  offers:
+  - store: Mercado Livre
+    price: '1000'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-e1531-dual-core-4gb-500gb-3ger-15pol/up/MLBU3886300618
+- source: apify:mercadolivre
+  external_id: MLB6235560140
+  name: Notebook Acer Gateway E1-571 I7 8gb 120gb Ssd /sem Bateria
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i7
+    storage_gb: 120
+    storage_type: SSD
+    ram_gb: 8
+  offers:
+  - store: Mercado Livre
+    price: '1250'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-gateway-e1571-i7-8gb-120gb-ssd-sem-bateria/up/MLBU3785128438
+- source: apify:mercadolivre
+  external_id: MLB4455807375
+  name: Notebook Dell 3421 Core I3 4gb 500gb 14pol 3°th /sem Bateria
+  brand: Dell
+  category: notebooks
+  specs:
+    cpu: Intel Core i3
+    storage_gb: 500
+    storage_type: SSD
+    ram_gb: 4
+    screen_in: 14.0
+  offers:
+  - store: Mercado Livre
+    price: '950'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-dell-3421-core-i3-4gb-500gb-14pol-3th-sem-bateria/up/MLBU3762834485
+- source: apify:mercadolivre
+  external_id: MLB4568179641
+  name: Notebook Dell Inspiron 5423 Core I3 8gb 500gb Hd 3°ger 14pol
+  brand: Dell
+  category: notebooks
+  specs:
+    cpu: Intel Core i3
+    storage_gb: 500
+    storage_type: HDD
+    ram_gb: 8
+    screen_in: 14.0
+  offers:
+  - store: Mercado Livre
+    price: '1100'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-dell-inspiron-5423-core-i3-8gb-500gb-hd-3ger-14pol/up/MLBU3876209038
+- source: apify:mercadolivre
+  external_id: MLB4568298021
+  name: Notebook Dell 3421 Core I3 8gb 120gb Ssd /sem Bateria
+  brand: Dell
+  category: notebooks
+  specs:
+    cpu: Intel Core i3
+    storage_gb: 120
+    storage_type: SSD
+    ram_gb: 8
+  offers:
+  - store: Mercado Livre
+    price: '1100'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-dell-3421-core-i3-8gb-120gb-ssd-sem-bateria/up/MLBU3876265786
+- source: apify:mercadolivre
+  external_id: MLB4442933593
+  name: Notebook Lenovo G40-80 Core I5 4gb 500gb Tela Com Defeito
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Core i5
+    storage_gb: 500
+    storage_type: SSD
+    ram_gb: 4
+  offers:
+  - store: Mercado Livre
+    price: '780'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-g4080-core-i5-4gb-500gb-tela-com-defeito/up/MLBU3750126585
+- source: apify:mercadolivre
+  external_id: MLB4600573275
+  name: Notebook Asus K45a Core I5 6gb 500gb Hd 14pol 3°ger
+  brand: Asus
+  category: notebooks
+  specs:
+    cpu: Intel Core i5
+    storage_gb: 500
+    storage_type: HDD
+    ram_gb: 6
+    screen_in: 14.0
+  offers:
+  - store: Mercado Livre
+    price: '1180'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-asus-k45a-core-i5-6gb-500gb-hd-14pol-3ger/up/MLBU3890891487
+- source: apify:mercadolivre
+  external_id: MLB4426777317
+  name: Notebook Acer E1 572 Core I3 6gb 500gb 15pol Sem Bateria
+  brand: Acer
+  category: notebooks
+  specs:
+    cpu: Intel Core i3
+    storage_gb: 500
+    storage_type: SSD
+    ram_gb: 6
+    screen_in: 15.0
+  offers:
+  - store: Mercado Livre
+    price: '1030'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-acer-e1-572-core-i3-6gb-500gb-15pol-sem-bateria/up/MLBU3732602249
+- source: apify:mercadolivre
+  external_id: MLB4731907479
+  name: Notebook + Mochila + Suporte | Kit Home Office Lenovo Ssd
+  brand: Lenovo
+  category: notebooks
+  specs: {}
+  offers:
+  - store: Mercado Livre
+    price: '2699'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-4731907479-notebook-mochila-suporte-kit-home-office-lenovo-ssd-_JM
+- source: apify:mercadolivre
+  external_id: MLB6778450724
+  name: Notebook Lenovo Ideapad Intel Celeron
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Celeron
+  offers:
+  - store: Mercado Livre
+    price: '1300'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-6778450724-notebook-lenovo-ideapad-intel-celeron-_JM
+- source: apify:mercadolivre
+  external_id: MLB2010875212
+  name: Notebook Hp Elitebook 840 G3 I5 8gb 256 Ssd Home Office Color Plateado - Excelente
+    (Recondicionado)
+  brand: HP
+  category: notebooks
+  specs:
+    cpu: Intel Core i5
+    storage_gb: 256
+    storage_type: SSD
+    ram_gb: 8
+  offers:
+  - store: Mercado Livre
+    price: '1299'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-hp-elitebook-840-g3-i5-8gb-256-ssd-home-office-color-plateado-excelente-recondicionado/p/MLB2010875212
+- source: apify:mercadolivre
+  external_id: MLB2010866410
+  name: Notebook Lenovo Ideapad Intel Celeron - N4020, 4GB RAM, 128SSD, Windows 11
+    Home C/office, Tela Led 15,6", Cor Cinza - 82VX0001BR - Bom (Recondicionado)
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Celeron
+    storage_gb: 128
+    storage_type: SSD
+    ram_gb: 4
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '1400'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-intel-celeron-n4020-4gb-ram-128ssd-windows-11-home-coffice-tela-led-156-cor-cinza-82vx0001br-bom-recondicionado/p/MLB2010866410
+- source: apify:mercadolivre
+  external_id: MLB6858695202
+  name: Notebook Lenovo Ideapad Intel Celeron
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Celeron
+  offers:
+  - store: Mercado Livre
+    price: '1600'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-6858695202-notebook-lenovo-ideapad-intel-celeron-_JM
+- source: apify:mercadolivre
+  external_id: MLB5710604976
+  name: Notebook Lenovo Ideapad Intel Celeron - N4020, 4gb Ram
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Celeron
+    ram_gb: 4
+  offers:
+  - store: Mercado Livre
+    price: '2500'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-5710604976-notebook-lenovo-ideapad-intel-celeron-n4020-4gb-ram-_JM
+- source: apify:mercadolivre
+  external_id: MLB4800450963
+  name: Lenovo Ideapad 1 15igl7 Celeron 4gb Ssd 128gb
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Celeron
+    storage_gb: 4
+    storage_type: SSD
+  offers:
+  - store: Mercado Livre
+    price: '1500'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-4800450963-lenovo-ideapad-1-15igl7-celeron-4gb-ssd-128gb-_JM
+- source: apify:mercadolivre
+  external_id: MLB4816760799
+  name: Notebook Lenovo Intel  Excelente Estado
+  brand: Lenovo
+  category: notebooks
+  specs: {}
+  offers:
+  - store: Mercado Livre
+    price: '2000'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-4816760799-notebook-lenovo-intel-excelente-estado-_JM
+- source: apify:mercadolivre
+  external_id: MLB4752992149
+  name: Notebook Lenovo Ideapad Intel - N4020, 4gb Ram, 128ssd
+  brand: Lenovo
+  category: notebooks
+  specs:
+    storage_gb: 128
+    storage_type: SSD
+    ram_gb: 4
+  offers:
+  - store: Mercado Livre
+    price: '1800'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-4752992149-notebook-lenovo-ideapad-intel-n4020-4gb-ram-128ssd-_JM
+- source: apify:mercadolivre
+  external_id: MLB6845415852
+  name: Notebook Lenovo Ideapad Intel Celeron4gb Ram,128ssd
+  brand: Lenovo
+  category: notebooks
+  specs:
+    storage_gb: 128
+    storage_type: SSD
+    ram_gb: 4
+  offers:
+  - store: Mercado Livre
+    price: '1900'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-6845415852-notebook-lenovo-ideapad-intel-celeron4gb-ram128ssd-_JM
+- source: apify:mercadolivre
+  external_id: MLB6835888046
+  name: Notebook Lenovo Ideapad Intel Celeron -cor Cinza
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Celeron
+  offers:
+  - store: Mercado Livre
+    price: '1700'
+    currency: BRL
+    url: https://produto.mercadolivre.com.br/MLB-6835888046-notebook-lenovo-ideapad-intel-celeron-cor-cinza-_JM
+- source: apify:mercadolivre
+  external_id: MLB26994223
+  name: Notebook Lenovo Ideapad Intel Celeron - N4020, 4GB RAM, 128SSD, Windows 11
+    Home C/office, Tela Led 15,6", Cor Cinza - 82VX0001BR
+  brand: Lenovo
+  category: notebooks
+  specs:
+    cpu: Intel Celeron
+    storage_gb: 128
+    storage_type: SSD
+    ram_gb: 4
+    screen_in: 15.6
+  offers:
+  - store: Mercado Livre
+    price: '2300000'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-intel-celeron-n4020-4gb-ram-128ssd-windows-11-home-coffice-tela-led-156-cor-cinza-82vx0001br/p/MLB26994223
