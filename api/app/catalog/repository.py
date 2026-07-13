@@ -12,15 +12,26 @@ from fastapi import Depends
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.catalog.schemas import CategoryOut, OfferOut, ProductDetailOut
+from app.catalog.schemas import CategoryOut, CompareProduct, OfferOut, ProductDetailOut
 from app.catalog.tables import brands, categories, offers, product_specs, products, stores
 from app.core.db import get_session
+
+
+def _to_uuids(ids: list[str]) -> list[UUID]:
+    """Converte ids em UUID, descartando os malformados (viram 'não encontrado')."""
+    out: list[UUID] = []
+    for i in ids:
+        try:
+            out.append(UUID(i))
+        except ValueError:
+            continue
+    return out
 
 
 class CatalogRepository(Protocol):
     def get_categories(self) -> list[CategoryOut]: ...
     def get_product(self, product_id: str) -> ProductDetailOut | None: ...
-    def get_products_by_ids(self, ids: list[str]) -> list[dict]: ...
+    def get_products_by_ids(self, ids: list[str]) -> list[CompareProduct]: ...
 
 
 class SqlCatalogRepository:
@@ -56,10 +67,10 @@ class SqlCatalogRepository:
 
         Retorna None se o id for malformado ou não existir (o router traduz em 404).
         """
-        try:
-            pid = UUID(product_id)
-        except ValueError:
+        pids = _to_uuids([product_id])
+        if not pids:
             return None
+        pid = pids[0]
 
         base_stmt = (
             select(
@@ -114,8 +125,35 @@ class SqlCatalogRepository:
             ],
         )
 
-    def get_products_by_ids(self, ids: list[str]) -> list[dict]:
-        raise NotImplementedError  # TODO Fase 3 — task "POST /compare"
+    def get_products_by_ids(self, ids: list[str]) -> list[CompareProduct]:
+        """Produtos (nome, categoria, specs) para a comparação. Ignora ids inexistentes."""
+        pids = _to_uuids(ids)
+        if not pids:
+            return []
+
+        base_rows = self._session.execute(
+            select(products.c.id, products.c.name, categories.c.slug.label("category"))
+            .select_from(products)
+            .join(categories, categories.c.id == products.c.category_id)
+            .where(products.c.id.in_(pids))
+        ).all()
+
+        specs_rows = self._session.execute(
+            select(product_specs.c.product_id, product_specs.c.attributes).where(
+                product_specs.c.product_id.in_(pids)
+            )
+        ).all()
+        specs_by_pid = {row.product_id: row.attributes for row in specs_rows}
+
+        return [
+            CompareProduct(
+                id=str(row.id),
+                name=row.name,
+                category=row.category,
+                specs=specs_by_pid.get(row.id) or {},
+            )
+            for row in base_rows
+        ]
 
 
 def get_catalog_repository(

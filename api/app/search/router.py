@@ -1,7 +1,11 @@
 """Endpoints de busca/comparação: GET /search, POST /compare."""
 
-from fastapi import APIRouter, HTTPException
-from pydantic import BaseModel
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException
+
+from app.catalog.repository import CatalogRepository, get_catalog_repository
+from app.search.comparison import CompareOut, CompareRequest, build_comparison
 
 router = APIRouter(tags=["search"])
 
@@ -19,11 +23,24 @@ def search(
     raise HTTPException(status_code=501, detail="Not implemented")
 
 
-class CompareRequest(BaseModel):
-    product_ids: list[str]
+@router.post("/compare", response_model=CompareOut)
+def compare(
+    req: CompareRequest,
+    repo: Annotated[CatalogRepository, Depends(get_catalog_repository)],
+) -> CompareOut:
+    """Comparação de 2-4 produtos da MESMA categoria (RF-20/21).
 
+    Devolve os specs alinhados, marcando quais atributos diferem entre os produtos.
+    """
+    encontrados = {p.id: p for p in repo.get_products_by_ids(req.product_ids)}
+    faltando = [pid for pid in req.product_ids if pid not in encontrados]
+    if faltando:
+        raise HTTPException(status_code=404, detail=f"Produtos não encontrados: {faltando}")
 
-@router.post("/compare")
-def compare(req: CompareRequest) -> dict:
-    """Comparação de 2-4 produtos da mesma categoria (RF-20/21). TODO Fase 3."""
-    raise HTTPException(status_code=501, detail="Not implemented")
+    produtos = [encontrados[pid] for pid in req.product_ids]
+    if len({p.category for p in produtos}) > 1:
+        raise HTTPException(
+            status_code=400, detail="Só é possível comparar produtos da mesma categoria"
+        )
+
+    return build_comparison(produtos)

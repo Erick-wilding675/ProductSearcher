@@ -39,3 +39,12 @@ class ProductDetailOut(BaseModel):
     brand: str
     specs: dict[str, Any] = Field(default_factory=dict)
     offers: list[OfferOut] = Field(default_factory=list)
+
+
+class CompareProduct(BaseModel):
+    """Produto no formato enxuto usado pela comparação (id, nome, categoria, specs)."""
+
+    id: str
+    name: str
+    category: str
+    specs: dict[str, Any] = Field(default_factory=dict)
