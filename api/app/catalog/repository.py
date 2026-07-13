@@ -131,11 +131,19 @@ class SqlCatalogRepository:
         if not pids:
             return []
 
+        min_price = func.min(offers.c.price)
         base_rows = self._session.execute(
-            select(products.c.id, products.c.name, categories.c.slug.label("category"))
+            select(
+                products.c.id,
+                products.c.name,
+                categories.c.slug.label("category"),
+                min_price.label("min_price"),
+            )
             .select_from(products)
             .join(categories, categories.c.id == products.c.category_id)
+            .outerjoin(offers, offers.c.product_id == products.c.id)
             .where(products.c.id.in_(pids))
+            .group_by(products.c.id, products.c.name, categories.c.slug)
         ).all()
 
         specs_rows = self._session.execute(
@@ -150,6 +158,7 @@ class SqlCatalogRepository:
                 id=str(row.id),
                 name=row.name,
                 category=row.category,
+                min_price=row.min_price,
                 specs=specs_by_pid.get(row.id) or {},
             )
             for row in base_rows

@@ -42,9 +42,10 @@ class ProductDetailOut(BaseModel):
 
 
 class CompareProduct(BaseModel):
-    """Produto no formato enxuto usado pela comparação (id, nome, categoria, specs)."""
+    """Produto no formato enxuto usado pela comparação (id, nome, categoria, preço, specs)."""
 
     id: str
     name: str
     category: str
+    min_price: Decimal | None = None  # menor preço entre as ofertas (RF-21: melhor valor)
     specs: dict[str, Any] = Field(default_factory=dict)

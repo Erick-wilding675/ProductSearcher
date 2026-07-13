@@ -4,6 +4,7 @@
 produtos já validados e devolve os atributos alinhados, marcando as diferenças.
 """
 
+from decimal import Decimal
 from typing import Any
 
 from pydantic import BaseModel, Field
@@ -28,13 +29,15 @@ class ComparedAttribute(BaseModel):
 class CompareProductInfo(BaseModel):
     id: str
     name: str
+    min_price: Decimal | None = None  # menor preço entre as ofertas
 
 
 class CompareOut(BaseModel):
-    """Resultado da comparação: categoria, produtos e os atributos alinhados."""
+    """Resultado da comparação: categoria, produtos, melhor valor e atributos alinhados."""
 
     category: str
     products: list[CompareProductInfo]
+    best_value_id: str | None = None  # id do mais barato (RF-21); None em empate/sem preço
     attributes: list[ComparedAttribute]
 
 
@@ -61,6 +64,20 @@ def build_comparison(produtos: list[CompareProduct]) -> CompareOut:
         )
     return CompareOut(
         category=produtos[0].category,
-        products=[CompareProductInfo(id=p.id, name=p.name) for p in produtos],
+        products=[
+            CompareProductInfo(id=p.id, name=p.name, min_price=p.min_price) for p in produtos
+        ],
+        best_value_id=_best_value_id(produtos),
         attributes=attributes,
     )
+
+
+def _best_value_id(produtos: list[CompareProduct]) -> str | None:
+    """Id do produto de menor preço (RF-21). None se ninguém tem preço ou há empate
+    no menor — evita eleger um "melhor valor" arbitrário."""
+    precificados = [(p.id, p.min_price) for p in produtos if p.min_price is not None]
+    if not precificados:
+        return None
+    menor = min(preco for _, preco in precificados)
+    mais_baratos = [pid for pid, preco in precificados if preco == menor]
+    return mais_baratos[0] if len(mais_baratos) == 1 else None
