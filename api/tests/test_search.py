@@ -65,3 +65,11 @@ def test_search_retorna_pagina_e_repassa_filtros():
     assert repo.recebido["price_max"] == 5000
     assert repo.recebido["sort"] == "price_asc"
     assert repo.recebido["page"] == 2
+
+
+def test_search_rejeita_parametros_invalidos():
+    repo = _FakeSearchRepo(SearchResponse(page=1, page_size=20, total=0, results=[]))
+    client = _client(repo)
+    assert client.get("/search?sort=xpto").status_code == 422  # sort fora do enum
+    assert client.get("/search?page=0").status_code == 422  # page >= 1
+    assert client.get("/search?price_max=-1").status_code == 422  # price_max >= 0

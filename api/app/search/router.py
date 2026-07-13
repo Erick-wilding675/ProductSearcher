@@ -2,12 +2,12 @@
 
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.catalog.repository import CatalogRepository, get_catalog_repository
 from app.search.comparison import CompareOut, CompareRequest, build_comparison
 from app.search.repository import SearchRepository, get_search_repository
-from app.search.schemas import SearchResponse
+from app.search.schemas import SearchResponse, SortOption
 
 router = APIRouter(tags=["search"])
 
@@ -17,14 +17,14 @@ def search(
     repo: Annotated[SearchRepository, Depends(get_search_repository)],
     q: str | None = None,
     category: str | None = None,
-    price_max: float | None = None,
+    price_max: float | None = Query(None, ge=0),
     brand: str | None = None,
-    sort: str = "relevance",
-    page: int = 1,
+    sort: SortOption = SortOption.relevance,
+    page: int = Query(1, ge=1),
 ) -> SearchResponse:
     """Busca de produtos (RF-10/11/12): texto (FTS PT-BR) + filtros + ordenação + paginação."""
     return repo.search(
-        q=q, category=category, price_max=price_max, brand=brand, sort=sort, page=page
+        q=q, category=category, price_max=price_max, brand=brand, sort=sort.value, page=page
     )
 
 

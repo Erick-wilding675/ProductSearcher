@@ -132,3 +132,9 @@ def test_compare_menos_de_dois_422():
     resp = _client([]).post("/compare", json={"product_ids": ["a"]})
 
     assert resp.status_code == 422
+
+
+def test_compare_ids_duplicados_422():
+    resp = _client([]).post("/compare", json={"product_ids": ["a", "a"]})
+
+    assert resp.status_code == 422

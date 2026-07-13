@@ -7,7 +7,7 @@ produtos já validados e devolve os atributos alinhados, marcando as diferenças
 from decimal import Decimal
 from typing import Any
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, field_validator
 
 from app.catalog.schemas import CompareProduct
 
@@ -16,6 +16,13 @@ class CompareRequest(BaseModel):
     """Corpo do POST /compare: 2 a 4 ids de produto (validado pelo Pydantic)."""
 
     product_ids: list[str] = Field(min_length=2, max_length=4)
+
+    @field_validator("product_ids")
+    @classmethod
+    def _sem_duplicados(cls, ids: list[str]) -> list[str]:
+        if len(set(ids)) != len(ids):
+            raise ValueError("product_ids não pode ter ids repetidos")
+        return ids
 
 
 class ComparedAttribute(BaseModel):
