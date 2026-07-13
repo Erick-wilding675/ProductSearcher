@@ -5,9 +5,10 @@ Ver docs/architecture.md e ADR-0003.
 """
 
 import logging
+from collections.abc import Awaitable, Callable
 from typing import Annotated
 
-from fastapi import Depends, FastAPI
+from fastapi import Depends, FastAPI, Request, Response
 from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
@@ -16,7 +17,7 @@ from sqlalchemy.orm import Session
 from app.catalog.router import router as catalog_router
 from app.core.config import settings
 from app.core.db import get_session
-from app.core.logging import configure_logging
+from app.core.logging import configure_logging, set_request_id
 from app.search.router import router as search_router
 
 configure_logging()
@@ -32,6 +33,18 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+@app.middleware("http")
+async def request_id_middleware(
+    request: Request, call_next: Callable[[Request], Awaitable[Response]]
+) -> Response:
+    """Correlação por requisição: fixa o request id (header ou gerado) no contexto
+    de log e o devolve em `X-Request-ID`, para o cliente amarrar suas chamadas."""
+    rid = set_request_id(request.headers.get("X-Request-ID"))
+    response = await call_next(request)
+    response.headers["X-Request-ID"] = rid
+    return response
 
 
 @app.get("/health", tags=["meta"])
