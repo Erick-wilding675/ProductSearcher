@@ -39,6 +39,18 @@ def _p(pid: str, category: str, specs: dict) -> CompareProduct:
 # ---- build_comparison (função pura) ----
 
 
+def test_build_comparison_tolera_valores_nao_hashaveis():
+    # JSONB permite listas/dicts; a deteccao de diferenca nao pode quebrar (era 500).
+    produtos = [
+        _p("a", "notebooks", {"ports": ["USB-C", "HDMI"], "ram_gb": 16}),
+        _p("b", "notebooks", {"ports": ["USB-C"], "ram_gb": 16}),
+    ]
+    out = build_comparison(produtos)
+    attrs = {a.key: a for a in out.attributes}
+    assert attrs["ports"].differ is True
+    assert attrs["ram_gb"].differ is False
+
+
 def test_build_comparison_alinha_e_marca_diferencas():
     produtos = [
         _p("a", "notebooks", {"ram_gb": 16, "cpu": "i7"}),

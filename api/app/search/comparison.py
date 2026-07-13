@@ -44,16 +44,21 @@ def build_comparison(produtos: list[CompareProduct]) -> CompareOut:
     Assume produtos já validados (2-4, mesma categoria). Para cada atributo presente
     em algum produto, junta os valores na ordem dos produtos e marca `differ` quando
     nem todos são iguais (ausência conta como valor diferente).
+
+    A comparação de `differ` é feita por igualdade ao primeiro valor (não por `set`),
+    para tolerar valores não-hasháveis que o JSONB permite (listas/dicts), sem quebrar.
     """
     keys = sorted({key for produto in produtos for key in produto.specs})
-    attributes = [
-        ComparedAttribute(
-            key=key,
-            values=[produto.specs.get(key) for produto in produtos],
-            differ=len({produto.specs.get(key) for produto in produtos}) > 1,
+    attributes = []
+    for key in keys:
+        values = [produto.specs.get(key) for produto in produtos]
+        attributes.append(
+            ComparedAttribute(
+                key=key,
+                values=values,
+                differ=any(value != values[0] for value in values[1:]),
+            )
         )
-        for key in keys
-    ]
     return CompareOut(
         category=produtos[0].category,
         products=[CompareProductInfo(id=p.id, name=p.name) for p in produtos],
