@@ -4,13 +4,14 @@ Fica atrás de interface (`SearchRepository`), como o catálogo — o router nã
 e nos testes dá para trocar por um fake.
 """
 
-from typing import Annotated, Protocol
+from typing import Annotated, Any, Protocol
 
 from fastapi import Depends
-from sqlalchemy import and_, func, nulls_last, select
+from sqlalchemy import and_, cast, func, nulls_last, select
+from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session
 
-from app.catalog.tables import brands, categories, offers, products
+from app.catalog.tables import brands, categories, offers, product_specs, products
 from app.core.db import get_session
 from app.search.schemas import SearchResponse, SearchResultItem
 
@@ -25,6 +26,7 @@ class SearchRepository(Protocol):
         category: str | None = None,
         price_max: float | None = None,
         brand: str | None = None,
+        attributes: dict[str, Any] | None = None,
         sort: str = "relevance",
         page: int = 1,
     ) -> SearchResponse: ...
@@ -43,6 +45,7 @@ class SqlSearchRepository:
         category: str | None = None,
         price_max: float | None = None,
         brand: str | None = None,
+        attributes: dict[str, Any] | None = None,
         sort: str = "relevance",
         page: int = 1,
     ) -> SearchResponse:
@@ -79,6 +82,14 @@ class SqlSearchRepository:
                 brands.c.name,
             )
         )
+
+        # Filtro estruturado por atributos (RF-12): JSONB containment (@>), servido pelo
+        # índice GIN jsonb_path_ops. `attributes` é 1:1 com produto (uq_product_specs_product),
+        # então o INNER JOIN não infla linhas — só corta quem não casa os atributos pedidos.
+        if attributes:
+            base = base.join(product_specs, product_specs.c.product_id == products.c.id)
+            conditions.append(product_specs.c.attributes.op("@>")(cast(attributes, JSONB)))
+
         if conditions:
             base = base.where(and_(*conditions))
         if price_max is not None:

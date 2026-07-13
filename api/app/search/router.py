@@ -1,5 +1,6 @@
 """Endpoints de busca/comparação: GET /search, POST /compare."""
 
+import json
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException, Query
@@ -21,11 +22,33 @@ def search(
     brand: str | None = None,
     sort: SortOption = SortOption.relevance,
     page: int = Query(1, ge=1),
+    attrs: str | None = Query(
+        None, description='Filtro por atributos, objeto JSON. Ex.: {"ram_gb": 16, "anc": true}'
+    ),
 ) -> SearchResponse:
     """Busca de produtos (RF-10/11/12): texto (FTS PT-BR) + filtros + ordenação + paginação."""
     return repo.search(
-        q=q, category=category, price_max=price_max, brand=brand, sort=sort.value, page=page
+        q=q,
+        category=category,
+        price_max=price_max,
+        brand=brand,
+        attributes=_parse_attrs(attrs),
+        sort=sort.value,
+        page=page,
     )
+
+
+def _parse_attrs(attrs: str | None) -> dict | None:
+    """Interpreta o filtro de atributos (JSON) do /search (RF-12). Erros viram 422."""
+    if not attrs:
+        return None
+    try:
+        parsed = json.loads(attrs)
+    except json.JSONDecodeError as exc:
+        raise HTTPException(status_code=422, detail="attrs deve ser JSON válido") from exc
+    if not isinstance(parsed, dict) or not parsed:
+        raise HTTPException(status_code=422, detail="attrs deve ser um objeto JSON não vazio")
+    return parsed
 
 
 @router.post("/compare", response_model=CompareOut)

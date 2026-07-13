@@ -73,3 +73,17 @@ def test_search_rejeita_parametros_invalidos():
     assert client.get("/search?sort=xpto").status_code == 422  # sort fora do enum
     assert client.get("/search?page=0").status_code == 422  # page >= 1
     assert client.get("/search?price_max=-1").status_code == 422  # price_max >= 0
+
+
+def test_search_repassa_filtro_de_atributos():
+    repo = _FakeSearchRepo(SearchResponse(page=1, page_size=20, total=0, results=[]))
+    resp = _client(repo).get('/search?attrs={"ram_gb":16,"anc":true}')
+    assert resp.status_code == 200
+    assert repo.recebido["attributes"] == {"ram_gb": 16, "anc": True}
+
+
+def test_search_attrs_invalido_422():
+    repo = _FakeSearchRepo(SearchResponse(page=1, page_size=20, total=0, results=[]))
+    client = _client(repo)
+    assert client.get("/search?attrs=notjson").status_code == 422  # JSON inválido
+    assert client.get("/search?attrs=[1,2]").status_code == 422  # não é objeto
