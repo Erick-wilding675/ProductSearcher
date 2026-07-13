@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.catalog.repository import CatalogRepository, get_catalog_repository
-from app.catalog.schemas import CategoryOut
+from app.catalog.schemas import CategoryOut, ProductDetailOut
 
 router = APIRouter(tags=["catalog"])
 
@@ -22,7 +22,13 @@ def list_categories(
     return repo.get_categories()
 
 
-@router.get("/products/{product_id}")
-def get_product(product_id: str) -> dict:
-    """Detalhe do produto: specs + ofertas (RF-42). TODO Fase 3."""
-    raise HTTPException(status_code=501, detail="Not implemented")
+@router.get("/products/{product_id}", response_model=ProductDetailOut)
+def get_product(
+    product_id: str,
+    repo: Annotated[CatalogRepository, Depends(get_catalog_repository)],
+) -> ProductDetailOut:
+    """Detalhe do produto: specs completas + ofertas com link (RF-42)."""
+    product = repo.get_product(product_id)
+    if product is None:
+        raise HTTPException(status_code=404, detail="Produto não encontrado")
+    return product
