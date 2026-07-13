@@ -4,10 +4,17 @@ Só as colunas usadas na leitura — a migration inicial (`7d5fdc583693`) é a f
 verdade do schema. Novos endpoints estendem este módulo com as tabelas que precisarem.
 """
 
-from sqlalchemy import Column, ForeignKey, MetaData, Numeric, Table, Text
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import Column, Computed, ForeignKey, MetaData, Numeric, Table, Text
+from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 
 metadata = MetaData()
+
+# Expressão da coluna gerada `search_vector` (espelha a migration c1a2b3d4e5f6).
+_SEARCH_VECTOR = Computed(
+    "to_tsvector('portuguese', "
+    "coalesce(name, '') || ' ' || coalesce(model, '') || ' ' || coalesce(description, ''))",
+    persisted=True,
+)
 
 categories = Table(
     "categories",
@@ -31,7 +38,7 @@ stores = Table(
     Column("id", UUID(as_uuid=True), primary_key=True),
     Column("slug", Text, nullable=False),
     Column("name", Text, nullable=False),
-    Column("url", Text, nullable=False),
+    Column("url", Text),
 )
 
 products = Table(
@@ -44,6 +51,7 @@ products = Table(
     Column("name", Text, nullable=False),
     Column("model", Text),
     Column("description", Text),
+    Column("search_vector", TSVECTOR, _SEARCH_VECTOR),
 )
 
 product_specs = Table(
