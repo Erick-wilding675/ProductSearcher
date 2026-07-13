@@ -1,0 +1,17 @@
+# Normalização de fim de linha (evita ruído CRLF↔LF entre Windows/OneDrive e Linux/CI).
+# Regra geral: todo arquivo de texto é normalizado para LF no repositório.
+* text=auto eol=lf
+
+# Binários explícitos: nunca normalizar/alterar.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.pdf binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+
+# Scripts de shell sempre LF (executáveis no CI/containers).
+*.sh text eol=lf
