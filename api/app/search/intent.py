@@ -4,8 +4,8 @@ Default determinístico (regras/regex) — princípio: o sistema funciona sem IA
 LLM pode reforçar no futuro (RF-16), atrás da mesma interface.
 """
 
-from dataclasses import dataclass, field
 import re
+from dataclasses import dataclass, field
 from typing import Protocol
 
 
@@ -62,11 +62,7 @@ class RuleBasedIntentParser:
         if match:
             # Remove separador de milhar e converte vírgula decimal
             # para o formato esperado pelo Python.
-            value = (
-                match.group(1)
-                .replace(".", "")
-                .replace(",", ".")
-            )
+            value = match.group(1).replace(".", "").replace(",", ".")
 
             # Caso o valor seja inválido, simplesmente mantém
             # price_max como None.

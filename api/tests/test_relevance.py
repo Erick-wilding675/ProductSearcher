@@ -10,7 +10,6 @@ Esta suíte mede o KPI de relevância da busca.
 
 from app.search.repository import SearchRepository
 
-
 TEST_CASES = [
     {
         "query": "lenovo loq",
@@ -56,7 +55,6 @@ def test_relevancia_top5(search_repository: SearchRepository):
     hits = 0
 
     for case in TEST_CASES:
-
         response = search_repository.search(
             q=case["query"],
             page=1,
@@ -64,10 +62,7 @@ def test_relevancia_top5(search_repository: SearchRepository):
 
         top5 = response.results[:5]
 
-        nomes = {
-            item.name.lower()
-            for item in top5
-        }
+        nomes = {item.name.lower() for item in top5}
 
         esperado = case["expected"].lower()
 
