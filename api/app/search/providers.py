@@ -70,9 +70,7 @@ class FtsSearchProvider:
             conditions.append(brands.c.slug == brand)
 
         rank_expr = (
-            func.ts_rank(products.c.search_vector, tsquery)
-            if tsquery is not None
-            else literal(0.0)
+            func.ts_rank(products.c.search_vector, tsquery) if tsquery is not None else literal(0.0)
         )
 
         stmt = (

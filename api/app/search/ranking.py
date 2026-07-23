@@ -94,9 +94,9 @@ def _weighted_score(factors: dict) -> float:
     total_w = sum(WEIGHTS[name] for name, f in factors.items() if f["applicable"])
     if total_w == 0:
         return 0.0
-    return sum(
-        WEIGHTS[name] * f["score"] for name, f in factors.items() if f["applicable"]
-    ) / total_w
+    return (
+        sum(WEIGHTS[name] * f["score"] for name, f in factors.items() if f["applicable"]) / total_w
+    )
 
 
 def _criteria(intent: Intent) -> list[dict]:
