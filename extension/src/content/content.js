@@ -134,30 +134,39 @@ async function enviar(mensagem) {
   }
 }
 
+// Entre a limpeza e a injeção há idas ao service worker. Se o usuário troca de busca
+// nesse meio-tempo, duas execuções se sobrepõem e a mais lenta injetaria o resultado
+// da busca anterior. Cada execução carimba a sua geração e desiste se outra começou.
+let geracao = 0;
+
 async function avaliarPagina() {
+  const minha = ++geracao;
+  const atual = () => minha === geracao;
+
   limpar();
 
   const { queryDaSerp } = await import(
     chrome.runtime.getURL("src/shared/coverage.js")
   );
   const query = queryDaSerp(location.href);
-  if (!query) return;
+  if (!query || !atual()) return;
 
   const cobertura = await enviar({ type: "coverage", query });
-  if (!cobertura?.category) return; // fora de cobertura: silêncio (RF-51)
+  if (!cobertura?.category || !atual()) return; // fora de cobertura: silêncio (RF-51)
 
   const resposta = await enviar({
     type: "topProducts",
     query,
     category: cobertura.category,
   });
-  if (!resposta?.ok || !resposta.results?.length) return;
+  if (!resposta?.ok || !resposta.results?.length || !atual()) return;
 
   const dados = {
     query,
     results: resposta.results,
     webAppUrl: await urlDoWebApp(query),
   };
+  if (!atual()) return;
 
   const painel = montarPainel(dados);
   if (!injetar(painel)) botaoFlutuante(dados);
