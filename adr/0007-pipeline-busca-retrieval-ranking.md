@@ -75,6 +75,35 @@ enquanto não há `IntentParser`. Quando o parser (Sofia) entrar, o endpoint pod
 para o pipeline `IntentParser → SearchProvider → RankingService` sem reescrever o core —
 os dois já dividem as mesmas tabelas Core e o mesmo `search_vector` (ADR-0005 D8).
 
+**D5.1 — Convergência executada** *(2026-08-06)*. O gatilho de D5 foi atingido: o
+`IntentParser` existe e a suíte de relevância mede 100% no top-5. O `GET /search`
+passou a usar o pipeline e o `SqlSearchRepository` foi **aposentado** (arquivo
+removido) — não há mais dois caminhos de busca.
+
+A composição vive em `search/service.py` (`SearchService`), não no router: o endpoint
+fica só com o contrato HTTP e o pipeline continua testável sem subir a aplicação.
+
+Efeitos no contrato do `GET /search`:
+
+- A resposta ganha **`criteria`** (RF-31) e, por item, **`score` + `factors`** (RF-30) —
+  a explicabilidade deixou de ser código morto e virou contrato.
+- Cada item passa a trazer **`specs`**, que o retrieval já lia para o ranking.
+- **`total` mudou de significado:** era a contagem de tudo que casava no banco; agora é
+  o tamanho do **pool de candidatos** considerado. Só o que entra no pool é ranqueável
+  e paginável — reportar o total do banco prometeria páginas que não existem.
+
+Duas correções que a convergência exigiu, ambas defeitos silenciosos:
+
+1. O `FtsSearchProvider` não aplicava o **filtro por atributos** (RF-12) — só o
+   `SqlSearchRepository` tinha. Migrar sem isso perderia o requisito.
+2. O provider não devolvia `attributes` no `hit`, então o fator de atributos do ranking
+   (peso 0.1) era sempre `score 0` com `applicable: True`: **diluía o score sem
+   discriminar nada**. Agora o fator funciona de fato.
+
+`CANDIDATE_POOL` virou a configuração `search_candidate_pool` (default **200**, era 50
+fixo). Com ~170 produtos no seed, o pool cobre o catálogo e não corta resultado; o
+gatilho de escala abaixo segue válido.
+
 ## Benefícios
 
 - **Explicabilidade (RF-31):** cada resultado carrega o porquê da posição (fatores +
@@ -88,9 +117,9 @@ os dois já dividem as mesmas tabelas Core e o mesmo `search_vector` (ADR-0005 D
 
 ## Consequências negativas
 
-- **Dois caminhos de busca** coexistem temporariamente (repository direto + pipeline).
-  Custo de clareza mitigado por este ADR e pelos docstrings; a convergência é o gatilho
-  de revisão abaixo.
+- ~~**Dois caminhos de busca** coexistem temporariamente (repository direto + pipeline).~~
+  **Resolvido em D5.1:** o caminho direto foi aposentado e só o pipeline atende o
+  `GET /search`.
 - **Ranking em memória:** reordenar candidatos no app assume um **pool limitado**
   (`CANDIDATE_POOL = 50`). Suficiente para o MVP; para catálogos grandes, revisar.
 - Pesos do ranking são um **ponto de calibração** — sujeitos à suíte de relevância
@@ -106,9 +135,9 @@ os dois já dividem as mesmas tabelas Core e o mesmo `search_vector` (ADR-0005 D
 
 ## Caminho de evolução / gatilho de revisão
 
-- **Gatilho de convergência:** quando o `IntentParser` existir e a suíte de relevância
+- ~~**Gatilho de convergência:** quando o `IntentParser` existir e a suíte de relevância
   validar os pesos, migrar `GET /search` para o pipeline e **aposentar** o caminho
-  direto (ou reduzi-lo a um atalho para consultas sem intent).
+  direto.~~ **Cumprido em D5.1 (2026-08-06).**
 - **Gatilho de escala:** se o catálogo crescer a ponto de `CANDIDATE_POOL` cortar
   resultados relevantes, mover parte do ranking para o banco ou aumentar o pool com
   paginação de candidatos.

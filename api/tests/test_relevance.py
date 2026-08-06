@@ -4,7 +4,9 @@ Meta: **≥80%** das consultas de teste devem trazer o produto esperado entre os
 cinco primeiros resultados (docs/prd.md §5).
 
 Não é teste unitário: mede a qualidade real do retrieval (Postgres FTS PT-BR)
-contra o **seed carregado**. Exige banco — a fixture `search_repository`
+contra o **seed carregado**, pelo mesmo pipeline que o `GET /search` monta
+(ADR-0007) — o que é medido aqui é o que o usuário recebe. Exige banco: a fixture
+`search_service`
 (`conftest.py`) pula a suíte quando não há Postgres ou o catálogo está vazio.
 
 Os casos usam produtos que existem no seed e consultas no formato que o usuário
@@ -18,7 +20,7 @@ mede zero e derruba o KPI sem que a busca tenha piorado.
 
 import pytest
 
-from app.search.repository import SearchRepository
+from app.search.service import SearchService
 
 # (consulta do usuário, trecho que identifica o produto esperado)
 TEST_CASES: list[tuple[str, str]] = [
@@ -42,19 +44,19 @@ TOP_N = 5
 META = 0.80
 
 
-def _acertou(repo: SearchRepository, query: str, esperado: str) -> bool:
+def _acertou(service: SearchService, query: str, esperado: str) -> bool:
     """True se `esperado` aparece no nome de algum dos TOP_N resultados."""
-    resposta = repo.search(q=query, page=1)
+    resposta = service.search(q=query, page=1)
     alvo = esperado.lower()
     return any(alvo in item.name.lower() for item in resposta.results[:TOP_N])
 
 
-def test_relevancia_top5(search_repository: SearchRepository) -> None:
+def test_relevancia_top5(search_service: SearchService) -> None:
     """KPI agregado: ≥80% das consultas com o produto esperado no top-5."""
     faltaram = [
         f"{query!r} (esperava {esperado!r})"
         for query, esperado in TEST_CASES
-        if not _acertou(search_repository, query, esperado)
+        if not _acertou(search_service, query, esperado)
     ]
 
     score = 1 - len(faltaram) / len(TEST_CASES)
@@ -65,10 +67,8 @@ def test_relevancia_top5(search_repository: SearchRepository) -> None:
 
 
 @pytest.mark.parametrize(("query", "esperado"), TEST_CASES, ids=lambda v: v)
-def test_consulta_individual(
-    search_repository: SearchRepository, query: str, esperado: str
-) -> None:
+def test_consulta_individual(search_service: SearchService, query: str, esperado: str) -> None:
     """Cada consulta isolada — aponta exatamente qual regrediu."""
-    assert _acertou(search_repository, query, esperado), (
+    assert _acertou(search_service, query, esperado), (
         f"{esperado!r} não apareceu no top-{TOP_N} de {query!r}"
     )

@@ -18,7 +18,10 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.catalog.tables import products
 from app.core.config import settings
-from app.search.repository import SqlSearchRepository
+from app.search.intent import RuleBasedIntentParser
+from app.search.providers import FtsSearchProvider
+from app.search.ranking import DeterministicRanking
+from app.search.service import SearchService
 
 
 @pytest.fixture(scope="session")
@@ -40,12 +43,19 @@ def db_session() -> Iterator[Session]:
 
 
 @pytest.fixture
-def search_repository(db_session: Session) -> SqlSearchRepository:
-    """Repositório de busca sobre o banco real, com o seed carregado.
+def search_service(db_session: Session) -> SearchService:
+    """Pipeline completo sobre o banco real, com o seed carregado.
+
+    É o mesmo pipeline que o `GET /search` monta (ADR-0007), então a relevância
+    medida aqui é a que o usuário recebe — não a de um caminho paralelo.
 
     Sem catálogo não há o que medir — pula em vez de reportar relevância 0.
     """
     total = db_session.execute(select(func.count()).select_from(products)).scalar_one()
     if not total:
         pytest.skip("Catálogo vazio: rode a ingestão do seed antes da suíte de relevância")
-    return SqlSearchRepository(db_session)
+    return SearchService(
+        RuleBasedIntentParser(),
+        FtsSearchProvider(db_session),
+        DeterministicRanking(),
+    )

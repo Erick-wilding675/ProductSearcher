@@ -10,8 +10,9 @@ from types import SimpleNamespace
 
 from sqlalchemy.dialects import postgresql
 
+from app.core.config import settings
 from app.search.intent import Intent, RuleBasedIntentParser
-from app.search.providers import CANDIDATE_POOL, FtsSearchProvider
+from app.search.providers import FtsSearchProvider
 
 
 class _FakeResult:
@@ -52,6 +53,7 @@ def _row(**kw):
         "brand": "Dell",
         "min_price": Decimal("3999.90"),
         "fts_rank": 0.42,
+        "attributes": {"ram_gb": 16, "storage_type": "SSD"},
     }
     base.update(kw)
     return SimpleNamespace(**base)
@@ -104,7 +106,8 @@ def test_filtros_de_ui_complementam_o_intent():
 def test_limita_ao_pool_de_candidatos():
     session = _FakeSession([])
     FtsSearchProvider(session).search(Intent(raw="notebook"))
-    assert f"LIMIT {CANDIDATE_POOL}" in session.sql() or CANDIDATE_POOL in session.bound_values()
+    pool = settings.search_candidate_pool
+    assert f"LIMIT {pool}" in session.sql() or pool in session.bound_values()
 
 
 def test_fts_usa_texto_sem_preco_e_nao_a_query_crua():
@@ -120,3 +123,47 @@ def test_fts_usa_texto_sem_preco_e_nao_a_query_crua():
     assert "notebook gamer" in valores  # texto limpo vai para o tsquery
     assert 5000.0 in valores  # e o preço vira filtro
     assert not any(isinstance(v, str) and "5000" in v for v in valores)
+
+
+def test_hit_carrega_os_atributos_para_o_ranking():
+    """O fator de atributos do RankingService le `hit["attributes"]`.
+
+    Sem essa chave ele ficava sempre com score 0 mas "aplicavel", diluindo o score
+    final sem discriminar nada.
+    """
+    session = _FakeSession([_row()])
+    hit = FtsSearchProvider(session).search(Intent(raw="notebook"))[0]
+    assert hit["attributes"] == {"ram_gb": 16, "storage_type": "SSD"}
+
+
+def test_produto_sem_specs_nao_quebra_o_hit():
+    session = _FakeSession([_row(attributes=None)])
+    hit = FtsSearchProvider(session).search(Intent(raw="notebook"))[0]
+    assert hit["attributes"] == {}
+
+
+def test_filtro_de_atributos_usa_containment_jsonb():
+    """RF-12: o filtro estruturado vira @> sobre product_specs (indice GIN)."""
+    session = _FakeSession([])
+    FtsSearchProvider(session).search(
+        Intent(raw="notebook"), filters={"attributes": {"ram_gb": 16}}
+    )
+    sql = session.sql()
+    assert "product_specs" in sql
+    assert "@>" in sql
+
+
+def test_atributos_do_intent_tambem_filtram():
+    """O que o parser extrai da consulta filtra igual ao que vem da UI."""
+    session = _FakeSession([])
+    intent = RuleBasedIntentParser().parse("notebook 16gb ram ssd")
+    assert intent.attributes  # o parser extraiu algo
+    FtsSearchProvider(session).search(intent)
+    assert "@>" in session.sql()
+
+
+def test_sem_atributos_nao_filtra_por_specs():
+    """Sem atributos pedidos, nao deve haver containment no WHERE."""
+    session = _FakeSession([])
+    FtsSearchProvider(session).search(Intent(raw="notebook"))
+    assert "@>" not in session.sql()

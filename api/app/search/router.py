@@ -7,15 +7,15 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 
 from app.catalog.repository import CatalogRepository, get_catalog_repository
 from app.search.comparison import CompareOut, CompareRequest, build_comparison
-from app.search.repository import SearchRepository, get_search_repository
 from app.search.schemas import SearchResponse, SortOption
+from app.search.service import SearchService, get_search_service
 
 router = APIRouter(tags=["search"])
 
 
 @router.get("/search", response_model=SearchResponse)
 def search(
-    repo: Annotated[SearchRepository, Depends(get_search_repository)],
+    service: Annotated[SearchService, Depends(get_search_service)],
     q: str | None = None,
     category: str | None = None,
     price_max: float | None = Query(None, ge=0),
@@ -26,8 +26,13 @@ def search(
         None, description='Filtro por atributos, objeto JSON. Ex.: {"ram_gb": 16, "anc": true}'
     ),
 ) -> SearchResponse:
-    """Busca de produtos (RF-10/11/12): texto (FTS PT-BR) + filtros + ordenação + paginação."""
-    return repo.search(
+    """Busca de produtos (RF-10/11/12/30/31).
+
+    Pipeline do ADR-0007: o texto passa pelo `IntentParser`, o retrieval aplica os
+    filtros duros e o `RankingService` produz a ordem final — junto dos **critérios**
+    que a justificam, para a UI poder explicar o porquê de cada posição.
+    """
+    return service.search(
         q=q,
         category=category,
         price_max=price_max,

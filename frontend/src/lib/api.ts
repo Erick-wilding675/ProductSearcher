@@ -13,6 +13,27 @@ export type Money = string;
 
 // ---------------------------------------------------------------- busca
 
+/**
+ * Contribuição de um fator para o score de um item (RF-31).
+ * `applicable: false` quando o fator não se aplica à consulta (ex.: preço sem teto
+ * pedido) — nesse caso ele sai da média e não deve ser exibido como decisivo.
+ */
+export interface RankingFactor {
+  /** Normalizado em [0,1]. */
+  score: number;
+  applicable: boolean;
+}
+
+/** Critério usado pelo ranking, com peso e rótulo pronto para a UI (RF-31). */
+export interface RankingCriterion {
+  /** `relevance` | `price` | `attributes`. */
+  factor: string;
+  weight: number;
+  /** `false` quando a consulta não ativa esse critério. */
+  active: boolean;
+  description: string;
+}
+
 /** Item do resultado de busca (`SearchResultItem`). */
 export interface SearchResultItem {
   id: string;
@@ -22,14 +43,26 @@ export interface SearchResultItem {
   brand: string;
   /** Menor preço entre as ofertas; `null` quando o produto não tem oferta. */
   min_price: Money | null;
+  /** Specs do produto (mesmo formato usado na comparação). */
+  specs: Record<string, unknown>;
+  /** Score final do ranking, em [0,1] (RF-30). */
+  score: number;
+  /** O porquê da posição, fator a fator (RF-31). */
+  factors: Record<string, RankingFactor>;
 }
 
 /** Página de resultados de `GET /search` (`SearchResponse`). */
 export interface SearchResponse {
   page: number;
   page_size: number;
-  /** Total de produtos que casam, antes da paginação. */
+  /**
+   * Candidatos considerados pelo ranking — **não** o total de produtos que casam
+   * no banco. O retrieval limita o pool (ADR-0007), e só o que entra nele é
+   * ranqueável e paginável.
+   */
   total: number;
+  /** Critérios que justificam a ordenação (RF-31). */
+  criteria: RankingCriterion[];
   results: SearchResultItem[];
 }
 
