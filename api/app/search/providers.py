@@ -58,7 +58,11 @@ class FtsSearchProvider:
         brand = filters.get("brand")
         price_max = intent.price_max if intent.price_max is not None else filters.get("price_max")
 
-        tsquery = func.plainto_tsquery("portuguese", intent.raw) if intent.raw else None
+        # `intent.text` (e não `raw`): o texto já sem as partes que viraram filtro.
+        # `plainto_tsquery` combina os termos com AND — "até R$5000" no texto exigiria
+        # "ate"/"r"/"5000" no produto e zeraria o resultado.
+        texto = intent.text or intent.raw
+        tsquery = func.plainto_tsquery("portuguese", texto) if texto else None
         min_price = func.min(offers.c.price)
 
         conditions = []

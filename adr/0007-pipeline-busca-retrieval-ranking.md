@@ -44,6 +44,22 @@ Restrições herdadas: **Postgres-only** (ADR-0002), **IA opcional e desacoplada
 `id, slug, name, category, brand, min_price, fts_rank`. É o formato que o ranking
 consome — desacopla ranking da fonte (Postgres hoje; pgvector/OpenSearch depois).
 
+**D2.1 — Contrato do `Intent`: `raw` ≠ `text`** *(adendo, 2026-08-06)*.
+`raw` é a consulta verbatim (log/UI); **`text` é o resíduo que vai para o FTS**, depois
+de remover o que já virou filtro estruturado (preço) e o vocabulário de intenção
+("melhor", "barato", "quero"). O `SearchProvider` **deve** consultar `intent.text`.
+
+Motivo: `plainto_tsquery` combina os termos com **AND**. Usar `raw` faz de "até R$5000"
+três termos obrigatórios (`ate`, `r`, `5000`) que não existem em nenhum título — a
+consulta devolve **zero**. O dicionário `portuguese` descarta stopword gramatical
+("para", "com", "qual"), mas não "melhor"/"barato"; separar esse ruído é justamente o
+papel do `IntentParser` (RF-11).
+
+**Limitação conhecida:** termos de caso de uso ("para trabalho", "para jogos") continuam
+obrigatórios no AND e não aparecem em títulos de marketplace, então zeram o resultado.
+Não é defeito do parser: é a semântica do FTS contra o vocabulário do catálogo. Caminho
+previsto: reforço semântico (pgvector) ou RF-16 (linguagem natural via LLM).
+
 **D3 — Modelo de ranking determinístico** (`DeterministicRanking`): soma ponderada
 sobre os fatores **aplicáveis ao intent**, com renormalização dos pesos:
 `relevance` 0.6 (fts_rank normalizado no conjunto), `price` 0.3 (aderência ao teto),

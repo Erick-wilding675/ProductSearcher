@@ -10,7 +10,7 @@ from types import SimpleNamespace
 
 from sqlalchemy.dialects import postgresql
 
-from app.search.intent import Intent
+from app.search.intent import Intent, RuleBasedIntentParser
 from app.search.providers import CANDIDATE_POOL, FtsSearchProvider
 
 
@@ -105,3 +105,18 @@ def test_limita_ao_pool_de_candidatos():
     session = _FakeSession([])
     FtsSearchProvider(session).search(Intent(raw="notebook"))
     assert f"LIMIT {CANDIDATE_POOL}" in session.sql() or CANDIDATE_POOL in session.bound_values()
+
+
+def test_fts_usa_texto_sem_preco_e_nao_a_query_crua():
+    """Regressão: o provider precisa consultar `intent.text`, não `intent.raw`.
+
+    `plainto_tsquery` combina os termos com AND — mandar "notebook ate r$5000" exigiria
+    "ate"/"r"/"5000" no produto e devolveria zero resultado.
+    """
+    session = _FakeSession([])
+    intent = RuleBasedIntentParser().parse("notebook gamer até R$5000")
+    FtsSearchProvider(session).search(intent)
+    valores = session.bound_values()
+    assert "notebook gamer" in valores  # texto limpo vai para o tsquery
+    assert 5000.0 in valores  # e o preço vira filtro
+    assert not any(isinstance(v, str) and "5000" in v for v in valores)
