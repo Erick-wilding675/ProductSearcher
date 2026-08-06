@@ -1,0 +1,46 @@
+{
+  "manifest_version": 3,
+  "name": "ProductSearcher",
+  "version": "0.1.0",
+  "description": "Mostra os melhores produtos para a sua busca, direto na SERP do Google.",
+  "default_locale": "pt_BR",
+  "icons": {
+    "16": "icons/icon.png",
+    "32": "icons/icon.png",
+    "48": "icons/icon.png",
+    "128": "icons/icon.png"
+  },
+  "action": {
+    "default_popup": "src/popup/popup.html",
+    "default_title": "ProductSearcher",
+    "default_icon": {
+      "16": "icons/icon.png",
+      "32": "icons/icon.png",
+      "48": "icons/icon.png",
+      "128": "icons/icon.png"
+    }
+  },
+  "background": {
+    "service_worker": "src/background/service-worker.js",
+    "type": "module"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://www.google.com/search*",
+        "https://www.google.com.br/search*"
+      ],
+      "js": ["src/content/content.js"],
+      "css": ["src/content/content.css"],
+      "run_at": "document_idle"
+    }
+  ],
+  "permissions": ["storage", "activeTab"],
+  "host_permissions": ["http://localhost:8000/*"],
+  "web_accessible_resources": [
+    {
+      "resources": ["src/shared/coverage.js", "src/shared/config.js"],
+      "matches": ["https://www.google.com/*", "https://www.google.com.br/*"]
+    }
+  ]
+}
