@@ -38,7 +38,7 @@ const config: Config = {
         info: "#2563EB",
       },
       borderRadius: { sm: "6px", md: "8px", lg: "12px", xl: "16px" },
-      fontFamily: { sans: ["Inter", "system-ui", "sans-serif"] },
+      fontFamily: { sans: ["var(--font-inter)", "Inter", "system-ui", "sans-serif"] },
     },
   },
   plugins: [],
