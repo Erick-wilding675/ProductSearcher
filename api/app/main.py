@@ -32,6 +32,10 @@ app.add_middleware(
     allow_origin_regex=settings.cors_origin_regex,
     allow_methods=["*"],
     allow_headers=["*"],
+    # Sem expor explicitamente, o browser esconde `X-Request-ID` do JS em resposta
+    # cross-origin (web app em :3000 -> API em :8000). Expor é o que torna a
+    # correlação de log utilizável pelo cliente ao reportar um erro.
+    expose_headers=["X-Request-ID"],
 )
 
 
