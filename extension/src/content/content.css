@@ -1,0 +1,198 @@
+/* Estilos do painel injetado na SERP.
+   Tokens do design system (docs/design-system.md) — hero violet, Inter.
+
+   Tudo prefixado com `ps-` e com propriedades explícitas: a SERP tem CSS próprio e
+   agressivo, então não herdamos nada de graça nem vazamos estilo para a página. */
+
+.ps-painel {
+  box-sizing: border-box;
+  margin: 0 0 16px;
+  padding: 16px;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgb(15 23 42 / 8%);
+  font-family:
+    Inter,
+    system-ui,
+    -apple-system,
+    sans-serif;
+  color: #0f172a;
+  line-height: 1.4;
+  max-width: 420px;
+}
+
+.ps-cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ps-marca-logo {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  color: #7c3aed;
+}
+
+.ps-fechar {
+  border: 0;
+  background: none;
+  cursor: pointer;
+  padding: 0 4px;
+  font-size: 18px;
+  line-height: 1;
+  color: #64748b;
+}
+
+.ps-fechar:hover {
+  color: #0f172a;
+}
+
+.ps-titulo {
+  margin: 0 0 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.ps-lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ps-card {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 8px;
+  border-radius: 8px;
+  background: #f8fafc;
+}
+
+.ps-posicao {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: #7c3aed;
+  color: #ffffff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ps-corpo {
+  min-width: 0; /* deixa o texto truncar em vez de estourar o card */
+}
+
+.ps-nome {
+  margin: 0 0 2px;
+  font-size: 13px;
+  font-weight: 500;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.ps-meta {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  font-size: 12px;
+}
+
+.ps-marca {
+  color: #64748b;
+}
+
+.ps-preco {
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.ps-link {
+  display: inline-block;
+  margin-top: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #7c3aed;
+  text-decoration: none;
+}
+
+.ps-link:hover {
+  text-decoration: underline;
+}
+
+/* Fallback: botão fixo quando não há âncora para injetar o painel. */
+.ps-flutuante {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 2147483000; /* alto o bastante para a SERP não cobrir */
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: #7c3aed;
+  color: #ffffff;
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgb(124 58 237 / 35%);
+}
+
+.ps-flutuante:hover {
+  background: #6d28d9;
+}
+
+.ps-painel-flutuante {
+  position: fixed;
+  right: 20px;
+  bottom: 72px;
+  z-index: 2147483000;
+  width: 360px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Foco sempre visível (RNF-11) — o anel do design system. */
+.ps-painel :focus-visible,
+.ps-flutuante:focus-visible {
+  outline: 2px solid #a78bfa;
+  outline-offset: 2px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ps-painel {
+    border-color: #2a3852;
+    background: #1e293b;
+    color: #f8fafc;
+  }
+
+  .ps-card {
+    background: #334155;
+  }
+
+  .ps-marca-logo,
+  .ps-link {
+    color: #a78bfa;
+  }
+
+  .ps-preco {
+    color: #f8fafc;
+  }
+
+  .ps-marca,
+  .ps-fechar {
+    color: #94a3b8;
+  }
+}
