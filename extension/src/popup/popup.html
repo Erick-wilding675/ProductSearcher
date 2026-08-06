@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <title>ProductSearcher</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <header class="cabecalho">
+      <span class="marca">ProductSearcher</span>
+    </header>
+
+    <!-- aria-live: o conteúdo troca de forma assíncrona; leitores de tela precisam
+         ser avisados quando o resultado chega. -->
+    <main id="conteudo" aria-live="polite" aria-busy="true">
+      <p class="estado">Consultando…</p>
+    </main>
+
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>
