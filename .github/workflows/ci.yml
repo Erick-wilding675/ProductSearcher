@@ -43,10 +43,12 @@ jobs:
       - run: pip install --upgrade pip && pip install ".[dev]"
       - run: ruff check --fix .
       - run: ruff format .
-      
+
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style(worker): auto-fix linting and formatting issues"
+
+      - run: pytest -q
 
   frontend:
     runs-on: ubuntu-latest
@@ -58,10 +60,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: npm install
+      - run: npm ci
       - run: npm run lint --if-present -- --fix
-      - run: npm run format --if-present 
-      
+      - run: npm run format --if-present
+
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style(frontend): auto-fix linting and formatting issues"
