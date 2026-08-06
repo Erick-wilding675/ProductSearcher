@@ -28,9 +28,9 @@ format-check: ## Verifica formatação sem alterar arquivos
 	cd worker && ruff format --check .
 	cd frontend && npm run format:check
 
-test: ## Roda os testes (pytest); worker ainda sem testes (Fase 2)
+test: ## Roda os testes (pytest) da api e do worker
 	cd api && pytest -q
-	cd worker && pytest -q || [ $$? -eq 5 ]  # 5 = nenhum teste coletado (ok por ora)
+	cd worker && pytest -q
 
 ci: lint test ## Replica localmente o que a CI roda (lint + test)
 
