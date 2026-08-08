@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { FilterPanel } from "@/components/FilterPanel/FilterPanel";
 import { ResultCard } from "@/components/ResultCard/ResultCard";
 import { SearchBar } from "@/components/SearchBar/SearchBar";
+import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { search } from "@/lib/api";
 import type { SearchResultItem } from "@/lib/api";
 
@@ -73,8 +74,12 @@ export default function HomePage() {
 
   return (
     <main className="mx-auto max-w-6xl px-6 py-10">
+      
+      <ThemeToggle />
+
       <header className="mb-8">
         <h1 className="text-3xl font-bold">🔎 ProductSearcher</h1>
+        
 
         <p className="mt-2 text-[var(--text-muted)]">
           Descoberta inteligente de produtos.
