@@ -100,6 +100,37 @@ def refresh_access_token(
     )
 
 
+def access_token_from_env(*, urlopen: Callable = urllib.request.urlopen) -> str:
+    """Devolve um access token, sem exigir passo manual.
+
+    Ordem: ``ML_ACCESS_TOKEN`` explícito → **client_credentials** → refresh token.
+
+    O `client_credentials` no meio é o que faz diferença: ele resolve sozinho,
+    sem navegador e sem redirect (token de 6h), e cobre tudo que o enriquecimento
+    precisa (`/products`, `/products/{id}/items`, `/users`). O fluxo
+    `authorization_code` continua existindo para o dia em que for preciso um
+    recurso de usuário — hoje, não é.
+    """
+    token = (os.environ.get("ML_ACCESS_TOKEN") or "").strip()
+    if token:
+        return token
+
+    client_id = _env("ML_CLIENT_ID")
+    client_secret = _env("ML_CLIENT_SECRET")
+    try:
+        return client_credentials_token(client_id, client_secret, urlopen=urlopen)["access_token"]
+    except Exception as exc:  # noqa: BLE001
+        refresh = (os.environ.get("ML_REFRESH_TOKEN") or "").strip()
+        if not refresh:
+            raise RuntimeError(
+                "Não foi possível obter um token do ML. Defina ML_ACCESS_TOKEN ou "
+                "confira ML_CLIENT_ID/ML_CLIENT_SECRET."
+            ) from exc
+        return refresh_access_token(client_id, client_secret, refresh, urlopen=urlopen)[
+            "access_token"
+        ]
+
+
 def _env(name: str) -> str:
     value = os.environ.get(name)
     if not value:
