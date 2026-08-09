@@ -8,70 +8,201 @@ on:
 permissions:
   contents: write
 
+# Um push novo cancela a execução anterior do mesmo ref: economiza minutos do
+# free-tier e — importante para o job `lint`, que commita — evita duas execuções
+# empurrando correções de estilo para o mesmo ref ao mesmo tempo.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  api:
+  # ------------------------------------------------------------------ lint
+  # Antes: os 3 jobs (api, worker, frontend) rodavam `--fix` + git-auto-commit-action
+  # EM PARALELO. Três execuções commitando e dando push no mesmo ref ao mesmo
+  # tempo — o primeiro passava e os outros tomavam rejeição de push (non-fast-forward),
+  # com resultado dependente de quem chegasse primeiro.
+  #
+  # Agora existe UM job que corrige e commita uma vez só; os demais dependem
+  # dele (`needs: lint`) e nunca escrevem no repositório.
+  lint:
     runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: api
     steps:
+      # `ref: head_ref` faz o checkout do BRANCH da PR em vez do merge commit
+      # destacado — sem isso não há para onde commitar.
       - uses: actions/checkout@v4
         with:
+          ref: ${{ github.head_ref }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-      - run: pip install --upgrade pip && pip install ".[dev]"
-      - run: ruff check --fix .
-      - run: ruff format .
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "style(api): auto-fix linting and formatting issues"
-          
-      - run: pytest -q
+          cache: pip
 
-  worker:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: worker
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-      - run: pip install --upgrade pip && pip install ".[dev]"
-      - run: ruff check --fix .
-      - run: ruff format .
-
-      - uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "style(worker): auto-fix linting and formatting issues"
-
-      - run: pytest -q
-
-  frontend:
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        working-directory: frontend
-    steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
-      - run: npm ci
-      - run: npm run lint --if-present -- --fix
-      - run: npm run format --if-present
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
 
+      - name: Instala dependências de lint
+        run: |
+          pip install --upgrade pip
+          pip install "./api[dev]" "./worker[dev]"
+          npm ci --prefix frontend
+
+      - name: ruff (api)
+        working-directory: api
+        run: |
+          ruff check --fix .
+          ruff format .
+
+      - name: ruff (worker)
+        working-directory: worker
+        run: |
+          ruff check --fix .
+          ruff format .
+
+      - name: eslint + prettier (frontend)
+        working-directory: frontend
+        run: |
+          npm run lint -- --fix
+          npm run format
+
+      # Um único commit para os três projetos, em um único job.
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
-          commit_message: "style(frontend): auto-fix linting and formatting issues"
+          commit_message: "style: auto-fix de lint e formatação"
 
-      - run: npm run build --if-present
+  # ------------------------------------------------------------------- api
+  # Postgres real com pgvector: sem serviço de banco, a suíte de relevância
+  # (KPI Top-5 ≥80% do PRD) era PULADA no CI e só rodava na máquina do dev —
+  # ou seja, o KPI não era verificado em nenhum merge.
+  api:
+    runs-on: ubuntu-latest
+    needs: lint
 
+    services:
+      postgres:
+        # Traz a extensão pgvector pronta (ADR-0002), igual ao docker-compose.
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: productsearcher
+        ports:
+          - 5432:5432
+        # Sem healthcheck os steps começam antes do banco aceitar conexão.
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/productsearcher
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instala api + worker
+        # O worker entra porque a ingestão do seed é pré-requisito do KPI.
+        run: |
+          pip install --upgrade pip
+          pip install "./api[dev]" "./worker"
+
+      - name: Aplica as migrations
+        working-directory: api
+        run: alembic upgrade head
+
+      - name: Carrega o seed
+        # A fixture `search_service` pula a suíte de relevância com catálogo
+        # vazio. Sem este passo o KPI continuaria não sendo medido.
+        working-directory: worker
+        run: python -m ingestion.pipeline
+
+      - name: Testes (inclui o KPI de relevância)
+        working-directory: api
+        run: pytest -q
+
+  # ---------------------------------------------------------------- worker
+  worker:
+    runs-on: ubuntu-latest
+    needs: lint
+    defaults:
+      run:
+        working-directory: worker
+
+    services:
+      postgres:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: productsearcher
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      DATABASE_URL: postgresql+psycopg://postgres:postgres@localhost:5432/productsearcher
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Instala worker + alembic da api
+        run: |
+          pip install --upgrade pip
+          pip install ".[dev]" "../api"
+        working-directory: worker
+
+      # `test_load` (idempotência do upsert) exige o schema aplicado; sem isto
+      # ele se pulava sozinho e a ingestão ficava sem teste de integração.
+      - name: Aplica as migrations
+        working-directory: api
+        run: alembic upgrade head
+
+      - run: pytest -q
+
+  # -------------------------------------------------------------- frontend
+  frontend:
+    runs-on: ubuntu-latest
+    needs: lint
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - run: npm ci
+
+      - run: npm run build
+
+  # ------------------------------------------------------------------- ext
   extension:
     runs-on: ubuntu-latest
+    needs: lint
     defaults:
       run:
         working-directory: extension
