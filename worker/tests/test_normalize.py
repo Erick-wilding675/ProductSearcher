@@ -63,12 +63,99 @@ def test_normalize_one_sem_marca_rejeita():
         normalize_one(raw)
 
 
-def test_normalize_lote_dedup_e_rejeicoes():
+def test_normalize_lote_funde_repetido_e_rejeita_sem_marca():
     raws = [
         RawProduct(source="seed", name="A", brand="Dell", category="notebooks", model="x"),
         RawProduct(source="seed", name="A dup", brand="Dell", category="notebooks", model="x"),
         RawProduct(source="seed", name="Sem marca", category="notebooks"),
     ]
     normalized, rejected = normalize(raws)
+
+    # Mesma identidade vira um produto só (não é mais descarte) — ADR-0009.
     assert [p.slug for p in normalized] == ["dell-x"]
-    assert len(rejected) == 2  # duplicado + sem marca
+    assert [r.reasons[0] for r in rejected] == [
+        "marca ausente (obrigatória para o slug e o catálogo)"
+    ]
+
+
+def test_normalize_sku_separa_produtos_de_mesmo_modelo():
+    # Os "IdeaPad Slim 3 15IRH10" i5 e i7 têm o mesmo modelo e SKUs diferentes:
+    # sem o SKU no slug, um sobrescreveria o outro.
+    raws = [
+        RawProduct(
+            source="seed",
+            name="IdeaPad i5",
+            brand="Lenovo",
+            category="notebooks",
+            model="IdeaPad Slim 3 15IRH10",
+            catalog_parent_id="MLB1",
+            catalog_sku="83NS0002BR",
+        ),
+        RawProduct(
+            source="seed",
+            name="IdeaPad i7",
+            brand="Lenovo",
+            category="notebooks",
+            model="IdeaPad Slim 3 15IRH10",
+            catalog_parent_id="MLB2",
+            catalog_sku="83NS0004BR",
+        ),
+    ]
+    normalized, rejected = normalize(raws)
+
+    assert [p.slug for p in normalized] == [
+        "lenovo-ideapad-slim-3-15irh10-83ns0002br",
+        "lenovo-ideapad-slim-3-15irh10-83ns0004br",
+    ]
+    assert rejected == []
+
+
+def test_normalize_funde_variantes_de_cor_somando_ofertas():
+    # Os cinco "Dapon H02D" do seed compartilham o mesmo pai: mesma coisa, cores
+    # diferentes. Fundir soma os vendedores em vez de jogar oferta fora.
+    def variante(nome, loja, preco):
+        return RawProduct(
+            source="seed",
+            name=nome,
+            brand="Dapon",
+            category="headphones",
+            model="H02D",
+            catalog_parent_id="MLB24117256",
+            offers=[{"store": loja, "price": preco}],
+        )
+
+    normalized, rejected = normalize(
+        [variante("Dapon H02D Preto", "Loja A", "100"), variante("Dapon H02D Rosa", "Loja B", "90")]
+    )
+
+    assert len(normalized) == 1
+    assert {o.store_name for o in normalized[0].offers} == {"Loja A", "Loja B"}
+    assert rejected == []
+
+
+def test_normalize_desambigua_slug_de_identidades_diferentes():
+    # Sem SKU para desempatar, dois produtos distintos cairiam no mesmo slug e um
+    # sobrescreveria o outro no upsert. O sufixo evita a perda silenciosa.
+    raws = [
+        RawProduct(
+            source="seed",
+            name="X",
+            brand="Dell",
+            category="notebooks",
+            model="Inspiron",
+            catalog_parent_id="MLB1",
+        ),
+        RawProduct(
+            source="seed",
+            name="Y",
+            brand="Dell",
+            category="notebooks",
+            model="Inspiron",
+            catalog_parent_id="MLB2",
+        ),
+    ]
+    normalized, _ = normalize(raws)
+
+    assert len({p.slug for p in normalized}) == 2
+    assert normalized[0].slug == "dell-inspiron"
+    assert normalized[1].slug == "dell-inspiron-mlb2"
