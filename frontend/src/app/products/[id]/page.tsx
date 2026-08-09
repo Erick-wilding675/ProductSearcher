@@ -6,9 +6,12 @@ import { useParams, useRouter } from "next/navigation";
 import { EmptyState } from "@/components/states/empty-state";
 import { ErrorState } from "@/components/states/error-state";
 import { LoadingList } from "@/components/states/loading-list";
+import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { Button } from "@/components/ui/button";
-import { formatPrice, getProduct } from "@/lib/api";
+import { ApiError, formatPrice, getProduct } from "@/lib/api";
 import type { ProductDetail } from "@/lib/api";
+
+type ErroProduto = { message: string; requestId: string | null };
 
 function formatSpecKey(key: string): string {
   return key.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
@@ -37,7 +40,9 @@ export default function ProductPage() {
   const [product, setProduct] = useState<ProductDetail | null>(null);
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<ErroProduto | null>(null);
+  // "Tentar de novo" refaz só o fetch, em vez de recarregar a página inteira.
+  const [tentativa, setTentativa] = useState(0);
 
   const id = params.id;
 
@@ -59,7 +64,18 @@ export default function ProductPage() {
 
         setProduct(null);
 
-        setError(err instanceof Error ? err.message : "Não foi possível carregar o produto.");
+        setError(
+          err instanceof ApiError
+            ? {
+                message: err.detail || "Não foi possível carregar o produto.",
+                requestId: err.requestId,
+              }
+            : {
+                message:
+                  err instanceof Error ? err.message : "Não foi possível carregar o produto.",
+                requestId: null,
+              }
+        );
       } finally {
         if (!controller.signal.aborted) {
           setLoading(false);
@@ -76,23 +92,27 @@ export default function ProductPage() {
     return () => {
       controller.abort();
     };
-  }, [id]);
-
-  function handleRetry() {
-    window.location.reload();
-  }
+  }, [id, tentativa]);
 
   return (
     <main className="mx-auto min-h-screen max-w-5xl px-4 py-8">
-      <div className="mb-8">
+      <div className="mb-8 flex items-center justify-between gap-4">
         <Button type="button" variant="outline" onClick={() => router.push("/")}>
           Voltar para busca
         </Button>
+
+        <ThemeToggle />
       </div>
 
       {loading && <LoadingList />}
 
-      {!loading && error && <ErrorState message={error} onRetry={handleRetry} />}
+      {!loading && error && (
+        <ErrorState
+          message={error.message}
+          requestId={error.requestId}
+          onRetry={() => setTentativa((n) => n + 1)}
+        />
+      )}
 
       {!loading && !error && !product && (
         <EmptyState
