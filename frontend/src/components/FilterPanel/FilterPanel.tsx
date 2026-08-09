@@ -36,7 +36,7 @@ export function FilterPanel({
   return (
     <aside
       aria-label="Filtros de busca"
-      className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4"
+      className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 md:sticky md:top-6 md:self-start"
     >
       <div className="mb-4 flex items-center justify-between">
         <h2 className="text-lg font-semibold">Filtros</h2>

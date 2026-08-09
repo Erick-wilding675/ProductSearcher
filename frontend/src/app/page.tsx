@@ -217,10 +217,14 @@ function SearchPageContent() {
 
   const resultados = response?.results ?? [];
   const semResultados = temBusca && !loading && !error && resultados.length === 0;
+  // Rank global (não reinicia a cada página) para o selo de Top 5.
+  const rankInicial = response ? (response.page - 1) * response.page_size : 0;
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 pb-36 sm:pb-28">
-      <ThemeToggle />
+      <div className="mb-4">
+        <ThemeToggle />
+      </div>
 
       <header className="mb-8">
         <h1 className="text-2xl font-bold sm:text-3xl">🔎 ProductSearcher</h1>
@@ -288,10 +292,11 @@ function SearchPageContent() {
           {!loading && !error && resultados.length > 0 && (
             <>
               <div className="space-y-4">
-                {resultados.map((product) => (
+                {resultados.map((product, index) => (
                   <ResultCard
                     key={product.id}
                     product={product}
+                    rank={rankInicial + index + 1}
                     selectedForComparison={selectedProducts.includes(product.id)}
                     onCompareChange={(selected) => handleCompareChange(product.id, selected)}
                   />
