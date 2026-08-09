@@ -11,6 +11,8 @@ type FilterPanelProps = {
   brand: string;
   categories: FilterOption[];
   brands: FilterOption[];
+  /** Categorias e marcas vêm da API (`/categories`, `/brands`) e chegam depois do 1º render. */
+  loadingOptions?: boolean;
   onCategoryChange: (category: string) => void;
   onPriceMaxChange: (price: string) => void;
   onBrandChange: (brand: string) => void;
@@ -24,6 +26,7 @@ export function FilterPanel({
   brand,
   categories,
   brands,
+  loadingOptions = false,
   onCategoryChange,
   onPriceMaxChange,
   onBrandChange,
@@ -56,10 +59,11 @@ export function FilterPanel({
           <select
             id="filter-category"
             value={category}
+            disabled={loadingOptions}
             onChange={(event) => onCategoryChange(event.target.value)}
-            className="w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
+            className="w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2 disabled:opacity-60"
           >
-            <option value="">Todas</option>
+            <option value="">{loadingOptions ? "Carregando…" : "Todas"}</option>
 
             {categories.map((item) => (
               <option key={item.value} value={item.value}>
@@ -94,10 +98,11 @@ export function FilterPanel({
           <select
             id="filter-brand"
             value={brand}
+            disabled={loadingOptions}
             onChange={(event) => onBrandChange(event.target.value)}
-            className="w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2"
+            className="w-full rounded-md border border-[var(--border)] bg-[var(--surface)] px-3 py-2 disabled:opacity-60"
           >
-            <option value="">Todas</option>
+            <option value="">{loadingOptions ? "Carregando…" : "Todas"}</option>
 
             {brands.map((item) => (
               <option key={item.value} value={item.value}>

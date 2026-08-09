@@ -88,6 +88,17 @@ export interface Category {
   product_count: number;
 }
 
+/**
+ * Marca presente no catálogo (`BrandOut`).
+ * O `slug` é o que `search({ brand })` espera — o backend filtra por
+ * `brands.slug`, não pelo nome de exibição.
+ */
+export interface Brand {
+  slug: string;
+  name: string;
+  product_count: number;
+}
+
 /** Oferta de um produto (`OfferOut`). */
 export interface Offer {
   store: string;
@@ -190,6 +201,15 @@ export function search(params: SearchParams, signal?: AbortSignal): Promise<Sear
 /** `GET /categories` — categorias com ao menos um produto. */
 export function getCategories(signal?: AbortSignal): Promise<Category[]> {
   return request<Category[]>("/categories", { signal });
+}
+
+/**
+ * `GET /brands` — marcas com ao menos um produto, para montar o filtro de marca.
+ * `category` (slug) restringe às marcas daquela categoria.
+ */
+export function getBrands(category?: string, signal?: AbortSignal): Promise<Brand[]> {
+  const qs = category ? `?category=${encodeURIComponent(category)}` : "";
+  return request<Brand[]>(`/brands${qs}`, { signal });
 }
 
 /** `GET /products/{id}` — detalhe com specs e ofertas. */
