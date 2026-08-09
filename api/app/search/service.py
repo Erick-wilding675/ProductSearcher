@@ -16,6 +16,7 @@ from typing import Annotated, Any
 from fastapi import Depends
 
 from app.search.intent import Intent, IntentParser, RuleBasedIntentParser
+from app.search.log import NullSearchLog, SearchLog, get_search_log
 from app.search.providers import SearchProvider, get_fts_search_provider
 from app.search.ranking import DeterministicRanking, RankingService
 from app.search.schemas import (
@@ -36,10 +37,13 @@ class SearchService:
         parser: IntentParser,
         provider: SearchProvider,
         ranking: RankingService,
+        log: SearchLog | None = None,
     ) -> None:
         self._parser = parser
         self._provider = provider
         self._ranking = ranking
+        # Default sem registro: o serviço continua utilizável sem banco de log.
+        self._log = log or NullSearchLog()
 
     def search(
         self,
@@ -68,6 +72,12 @@ class SearchService:
 
         itens = _ordena(ranqueado["items"], sort)
         inicio = (page - 1) * PAGE_SIZE
+
+        # Registra a consulta com o total de candidatos, não com o tamanho da
+        # página: é o zero que interessa (busca que não achou nada).
+        if q:
+            self._log.record(q, intent, len(itens))
+
         return SearchResponse(
             page=page,
             page_size=PAGE_SIZE,
@@ -113,6 +123,7 @@ def _para_item(hit: dict) -> SearchResultItem:
 
 def get_search_service(
     provider: Annotated[SearchProvider, Depends(get_fts_search_provider)],
+    log: Annotated[SearchLog, Depends(get_search_log)],
 ) -> SearchService:
     """Dependency do FastAPI: monta o pipeline com as implementações do MVP."""
-    return SearchService(RuleBasedIntentParser(), provider, DeterministicRanking())
+    return SearchService(RuleBasedIntentParser(), provider, DeterministicRanking(), log)
