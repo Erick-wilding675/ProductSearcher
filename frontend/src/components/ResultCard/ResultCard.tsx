@@ -79,9 +79,7 @@ export function ResultCard({
   return (
     <article
       className={`rounded-lg border bg-[var(--surface)] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
-        isTopResult
-          ? "border-[var(--primary)]"
-          : "border-[var(--border)]"
+        isTopResult ? "border-[var(--primary)]" : "border-[var(--border)]"
       }`}
     >
       {/* Cabeçalho */}
@@ -98,9 +96,7 @@ export function ResultCard({
             {product.brand} · {product.category}
           </p>
 
-          <h2 className="mt-1 text-base font-semibold leading-snug">
-            {product.name}
-          </h2>
+          <h2 className="mt-1 text-base font-semibold leading-snug">{product.name}</h2>
         </div>
 
         <div className="shrink-0 text-left sm:text-right">
