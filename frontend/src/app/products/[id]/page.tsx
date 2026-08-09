@@ -132,8 +132,8 @@ export default function ProductPage() {
               <span>{product.category}</span>
             </div>
 
-            <h1 className="text-3xl font-bold">
-              {product.name}
+            <h1 className="text-2xl font-bold sm:text-3xl">
+            {   product.name}
             </h1>
 
             {product.model && (
@@ -151,8 +151,8 @@ export default function ProductPage() {
 
           <section
             aria-labelledby="specifications-title"
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-6"
-          >
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6"
+            >
             <h2
               id="specifications-title"
               className="mb-4 text-xl font-semibold"
@@ -188,8 +188,8 @@ export default function ProductPage() {
 
           <section
             aria-labelledby="offers-title"
-            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-6"
-          >
+            className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4 sm:p-6"
+            >
             <h2
               id="offers-title"
               className="mb-4 text-xl font-semibold"
@@ -219,12 +219,12 @@ export default function ProductPage() {
                     </div>
 
                     <a
-                      href={offer.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center justify-center rounded-md bg-[var(--primary)] px-4 py-2 font-medium text-[var(--primary-on)] hover:bg-[var(--primary-hover)]"
-                    >
-                      Ver oferta
+                        href={offer.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex w-full items-center justify-center rounded-md bg-[var(--primary)] px-4 py-2 font-medium text-[var(--primary-on)] hover:bg-[var(--primary-hover)] sm:w-auto"
+                        >
+                        Ver oferta
                     </a>
                   </article>
                 ))}

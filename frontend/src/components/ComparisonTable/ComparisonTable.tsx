@@ -34,8 +34,7 @@ export function ComparisonTable({
 
   return (
     <div className="w-full overflow-x-auto">
-      <table className="w-full border-collapse text-left">
-        <thead>
+        <table className="min-w-[700px] w-full border-collapse text-left text-sm sm:text-base">        <thead>
           <tr className="border-b">
             <th className="px-4 py-3 font-semibold">
               Especificação
@@ -44,7 +43,7 @@ export function ComparisonTable({
             {products.map((product) => (
               <th
                 key={product.id}
-                className="px-4 py-3 font-semibold"
+                className="min-w-[180px] px-3 py-3 font-semibold sm:px-4"
               >
                 {product.name}
               </th>
@@ -55,7 +54,7 @@ export function ComparisonTable({
         <tbody>
           {/* Preço */}
           <tr className="border-b">
-            <th className="px-4 py-3 font-medium">
+            <th className="min-w-[140px] px-3 py-3 font-medium sm:px-4">
               Preço
             </th>
 
@@ -89,7 +88,7 @@ export function ComparisonTable({
             >
               <th
                 scope="row"
-                className="px-4 py-3 font-medium"
+                className="min-w-[140px] px-3 py-3 font-medium sm:px-4"
               >
                 {formatAttributeKey(attribute.key)}
               </th>
@@ -97,7 +96,7 @@ export function ComparisonTable({
               {products.map((product, index) => (
                 <td
                   key={product.id}
-                  className="px-4 py-3"
+                  className="px-3 py-3 sm:px-4"
                 >
                   {formatAttributeValue(
                     attribute.values[index],

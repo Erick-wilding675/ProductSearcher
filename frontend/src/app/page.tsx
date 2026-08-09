@@ -89,12 +89,13 @@ export default function HomePage() {
   }
 
   return (
-    <main className="mx-auto max-w-6xl px-6 py-10">
-      
+    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 pb-36 sm:pb-28">      
       <ThemeToggle />
 
       <header className="mb-8">
-        <h1 className="text-3xl font-bold">🔎 ProductSearcher</h1>
+        <h1 className="text-2xl font-bold sm:text-3xl">
+          🔎 ProductSearcher
+        </h1>
         
 
         <p className="mt-2 text-[var(--text-muted)]">
@@ -165,7 +166,7 @@ export default function HomePage() {
           </div>
             {selectedProducts.length > 0 && (
                 <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-[var(--border)] bg-[var(--surface)] shadow-lg">
-                  <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+                  <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <p className="font-medium">
                         {selectedProducts.length}{" "}
@@ -183,6 +184,7 @@ export default function HomePage() {
                       type="button"
                       onClick={handleCompare}
                       disabled={selectedProducts.length < 2}
+                      className="w-full sm:w-auto"
                     >
                       Comparar produtos
                     </Button>

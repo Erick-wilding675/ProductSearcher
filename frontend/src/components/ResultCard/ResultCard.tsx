@@ -67,7 +67,7 @@ export function ResultCard({
   return (
     <article className="rounded-lg border border-[var(--border)] bg-[var(--surface)] p-4">
       {/* Cabeçalho */}
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           <p className="text-sm text-[var(--text-muted)]">
             {product.brand} · {product.category}
@@ -78,7 +78,7 @@ export function ResultCard({
           </h2>
         </div>
 
-        <div className="shrink-0 text-right">
+        <div className="shrink-0 text-left sm:text-right">
           {/* Badge de ranking */}
           <span className="inline-flex rounded-full bg-[var(--accent-surface)] px-3 py-1 text-sm font-semibold text-[var(--primary)]">
             Ranking: {(product.score * 100).toFixed(0)}%
@@ -122,7 +122,7 @@ export function ResultCard({
       )}
 
       {/* Comparação */}
-      <div className="mt-4 border-t border-[var(--border)] pt-3">
+      <div className="mt-4 flex flex-col gap-3 border-t border-[var(--border)] pt-3 sm:flex-row sm:items-center sm:justify-between">
         <label className="flex cursor-pointer items-center gap-2 text-sm">
           <input
             type="checkbox"
@@ -135,13 +135,12 @@ export function ResultCard({
           Comparar este produto
         </label>
 
-       <Link
+        <Link
           href={`/products/${product.id}`}
-          className="inline-flex items-center justify-center rounded-md border border-[var(--border)] px-4 py-2 text-sm font-medium hover:bg-[var(--surface-alt)]"
+          className="inline-flex w-full items-center justify-center rounded-md border border-[var(--border)] px-4 py-2 text-sm font-medium hover:bg-[var(--surface-alt)] sm:w-auto"
         >
           Ver detalhes
         </Link>
-
       </div>
     </article>
   );

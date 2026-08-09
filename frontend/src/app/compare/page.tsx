@@ -83,8 +83,8 @@ function CompareContent() {
       </div>
 
       <header className="mb-8">
-        <h1 className="text-3xl font-bold">
-          Comparação de produtos
+        <h1 className="text-2xl font-bold sm:text-3xl">
+            Comparação de produtos
         </h1>
 
         <p className="mt-2 text-[var(--text-muted)]">

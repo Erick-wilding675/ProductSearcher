@@ -18,9 +18,9 @@ export function SearchBar({
 
   return (
     <form
-      onSubmit={handleSubmit}
       role="search"
-      className="flex w-full gap-2"
+      onSubmit={handleSubmit}
+      className="flex flex-col gap-2 sm:flex-row"
     >
       <label htmlFor="search-input" className="sr-only">
         Buscar produtos
@@ -37,7 +37,7 @@ export function SearchBar({
 
       <button
         type="submit"
-        className="rounded-md bg-[var(--primary)] px-5 py-2 font-medium text-[var(--primary-on)] hover:bg-[var(--primary-hover)]"
+        className="w-full rounded-md bg-[var(--primary)] px-5 py-2 font-medium text-[var(--primary-on)] hover:bg-[var(--primary-hover)] sm:w-auto"
       >
         Buscar
       </button>
