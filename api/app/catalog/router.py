@@ -1,11 +1,11 @@
-"""Endpoints do catálogo: GET /categories, GET /products/{id}."""
+"""Endpoints do catálogo: GET /categories, GET /brands, GET /products/{id}."""
 
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, HTTPException
 
 from app.catalog.repository import CatalogRepository, get_catalog_repository
-from app.catalog.schemas import CategoryOut, ProductDetailOut
+from app.catalog.schemas import BrandOut, CategoryOut, ProductDetailOut
 
 router = APIRouter(tags=["catalog"])
 
@@ -20,6 +20,19 @@ def list_categories(
     ativar na SERP do Google (ativação por cobertura — ADR-0001).
     """
     return repo.get_categories()
+
+
+@router.get("/brands", response_model=list[BrandOut])
+def list_brands(
+    repo: Annotated[CatalogRepository, Depends(get_catalog_repository)],
+    category: str | None = None,
+) -> list[BrandOut]:
+    """Marcas presentes no catálogo, para montar o filtro de marca da UI.
+
+    O `slug` devolvido é exatamente o que o `GET /search?brand=` consome. Passar
+    `?category=<slug>` restringe às marcas daquela categoria.
+    """
+    return repo.get_brands(category)
 
 
 @router.get("/products/{product_id}", response_model=ProductDetailOut)

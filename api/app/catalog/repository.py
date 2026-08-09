@@ -12,7 +12,13 @@ from fastapi import Depends
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from app.catalog.schemas import CategoryOut, CompareProduct, OfferOut, ProductDetailOut
+from app.catalog.schemas import (
+    BrandOut,
+    CategoryOut,
+    CompareProduct,
+    OfferOut,
+    ProductDetailOut,
+)
 from app.catalog.tables import brands, categories, offers, product_specs, products, stores
 from app.core.db import get_session
 
@@ -30,6 +36,7 @@ def _to_uuids(ids: list[str]) -> list[UUID]:
 
 class CatalogRepository(Protocol):
     def get_categories(self) -> list[CategoryOut]: ...
+    def get_brands(self, category: str | None = None) -> list[BrandOut]: ...
     def get_product(self, product_id: str) -> ProductDetailOut | None: ...
     def get_products_by_ids(self, ids: list[str]) -> list[CompareProduct]: ...
 
@@ -60,6 +67,36 @@ class SqlCatalogRepository:
         return [
             CategoryOut(slug=row.slug, name=row.name, product_count=row.product_count)
             for row in rows
+        ]
+
+    def get_brands(self, category: str | None = None) -> list[BrandOut]:
+        """Marcas PRESENTES no catálogo: só as que têm ao menos 1 produto (INNER JOIN).
+
+        Irmão de `get_categories`: mesma forma (slug, name, product_count) e mesma
+        query agregada sobre o FK indexado. A UI monta o filtro de marca a partir
+        daqui em vez de manter uma lista fixa que envelhece a cada ingestão.
+
+        `category` (slug) restringe às marcas daquela categoria — evita oferecer
+        marca de notebook em uma busca de fones.
+        """
+        stmt = (
+            select(
+                brands.c.slug,
+                brands.c.name,
+                func.count(products.c.id).label("product_count"),
+            )
+            .select_from(brands)
+            .join(products, products.c.brand_id == brands.c.id)
+        )
+        if category:
+            stmt = stmt.join(categories, categories.c.id == products.c.category_id).where(
+                categories.c.slug == category
+            )
+        stmt = stmt.group_by(brands.c.id, brands.c.slug, brands.c.name).order_by(brands.c.name)
+
+        rows = self._session.execute(stmt).all()
+        return [
+            BrandOut(slug=row.slug, name=row.name, product_count=row.product_count) for row in rows
         ]
 
     def get_product(self, product_id: str) -> ProductDetailOut | None:

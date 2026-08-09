@@ -18,6 +18,18 @@ class CategoryOut(BaseModel):
     product_count: int
 
 
+class BrandOut(BaseModel):
+    """Uma marca presente no catálogo (com ao menos 1 produto).
+
+    `slug` é o que o `GET /search?brand=` espera — o filtro casa por
+    `brands.slug`, não pelo nome de exibição.
+    """
+
+    slug: str
+    name: str
+    product_count: int
+
+
 class OfferOut(BaseModel):
     """Uma oferta do produto: onde comprar, por quanto e o link."""
 

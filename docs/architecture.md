@@ -55,6 +55,7 @@ A IA é chamada **apenas quando habilitada**; o caminho crítico (busca/compara�
 | POST | `/compare` | `{ product_ids: [...] }` (mesma categoria) |
 | GET | `/products/{id}` | Detalhe: specs + ofertas |
 | GET | `/categories` | Categorias cobertas (extensão) |
+| GET | `/brands` | Marcas presentes; `?category=` restringe (filtro da UI) |
 
 ## Como atende os RNFs
 
