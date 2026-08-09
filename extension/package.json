@@ -1,0 +1,10 @@
+{
+  "name": "productsearcher-extension",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Extensão Chrome (MV3) do ProductSearcher — cliente fino da mesma API",
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  }
+}

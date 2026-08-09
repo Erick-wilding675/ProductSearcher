@@ -67,5 +67,20 @@ jobs:
       - uses: stefanzweifel/git-auto-commit-action@v5
         with:
           commit_message: "style(frontend): auto-fix linting and formatting issues"
-          
+
       - run: npm run build --if-present
+
+  extension:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: extension
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      # Sem dependências: os testes usam o runner nativo do Node.
+      - run: node --test
+      - name: Valida o manifest
+        run: node -e "JSON.parse(require('fs').readFileSync('manifest.json','utf8'))"
