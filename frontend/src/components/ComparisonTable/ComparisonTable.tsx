@@ -84,7 +84,7 @@ export function ComparisonTable({
             <tr
               key={attribute.key}
               className={`border-b ${
-                attribute.differ ? "bg-[var(--accent-surface)" : ""
+                attribute.differ ? "bg-[var(--accent-surface)]" : ""
               }`}
             >
               <th

@@ -163,21 +163,33 @@ export default function HomePage() {
               />
             ))}
           </div>
+            {selectedProducts.length > 0 && (
+                <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-[var(--border)] bg-[var(--surface)] shadow-lg">
+                  <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+                    <div>
+                      <p className="font-medium">
+                        {selectedProducts.length}{" "}
+                        {selectedProducts.length === 1
+                          ? "produto selecionado"
+                          : "produtos selecionados"}
+                      </p>
 
-          {selectedProducts.length > 0 && (
-            <div className="mt-6 flex items-center justify-between gap-4 rounded-lg border border-border bg-surface p-4">
-              <p className="text-sm text-text-muted">
-                {selectedProducts.length} produto(s) selecionado(s) para comparação.
-              </p>
+                      <p className="text-sm text-[var(--text-muted)]">
+                        Selecione de 2 a 4 produtos para comparar.
+                      </p>
+                    </div>
 
-              <Button
-                onClick={handleCompare}
-                disabled={selectedProducts.length < 2}
-              >
-                Comparar produtos
-              </Button>
-            </div>
-          )}
+                    <Button
+                      type="button"
+                      onClick={handleCompare}
+                      disabled={selectedProducts.length < 2}
+                    >
+                      Comparar produtos
+                    </Button>
+                  </div>
+                </div>
+              )}
+              
         </section>
       </div>
     </main>
