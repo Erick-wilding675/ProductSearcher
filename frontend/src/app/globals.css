@@ -17,6 +17,7 @@
   --primary-on: #ffffff;
   --accent-surface: #f5f3ff;
   --focus-ring: #a78bfa;
+  --success: #15803d;
 }
 
 .dark {
@@ -32,6 +33,8 @@
   --primary-on: #0b1220;
   --accent-surface: #2e1065;
   --focus-ring: #c4b5fd;
+  /* Verde claro: o escuro (#15803d) sai ilegível sobre o accent-surface violeta. */
+  --success: #4ade80;
 }
 
 body {

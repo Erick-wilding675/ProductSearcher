@@ -68,7 +68,7 @@ export function ComparisonTable({
                   key={product.id}
                   className={`px-4 py-3 ${
                     isBestValue
-                      ? "bg-[var(--accent-surface)] font-bold text-green-700"
+                      ? "bg-[var(--accent-surface)] font-bold text-[var(--success)]"
                       : ""
                   }`}
                 >

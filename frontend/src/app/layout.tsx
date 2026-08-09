@@ -31,10 +31,10 @@ const aplicarTemaSalvo = `
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
-      <head>
+      <body className="font-sans">
         <script dangerouslySetInnerHTML={{ __html: aplicarTemaSalvo }} />
-      </head>
-      <body className="font-sans">{children}</body>
+        {children}
+      </body>
     </html>
   );
 }
