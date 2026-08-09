@@ -4,7 +4,7 @@ Só as colunas usadas na leitura — a migration inicial (`7d5fdc583693`) é a f
 verdade do schema. Novos endpoints estendem este módulo com as tabelas que precisarem.
 """
 
-from sqlalchemy import Column, Computed, ForeignKey, MetaData, Numeric, Table, Text
+from sqlalchemy import Column, Computed, ForeignKey, Integer, MetaData, Numeric, Table, Text
 from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 
 metadata = MetaData()
@@ -60,6 +60,15 @@ product_specs = Table(
     Column("id", UUID(as_uuid=True), primary_key=True),
     Column("product_id", UUID(as_uuid=True), ForeignKey("products.id"), nullable=False),
     Column("attributes", JSONB, nullable=False),
+)
+
+searches = Table(
+    "searches",
+    metadata,
+    Column("id", UUID(as_uuid=True), primary_key=True),
+    Column("query_text", Text, nullable=False),
+    Column("parsed_intent", JSONB),
+    Column("result_count", Integer, nullable=False),
 )
 
 offers = Table(

@@ -99,9 +99,32 @@ erDiagram
 
 `SEARCHES` é um log de consultas (analytics/relevância), sem relação forte com as demais.
 
+## Colunas intencionalmente vazias
+
+Nem toda coluna vazia é lacuna. Estas são **estado correto** no MVP — a distinção
+está aqui para não serem lidas como esquecimento (ver ADR-0009 D7):
+
+| Onde | Por quê | O que a destrava |
+| --- | --- | --- |
+| `PRODUCTS.embedding` | O sistema funciona 100% sem IA; a busca vetorial é reforço opcional atrás do `VectorProvider` (ADR-0002) | Fase 6 — `VectorProvider` com pgvector |
+| `REVIEWS` (tabela) | RF-05 é `Could` no PRD. A API do ML **não expõe avaliação** para token de aplicação: `/reviews/item` responde 404, `/products/{id}/reviews` responde 500 e `rating_average` veio nulo em 44/44 produtos amostrados | Ator do **Apify** sobre a página do produto (mesma fonte do ADR-0001), colhendo `rating` e `rating_count`. A coluna `source` existe para distinguir a procedência |
+
+`SEARCHES` **deixou de ser vazia**: o `SearchService` registra consulta, intent
+interpretado e total de resultados a cada busca com texto. Serve para achar
+busca que volta vazia e termo que o `IntentParser` não entende. Gravamos o texto
+da consulta **sem identificação de usuário** — não há `users` no MVP, nem IP nem
+sessão. Falha ao registrar nunca derruba a busca.
+
+## Identidade do produto
+
+A chave natural é o `slug`, derivado de **marca + modelo + SKU do fabricante**.
+Variantes de cor do mesmo produto (mesmo `parent_id` no catálogo da fonte) são
+**fundidas em um produto só**, somando as ofertas. Ver ADR-0009 D3.
+
 ## Decisões em aberto
 
 - `product_specs` separado vs. embutido em `products`.
 - Granularidade de `reviews`.
 - Índices: GIN (FTS/JSONB) e IVFFlat/HNSW (embedding).
 - APIFY como possível fonte futura de `offers`/`price_history` (ver ADR-0001).
+- Expurgo por idade em `searches` (hoje cresce sem limite).

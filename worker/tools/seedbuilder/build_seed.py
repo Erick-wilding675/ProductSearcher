@@ -17,8 +17,9 @@ import os
 
 import yaml
 
-from tools.seedbuilder import mapping, ml_api
+from tools.seedbuilder import mapping
 from tools.seedbuilder import title_parser as tp
+from tools.seedbuilder.ml_api import MLClient, product_fields
 
 logger = logging.getLogger(__name__)
 
@@ -40,9 +41,16 @@ def _build_offer(row: dict) -> dict | None:
 
 
 def build(rows: list[dict], category: str, token: str | None = None) -> list[dict]:
-    """Monta a lista de produtos crus (formato `RawProduct`) a partir das linhas."""
+    """Monta a lista de produtos crus (formato `RawProduct`) a partir das linhas.
+
+    Com `token`, consulta `/products/{sku}` para sobrepor as specs do título pela
+    ficha técnica e trazer `model`/`description`. Sem token, fica só no título —
+    o `enrich.py` pode completar depois, sem refazer a coleta.
+    """
     products: list[dict] = []
     seen: set[str] = set()
+    client = MLClient(token) if token else None
+
     for row in rows:
         sku = (row.get("SKU") or "").strip()
         title = (row.get("eTituloProduto") or "").strip()
@@ -57,9 +65,15 @@ def build(rows: list[dict], category: str, token: str | None = None) -> list[dic
         seen.add(sku)
 
         specs = tp.parse_title(category, title)
-        if token:
-            ml_specs = mapping.map_attributes(category, ml_api.fetch_attributes(sku, token))
-            specs = {**specs, **ml_specs}
+        model = description = None
+
+        if client:
+            ficha = client.product(sku)
+            if ficha:
+                # A ficha técnica é fonte de 1ª mão: sobrepõe o que veio do título.
+                specs = {**specs, **mapping.map_attributes(category, ficha.get("attributes") or [])}
+                campos = product_fields(ficha)
+                model, description = campos["model"], campos["description"]
 
         offer = _build_offer(row)
         products.append(
@@ -70,6 +84,8 @@ def build(rows: list[dict], category: str, token: str | None = None) -> list[dic
                 "brand": (row.get("produtoMarca") or "").strip()
                 or tp.extract_brand(category, title),
                 "category": category,
+                "model": model,
+                "description": description,
                 "specs": specs,
                 "offers": [offer] if offer else [],
             }

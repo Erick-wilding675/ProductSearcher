@@ -28,7 +28,14 @@ from app.search.service import SearchService
 def db_session() -> Iterator[Session]:
     """Sessão contra o Postgres real. Pula a suíte se o banco não responder."""
     try:
-        engine = create_engine(settings.database_url, pool_pre_ping=True, future=True)
+        # Mesmo `connect_args` do `app/core/db.py`: sem isso a suíte quebra com
+        # `DuplicatePreparedStatement` contra o pooler do Supabase. Ver db.py.
+        engine = create_engine(
+            settings.database_url,
+            pool_pre_ping=True,
+            future=True,
+            connect_args={"prepare_threshold": None},
+        )
         factory = sessionmaker(bind=engine, autoflush=False, autocommit=False)
         session = factory()
         session.execute(select(1))

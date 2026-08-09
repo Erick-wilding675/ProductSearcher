@@ -22,14 +22,24 @@ Pré-requisito: Docker.
 
 ```bash
 cp .env.example .env
-docker compose up            # sobe db (pgvector) + api
-docker compose run --rm worker   # roda a ingestão do seed (quando implementada)
+docker compose up -d db          # sobe só o Postgres (pgvector)
+make migrate                     # cria o schema (alembic upgrade head)
+make seed                        # carrega o catálogo seed
+docker compose up -d api         # sobe a API já com dados
 # Frontend:
 cd frontend && npm install && npm run dev
 ```
 
 - API: http://localhost:8000 (`/health`)
 - Web: http://localhost:3000
+
+> **Não pule `make migrate` e `make seed`.** O `docker compose up` sobe o banco
+> **vazio** — nada no compose roda migrations. Com o banco vazio a API responde
+> `[]` em `/categories`, a busca não acha nada e a extensão fica calada, o que
+> parece defeito e não é.
+
+Para conferir se o catálogo entrou: `curl localhost:8000/categories` deve listar
+as categorias com `product_count > 0`.
 
 ### Sem Docker (venv local, Python 3.11+)
 

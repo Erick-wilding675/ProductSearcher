@@ -22,7 +22,8 @@ class RawOffer(BaseModel):
     store: str | None = None
     price: str | float | None = None  # cru: pode chegar "R$ 3.999,00"
     currency: str | None = None
-    url: str | None = None
+    url: str | None = None  # link da oferta
+    store_url: str | None = None  # perfil/vitrine da loja (vira `stores.url`)
 
 
 class RawProduct(BaseModel):
@@ -37,6 +38,11 @@ class RawProduct(BaseModel):
     category: str  # slug/nome cru da categoria
     model: str | None = None
     description: str | None = None
+    # Identidade vinda do catálogo da fonte (ADR-0009): variantes de cor do mesmo
+    # produto compartilham `catalog_parent_id`; `catalog_sku` desempata o slug
+    # quando marca+modelo colidem entre produtos de verdade diferentes.
+    catalog_parent_id: str | None = None
+    catalog_sku: str | None = None
     specs: dict[str, Any] = Field(default_factory=dict)  # atributos crus, sem validar
     offers: list[RawOffer] = Field(default_factory=list)
 
@@ -70,6 +76,7 @@ class NormalizedOffer(BaseModel):
 
     store_slug: str
     store_name: str
+    store_url: str | None = None
     price: Decimal
     currency: str = "BRL"
     url: str | None = None

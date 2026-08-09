@@ -75,6 +75,7 @@ def _normalize_offer(raw: RawOffer) -> NormalizedOffer | None:
     return NormalizedOffer(
         store_slug=slugify(raw.store),
         store_name=raw.store.strip(),
+        store_url=(raw.store_url or "").strip() or None,
         price=price,
         currency=(raw.currency or DEFAULT_CURRENCY).strip().upper(),
         url=raw.url,
@@ -87,7 +88,13 @@ def normalize_one(raw: RawProduct) -> NormalizedProduct:
         raise ValueError("marca ausente (obrigatória para o slug e o catálogo)")
     brand_name = raw.brand.strip()
 
-    slug = slugify(f"{brand_name} {raw.model or raw.name}")
+    # O SKU do fabricante entra no slug porque `marca + modelo` NÃO é único: os
+    # quatro "Lenovo IdeaPad Slim 3 15IRH10" do seed são produtos diferentes
+    # (i5 e i7), e sem o SKU três deles seriam descartados como duplicata.
+    # Ver ADR-0009.
+    sku = (raw.catalog_sku or "").strip()
+    base = raw.model or raw.name
+    slug = slugify(f"{brand_name} {base} {sku}" if sku else f"{brand_name} {base}")
     if not slug:
         raise ValueError("não foi possível derivar um slug")
 
@@ -110,11 +117,36 @@ def normalize_one(raw: RawProduct) -> NormalizedProduct:
     )
 
 
+def _funde(destino: NormalizedProduct, origem: NormalizedProduct) -> None:
+    """Absorve `origem` em `destino`: une as ofertas e preenche o que faltava.
+
+    Variantes de cor do mesmo produto trazem, cada uma, os seus vendedores. Juntar
+    é o que dá sentido ao "melhor valor" da comparação — descartar jogaria fora
+    oferta boa, e manter cinco entradas idênticas na busca seria ruído.
+    """
+    lojas = {o.store_slug for o in destino.offers}
+    destino.offers.extend(o for o in origem.offers if o.store_slug not in lojas)
+
+    if not destino.model and origem.model:
+        destino.model = origem.model
+    if not destino.description and origem.description:
+        destino.description = origem.description
+    for chave, valor in (origem.specs or {}).items():
+        destino.specs.setdefault(chave, valor)
+
+
 def normalize(raws: Iterable[RawProduct]) -> tuple[list[NormalizedProduct], list[Rejection]]:
-    """Normaliza um lote, deduplicando por slug e coletando rejeições."""
-    normalized: list[NormalizedProduct] = []
+    """Normaliza um lote, fundindo variantes do mesmo produto.
+
+    A identidade é o `catalog_parent_id` quando a fonte o fornece (variantes de
+    cor compartilham o pai) e o `slug` quando não. Duas linhas da mesma identidade
+    **não** são descarte: são o mesmo produto anunciado em cores/vendedores
+    diferentes, e viram um só com as ofertas somadas (ADR-0009).
+    """
+    por_identidade: dict[str, NormalizedProduct] = {}
+    ordem: list[str] = []
     rejected: list[Rejection] = []
-    seen: set[str] = set()
+    slugs: dict[str, str] = {}  # slug -> identidade que já o ocupa
 
     for raw in raws:
         try:
@@ -124,12 +156,28 @@ def normalize(raws: Iterable[RawProduct]) -> tuple[list[NormalizedProduct], list
             rejected.append(Rejection(name=raw.name, reasons=[str(exc)]))
             continue
 
-        if product.slug in seen:
-            logger.warning("Slug duplicado no lote, mantendo o primeiro: %s", product.slug)
-            rejected.append(Rejection(name=raw.name, reasons=[f"slug duplicado: {product.slug}"]))
+        identidade = (raw.catalog_parent_id or "").strip() or product.slug
+        existente = por_identidade.get(identidade)
+        if existente is None:
+            # Produtos distintos que caíram no mesmo slug (sem SKU para desempatar)
+            # ganham sufixo da identidade. Sem isso o upsert por slug faria um
+            # sobrescrever o outro em silêncio — pior que a rejeição de antes.
+            dono = slugs.get(product.slug)
+            if dono is not None and dono != identidade:
+                product.slug = f"{product.slug}-{slugify(identidade)}"
+                logger.info("Slug em conflito, desambiguado para %s", product.slug)
+            slugs[product.slug] = identidade
+
+            por_identidade[identidade] = product
+            ordem.append(identidade)
             continue
 
-        seen.add(product.slug)
-        normalized.append(product)
+        logger.info(
+            "Variante do mesmo produto (%s): fundindo %s em %s",
+            identidade,
+            raw.name,
+            existente.slug,
+        )
+        _funde(existente, product)
 
-    return normalized, rejected
+    return [por_identidade[i] for i in ordem], rejected
