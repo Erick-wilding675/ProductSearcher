@@ -10,7 +10,20 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from app.core.config import settings
 
-engine = create_engine(settings.database_url, pool_pre_ping=True, future=True)
+# `prepare_threshold=None` desliga os prepared statements do psycopg3.
+#
+# O Supabase é acessado pelo **pooler em modo transação** (porta 6543), que
+# multiplexa várias sessões na mesma conexão do Postgres. Prepared statements são
+# por sessão: quando a mesma consulta repete, o driver tenta reaproveitar um nome
+# (`_pg3_0`) que pode pertencer a outra sessão e o banco responde
+# `DuplicatePreparedStatement`. Não é hipótese — foi o que derrubou a suíte de
+# relevância inteira contra o banco real.
+engine = create_engine(
+    settings.database_url,
+    pool_pre_ping=True,
+    future=True,
+    connect_args={"prepare_threshold": None},
+)
 SessionLocal = sessionmaker(bind=engine, autoflush=False, autocommit=False)
 
 
