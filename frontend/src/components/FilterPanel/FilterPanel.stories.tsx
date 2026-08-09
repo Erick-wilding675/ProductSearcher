@@ -15,11 +15,24 @@ export const Default: Story = {
     category: "",
     priceMax: "",
     brand: "",
-    categories: ["notebooks", "headphones"],
-    brands: ["Lenovo", "Acer", "Dell", "Sony"],
+
+    categories: [
+      { value: "notebooks", label: "Notebooks" },
+      { value: "headphones", label: "Fones de ouvido" },
+    ],
+
+    brands: [
+      { value: "lenovo", label: "Lenovo" },
+      { value: "acer", label: "Acer" },
+      { value: "dell", label: "Dell" },
+      { value: "asus", label: "Asus" },
+      { value: "jbl", label: "JBL" },
+    ],
+
     onCategoryChange: () => {},
     onPriceMaxChange: () => {},
     onBrandChange: () => {},
+    onApply: () => {},
     onClear: () => {},
   },
 };

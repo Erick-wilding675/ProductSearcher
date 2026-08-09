@@ -1,14 +1,20 @@
 "use client";
 
+type FilterOption = {
+  value: string;
+  label: string;
+};
+
 type FilterPanelProps = {
   category: string;
   priceMax: string;
   brand: string;
-  categories: string[];
-  brands: string[];
+  categories: FilterOption[];
+  brands: FilterOption[];
   onCategoryChange: (category: string) => void;
   onPriceMaxChange: (price: string) => void;
   onBrandChange: (brand: string) => void;
+  onApply: () => void;
   onClear: () => void;
 };
 
@@ -21,6 +27,7 @@ export function FilterPanel({
   onCategoryChange,
   onPriceMaxChange,
   onBrandChange,
+  onApply,
   onClear,
 }: FilterPanelProps) {
   return (
@@ -58,8 +65,8 @@ export function FilterPanel({
             <option value="">Todas</option>
 
             {categories.map((item) => (
-              <option key={item} value={item}>
-                {item}
+              <option key={item.value} value={item.value}>
+                {item.label}
               </option>
             ))}
           </select>
@@ -102,12 +109,20 @@ export function FilterPanel({
             <option value="">Todas</option>
 
             {brands.map((item) => (
-              <option key={item} value={item}>
-                {item}
+              <option key={item.value} value={item.value}>
+                {item.label}
               </option>
             ))}
           </select>
         </div>
+
+        <button
+          type="button"
+          onClick={onApply}
+          className="w-full rounded-md bg-[var(--primary)] px-4 py-2 font-medium text-[var(--primary-on)] hover:bg-[var(--primary-hover)]"
+        >
+          Aplicar filtros
+        </button>
       </div>
     </aside>
   );
