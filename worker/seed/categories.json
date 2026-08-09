@@ -9,7 +9,6 @@
       { "attribute_key": "storage_type", "label": "Tipo de Armazenamento", "data_type": "enum", "allowed_values": ["SSD", "HDD", "eMMC"], "unit": null, "required": false },
       { "attribute_key": "screen_in", "label": "Tela (pol)", "data_type": "number", "allowed_values": null, "unit": "in", "required": false },
       { "attribute_key": "weight_kg", "label": "Peso (kg)", "data_type": "number", "allowed_values": null, "unit": "kg", "required": false },
-      { "attribute_key": "battery_wh", "label": "Capacidade da bateria", "data_type": "number", "allowed_values": null, "unit": "Wh", "required": false },
       { "attribute_key": "touchscreen", "label": "Tela touchscreen", "data_type": "boolean", "allowed_values": null, "unit": null, "required": false }
     ]
   },
@@ -17,7 +16,7 @@
     "slug": "headphones",
     "name": "Fones de ouvido",
     "attributes": [
-      { "attribute_key": "type", "label": "Tipo", "data_type": "enum", "allowed_values": ["in-ear", "on-ear", "over-ear", "earbuds"], "unit": null, "required": false },
+      { "attribute_key": "type", "label": "Tipo", "data_type": "enum", "allowed_values": ["in-ear", "on-ear", "over-ear", "earbuds"], "unit": null, "required": true },
       { "attribute_key": "anc", "label": "Cancelamento de ruído (ANC)", "data_type": "boolean", "allowed_values": null, "unit": null, "required": true },
       { "attribute_key": "battery_h", "label": "Bateria (h)", "data_type": "number", "allowed_values": null, "unit": "h", "required": false },
       { "attribute_key": "bluetooth", "label": "Bluetooth", "data_type": "text", "allowed_values": null, "unit": null, "required": false },
