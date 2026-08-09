@@ -47,11 +47,7 @@ function SearchPageContent() {
       setResults(response.results);
       setSelectedProducts([]);
     } catch (err) {
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Não foi possível realizar a busca.",
-      );
+      setError(err instanceof Error ? err.message : "Não foi possível realizar a busca.");
       setResults([]);
     } finally {
       setLoading(false);
@@ -74,7 +70,6 @@ function SearchPageContent() {
 
   function handleCompareChange(productId: string, selected: boolean) {
     setSelectedProducts((current) => {
-      
       if (selected) {
         if (current.includes(productId)) {
           return current;
@@ -101,25 +96,16 @@ function SearchPageContent() {
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 pb-36 sm:pb-28">      
+    <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 pb-36 sm:pb-28">
       <ThemeToggle />
 
       <header className="mb-8">
-        <h1 className="text-2xl font-bold sm:text-3xl">
-          🔎 ProductSearcher
-        </h1>
-        
+        <h1 className="text-2xl font-bold sm:text-3xl">🔎 ProductSearcher</h1>
 
-        <p className="mt-2 text-[var(--text-muted)]">
-          Descoberta inteligente de produtos.
-        </p>
+        <p className="mt-2 text-[var(--text-muted)]">Descoberta inteligente de produtos.</p>
       </header>
 
-      <SearchBar
-        value={query}
-        onChange={setQuery}
-        onSearch={handleSearch}
-      />
+      <SearchBar value={query} onChange={setQuery} onSearch={handleSearch} />
 
       <div className="mt-8 grid gap-8 md:grid-cols-[240px_1fr]">
         <FilterPanel
@@ -150,12 +136,7 @@ function SearchPageContent() {
         <section aria-label="Resultados da busca">
           {loading && <LoadingList />}
 
-          {error && (
-            <ErrorState
-              message={error}
-              onRetry={handleSearch}
-            />
-          )}
+          {error && <ErrorState message={error} onRetry={handleSearch} />}
 
           {!loading && !error && results.length === 0 && (
             <EmptyState
@@ -174,40 +155,37 @@ function SearchPageContent() {
                 key={product.id}
                 product={product}
                 selectedForComparison={selectedProducts.includes(product.id)}
-                onCompareChange={(selected) =>
-                  handleCompareChange(product.id, selected)
-                }
+                onCompareChange={(selected) => handleCompareChange(product.id, selected)}
               />
             ))}
           </div>
-            {selectedProducts.length > 0 && (
-                <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-[var(--border)] bg-[var(--surface)] shadow-lg">
-                  <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
-                    <div>
-                      <p className="font-medium">
-                        {selectedProducts.length}{" "}
-                        {selectedProducts.length === 1
-                          ? "produto selecionado"
-                          : "produtos selecionados"}
-                      </p>
+          {selectedProducts.length > 0 && (
+            <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-[var(--border)] bg-[var(--surface)] shadow-lg">
+              <div className="mx-auto flex max-w-6xl flex-col gap-3 px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="font-medium">
+                    {selectedProducts.length}{" "}
+                    {selectedProducts.length === 1
+                      ? "produto selecionado"
+                      : "produtos selecionados"}
+                  </p>
 
-                      <p className="text-sm text-[var(--text-muted)]">
-                        Selecione de 2 a 4 produtos para comparar.
-                      </p>
-                    </div>
-
-                    <Button
-                      type="button"
-                      onClick={handleCompare}
-                      disabled={selectedProducts.length < 2}
-                      className="w-full sm:w-auto"
-                    >
-                      Comparar produtos
-                    </Button>
-                  </div>
+                  <p className="text-sm text-[var(--text-muted)]">
+                    Selecione de 2 a 4 produtos para comparar.
+                  </p>
                 </div>
-              )}
-              
+
+                <Button
+                  type="button"
+                  onClick={handleCompare}
+                  disabled={selectedProducts.length < 2}
+                  className="w-full sm:w-auto"
+                >
+                  Comparar produtos
+                </Button>
+              </div>
+            </div>
+          )}
         </section>
       </div>
     </main>

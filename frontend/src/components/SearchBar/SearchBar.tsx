@@ -6,22 +6,14 @@ type SearchBarProps = {
   onSearch: () => void;
 };
 
-export function SearchBar({
-  value,
-  onChange,
-  onSearch,
-}: SearchBarProps) {
+export function SearchBar({ value, onChange, onSearch }: SearchBarProps) {
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     onSearch();
   }
 
   return (
-    <form
-      role="search"
-      onSubmit={handleSubmit}
-      className="flex flex-col gap-2 sm:flex-row"
-    >
+    <form role="search" onSubmit={handleSubmit} className="flex flex-col gap-2 sm:flex-row">
       <label htmlFor="search-input" className="sr-only">
         Buscar produtos
       </label>

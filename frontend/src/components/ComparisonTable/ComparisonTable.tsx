@@ -6,9 +6,7 @@ type ComparisonTableProps = {
 };
 
 function formatAttributeKey(key: string): string {
-  return key
-    .replace(/_/g, " ")
-    .replace(/\b\w/g, (letter) => letter.toUpperCase());
+  return key.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function formatAttributeValue(value: unknown): string {
@@ -27,49 +25,37 @@ function formatAttributeValue(value: unknown): string {
   return String(value);
 }
 
-export function ComparisonTable({
-  comparison,
-}: ComparisonTableProps) {
+export function ComparisonTable({ comparison }: ComparisonTableProps) {
   const { products, best_value_id, attributes } = comparison;
 
   return (
     <div className="w-full overflow-x-auto">
-        <table className="min-w-[700px] w-full border-collapse text-left text-sm sm:text-base">        <thead>
+      <table className="w-full min-w-[700px] border-collapse text-left text-sm sm:text-base">
+        {" "}
+        <thead>
           <tr className="border-b">
-            <th className="px-4 py-3 font-semibold">
-              Especificação
-            </th>
+            <th className="px-4 py-3 font-semibold">Especificação</th>
 
             {products.map((product) => (
-              <th
-                key={product.id}
-                className="min-w-[180px] px-3 py-3 font-semibold sm:px-4"
-              >
+              <th key={product.id} className="min-w-[180px] px-3 py-3 font-semibold sm:px-4">
                 {product.name}
               </th>
             ))}
           </tr>
         </thead>
-
         <tbody>
           {/* Preço */}
           <tr className="border-b">
-            <th className="min-w-[140px] px-3 py-3 font-medium sm:px-4">
-              Preço
-            </th>
+            <th className="min-w-[140px] px-3 py-3 font-medium sm:px-4">Preço</th>
 
             {products.map((product) => {
-              const isBestValue =
-                best_value_id !== null &&
-                product.id === best_value_id;
+              const isBestValue = best_value_id !== null && product.id === best_value_id;
 
               return (
                 <td
                   key={product.id}
                   className={`px-4 py-3 ${
-                    isBestValue
-                      ? "bg-[var(--accent-surface)] font-bold text-[var(--success)]"
-                      : ""
+                    isBestValue ? "bg-[var(--accent-surface)] font-bold text-[var(--success)]" : ""
                   }`}
                 >
                   {formatPrice(product.min_price)}
@@ -82,25 +68,15 @@ export function ComparisonTable({
           {attributes.map((attribute) => (
             <tr
               key={attribute.key}
-              className={`border-b ${
-                attribute.differ ? "bg-[var(--accent-surface)]" : ""
-              }`}
+              className={`border-b ${attribute.differ ? "bg-[var(--accent-surface)]" : ""}`}
             >
-              <th
-                scope="row"
-                className="min-w-[140px] px-3 py-3 font-medium sm:px-4"
-              >
+              <th scope="row" className="min-w-[140px] px-3 py-3 font-medium sm:px-4">
                 {formatAttributeKey(attribute.key)}
               </th>
 
               {products.map((product, index) => (
-                <td
-                  key={product.id}
-                  className="px-3 py-3 sm:px-4"
-                >
-                  {formatAttributeValue(
-                    attribute.values[index],
-                  )}
+                <td key={product.id} className="px-3 py-3 sm:px-4">
+                  {formatAttributeValue(attribute.values[index])}
                 </td>
               ))}
             </tr>

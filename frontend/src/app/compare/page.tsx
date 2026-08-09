@@ -15,8 +15,7 @@ function CompareContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const [comparison, setComparison] =
-    useState<CompareResult | null>(null);
+  const [comparison, setComparison] = useState<CompareResult | null>(null);
 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -36,9 +35,7 @@ function CompareContent() {
         .filter(Boolean);
 
       if (ids.length < 2 || ids.length > 4) {
-        setError(
-          "Selecione entre 2 e 4 produtos para comparar.",
-        );
+        setError("Selecione entre 2 e 4 produtos para comparar.");
         setLoading(false);
         return;
       }
@@ -53,11 +50,7 @@ function CompareContent() {
       } catch (err) {
         setComparison(null);
 
-        setError(
-          err instanceof Error
-            ? err.message
-            : "Não foi possível comparar os produtos.",
-        );
+        setError(err instanceof Error ? err.message : "Não foi possível comparar os produtos.");
       } finally {
         setLoading(false);
       }
@@ -73,19 +66,13 @@ function CompareContent() {
   return (
     <main className="mx-auto min-h-screen max-w-7xl px-4 py-8">
       <div className="mb-8">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => router.push("/")}
-        >
+        <Button type="button" variant="outline" onClick={() => router.push("/")}>
           Voltar para busca
         </Button>
       </div>
 
       <header className="mb-8">
-        <h1 className="text-2xl font-bold sm:text-3xl">
-            Comparação de produtos
-        </h1>
+        <h1 className="text-2xl font-bold sm:text-3xl">Comparação de produtos</h1>
 
         <p className="mt-2 text-[var(--text-muted)]">
           Compare preços e especificações dos produtos selecionados.
@@ -94,28 +81,17 @@ function CompareContent() {
 
       {loading && <LoadingList />}
 
-      {!loading && error && (
-        <ErrorState
-          message={error}
-          onRetry={handleRetry}
-        />
-      )}
+      {!loading && error && <ErrorState message={error} onRetry={handleRetry} />}
 
       {!loading && !error && !idsParam && (
         <EmptyState
           title="Nenhum produto selecionado"
           description="Volte para a busca e selecione entre 2 e 4 produtos para comparar."
-          action={
-            <Button onClick={() => router.push("/")}>
-              Ir para busca
-            </Button>
-          }
+          action={<Button onClick={() => router.push("/")}>Ir para busca</Button>}
         />
       )}
 
-      {!loading && !error && comparison && (
-        <ComparisonTable comparison={comparison} />
-      )}
+      {!loading && !error && comparison && <ComparisonTable comparison={comparison} />}
     </main>
   );
 }

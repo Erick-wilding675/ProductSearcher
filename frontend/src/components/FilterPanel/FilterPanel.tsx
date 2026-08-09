@@ -49,10 +49,7 @@ export function FilterPanel({
 
       <div className="space-y-4">
         <div>
-          <label
-            htmlFor="filter-category"
-            className="mb-1 block text-sm font-medium"
-          >
+          <label htmlFor="filter-category" className="mb-1 block text-sm font-medium">
             Categoria
           </label>
 
@@ -73,10 +70,7 @@ export function FilterPanel({
         </div>
 
         <div>
-          <label
-            htmlFor="filter-price"
-            className="mb-1 block text-sm font-medium"
-          >
+          <label htmlFor="filter-price" className="mb-1 block text-sm font-medium">
             Preço máximo
           </label>
 
@@ -93,10 +87,7 @@ export function FilterPanel({
         </div>
 
         <div>
-          <label
-            htmlFor="filter-brand"
-            className="mb-1 block text-sm font-medium"
-          >
+          <label htmlFor="filter-brand" className="mb-1 block text-sm font-medium">
             Marca
           </label>
 

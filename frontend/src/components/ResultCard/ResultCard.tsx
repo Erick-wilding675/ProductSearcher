@@ -29,12 +29,7 @@ function formatSpecKey(key: string): string {
     battery: "Bateria",
   };
 
-  return (
-    labels[key] ??
-    key
-      .replace(/_/g, " ")
-      .replace(/\b\w/g, (letter) => letter.toUpperCase())
-  );
+  return labels[key] ?? key.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
 function formatSpecValue(value: unknown): string {
@@ -53,13 +48,9 @@ function formatSpecValue(value: unknown): string {
   return String(value);
 }
 
-export function ResultCard({
-  product,
-  selectedForComparison,
-  onCompareChange,
-}: ResultCardProps) {
+export function ResultCard({ product, selectedForComparison, onCompareChange }: ResultCardProps) {
   const applicableFactors = Object.entries(product.factors).filter(
-    ([, factor]) => factor.applicable,
+    ([, factor]) => factor.applicable
   );
 
   const specs = Object.entries(product.specs);
@@ -73,9 +64,7 @@ export function ResultCard({
             {product.brand} · {product.category}
           </p>
 
-          <h2 className="mt-1 text-lg font-semibold">
-            {product.name}
-          </h2>
+          <h2 className="mt-1 text-lg font-semibold">{product.name}</h2>
         </div>
 
         <div className="shrink-0 text-left sm:text-right">
@@ -84,9 +73,7 @@ export function ResultCard({
             Ranking: {(product.score * 100).toFixed(0)}%
           </span>
 
-          <p className="mt-2 text-lg font-bold">
-            {formatPrice(product.min_price)}
-          </p>
+          <p className="mt-2 text-lg font-bold">{formatPrice(product.min_price)}</p>
         </div>
       </div>
 
@@ -94,14 +81,8 @@ export function ResultCard({
       {specs.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {specs.map(([key, value]) => (
-            <span
-              key={key}
-              className="rounded-full bg-[var(--surface-alt)] px-3 py-1 text-sm"
-            >
-              <span className="font-medium">
-                {formatSpecKey(key)}:
-              </span>{" "}
-              {formatSpecValue(value)}
+            <span key={key} className="rounded-full bg-[var(--surface-alt)] px-3 py-1 text-sm">
+              <span className="font-medium">{formatSpecKey(key)}:</span> {formatSpecValue(value)}
             </span>
           ))}
         </div>
@@ -111,10 +92,7 @@ export function ResultCard({
       {applicableFactors.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
           {applicableFactors.map(([key, factor]) => (
-            <span
-              key={key}
-              className="rounded-full bg-[var(--accent-surface)] px-3 py-1 text-sm"
-            >
+            <span key={key} className="rounded-full bg-[var(--accent-surface)] px-3 py-1 text-sm">
               {getFactorLabel(key)}: {(factor.score * 100).toFixed(0)}%
             </span>
           ))}
@@ -127,11 +105,8 @@ export function ResultCard({
           <input
             type="checkbox"
             checked={selectedForComparison}
-            onChange={(event) =>
-              onCompareChange(event.target.checked)
-            }
+            onChange={(event) => onCompareChange(event.target.checked)}
           />
-
           Comparar este produto
         </label>
 
