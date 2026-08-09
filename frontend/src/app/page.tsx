@@ -90,8 +90,9 @@ export default function HomePage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-6xl px-4 py-8 pb-36 sm:pb-28">      
-      <ThemeToggle />
-
+      <div className="mb-4">
+        <ThemeToggle />
+      </div>
       <header className="mb-8">
         <h1 className="text-2xl font-bold sm:text-3xl">
           🔎 ProductSearcher
@@ -153,10 +154,11 @@ export default function HomePage() {
           )}
 
           <div className="space-y-4">
-            {results.map((product) => (
+            {results.map((product, index) => (
               <ResultCard
                 key={product.id}
                 product={product}
+                rank={index +1}
                 selectedForComparison={selectedProducts.includes(product.id)}
                 onCompareChange={(selected) =>
                   handleCompareChange(product.id, selected)
