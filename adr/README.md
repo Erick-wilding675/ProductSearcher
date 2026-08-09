@@ -11,5 +11,6 @@ Registro das decisões arquiteturais do ProductSearcher. Cada ADR documenta **co
 | [0005](0005-decisoes-fase-2.md) | Decisões técnicas da Fase 2 (schema + ingestão) | Aceito |
 | [0006](0006-licenciamento-busl.md) | Licenciamento: Business Source License 1.1 | Aceito |
 | [0007](0007-pipeline-busca-retrieval-ranking.md) | Pipeline de busca: retrieval (SearchProvider) + ranking (RankingService) | Aceito |
+| [0008](0008-cobertura-do-seed-parser-e-specs-opcionais.md) | Cobertura do seed: parser de título e specs opcionais | Aceito |
 
 > Novos ADRs seguem o `template.md`. Numeração sequencial. A fonte de verdade também vive no Notion (Document Hub).

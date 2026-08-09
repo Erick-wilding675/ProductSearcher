@@ -113,6 +113,54 @@ def test_extract_brand_headphones_e_sublinha():
     assert extract_brand("headphones", "soundcore P40i da Anker") == "Anker"
 
 
+# --- marcas menores do marketplace ------------------------------------------
+# "marca ausente" era o maior motivo de rejeição da ingestão (60 de 112), bem
+# acima de specs faltando. Todas estas saem literalmente do título do anúncio.
+
+
+def test_extract_brand_marcas_menores():
+    assert extract_brand("headphones", "Headphone Dapon H02D Pro ANC Over Ear") == "Dapon"
+    assert extract_brand("headphones", "Headset Gamer Sem Fio OLAFVI CT790 Wireless") == "Olafvi"
+    assert extract_brand("headphones", "Fone de Ouvido JSKJ Esportivo OWS TWS") == "JSKJ"
+    assert extract_brand("headphones", "Fone De Ouvido In-ear Bluetooth Htc Ne76") == "HTC"
+    assert extract_brand("headphones", "Fone de Ouvido Davely A520 In-Ear") == "Davely"
+
+
+def test_extract_brand_ainda_devolve_none_para_generico():
+    # Anúncio sem marca alguma continua sendo rejeitado — o parser não inventa.
+    assert extract_brand("headphones", "Fone De Ouvido Bluetooth 5.0 A Prova De Suor Preto") is None
+
+
+# --- formato do fone ---------------------------------------------------------
+
+
+def test_parse_headphone_clipe_e_ouvido_aberto_viram_earbuds():
+    # Clipe/gancho/condução não casam com in/on/over-ear; `earbuds` é o vizinho
+    # mais próximo dentro do enum da categoria.
+    assert parse_headphone("Fone Basike Sem Fio Ear-Clip Ba-FON349")["type"] == "earbuds"
+    assert parse_headphone("Fone Monster Open Ear AC601 Clip-ear")["type"] == "earbuds"
+    assert parse_headphone("Fone Philips Ear Cuff Sem Fio Bluetooth")["type"] == "earbuds"
+    assert parse_headphone("Fone Lumva Bluetooth Condução Aérea")["type"] == "earbuds"
+
+
+def test_parse_headphone_sem_fio_sem_marcador_vira_earbuds():
+    # Último recurso: sem NENHUM marcador de formato, "fone sem fio/bluetooth"
+    # é TWS em praticamente todo o catálogo.
+    assert parse_headphone("Fone De Ouvido Sem Fio Havit Tw982 Bluetooth 5.4")["type"] == "earbuds"
+    assert parse_headphone("Fone De Ouvido Bluetooth Lenovo Le208 Sem Fio")["type"] == "earbuds"
+
+
+def test_parse_headphone_marcador_explicito_ganha_do_fallback():
+    # O fallback é o último ramo: qualquer marcador explícito tem precedência.
+    assert parse_headphone("Headphone Sem Fio Bluetooth 5.3 Over Ear")["type"] == "over-ear"
+    assert parse_headphone("Fone Bluetooth Sem Fio In-ear Duplo")["type"] == "in-ear"
+    assert parse_headphone("Headset Gamer Sem Fio Bluetooth")["type"] == "over-ear"
+
+
+def test_parse_headphone_com_fio_sem_marcador_nao_chuta_formato():
+    assert "type" not in parse_headphone("Fone De Ouvido Branco 3,5mm H2015se-white")
+
+
 def test_build_filtra_dominio_e_acessorio():
     rows = [
         {

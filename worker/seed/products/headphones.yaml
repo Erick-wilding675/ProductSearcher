@@ -28,10 +28,9 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB23175321
-  name: Fone de Ouvido Sem Fio Stage Hero6 TWS Bluetooth 5.2 Cancelamento De Ruído
-    Ativo, 35h, IPX5, Baixa Latência Gamer, Som Estéreo Hi-Fi, In-Ear para Academia
-    e Jogos – Stagesound
-  brand: null
+  name: Fone de Ouvido Sem Fio Stage Hero6 TWS Bluetooth 5.2 Cancelamento De Ruído Ativo, 35h, IPX5, Baixa
+    Latência Gamer, Som Estéreo Hi-Fi, In-Ear para Academia e Jogos – Stagesound
+  brand: Stagesound
   category: headphones
   specs:
     type: in-ear
@@ -46,10 +45,11 @@
 - source: apify:mercadolivre
   external_id: MLB47673835
   name: Fone De Ouvido Via Bluetooth Amby Hd 5.1 Stereo Led Gamer Sem Fio
-  brand: null
+  brand: Amby
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Amby
     price: 31,99
@@ -63,6 +63,7 @@
   specs:
     anc: false
     bluetooth: '5.4'
+    type: earbuds
   offers:
   - store: Baseus
     price: 72,65
@@ -84,7 +85,7 @@
 - source: apify:mercadolivre
   external_id: MLB6861281870
   name: Fone De Ouvido In-ear Bluetooth Htc Ne76 Com Mic
-  brand: null
+  brand: HTC
   category: headphones
   specs:
     type: in-ear
@@ -98,7 +99,7 @@
 - source: apify:mercadolivre
   external_id: MLB24117280
   name: Fone De Ouvido Headphone Dapon H02D Bluetooth 5.1 Over-ear 22h Preto
-  brand: null
+  brand: Dapon
   category: headphones
   specs:
     type: over-ear
@@ -145,6 +146,7 @@
   specs:
     anc: false
     bluetooth: '5.4'
+    type: earbuds
   offers:
   - store: Baseus
     price: 72,65
@@ -166,9 +168,9 @@
     url: https://www.mercadolivre.com.br/fone-qcy-buds-t43-bluetooth-53-enc-ipx4-cor-azul-celeste/p/MLB50181227
 - source: apify:mercadolivre
   external_id: MLB69961970
-  name: Fone de Ouvido Esportivo JSKJ T82 TWS Bluetooth 5.3 com Power Bank e Cancelamento
-    de Ruído para Corrida
-  brand: null
+  name: Fone de Ouvido Esportivo JSKJ T82 TWS Bluetooth 5.3 com Power Bank e Cancelamento de Ruído para
+    Corrida
+  brand: JSKJ
   category: headphones
   specs:
     type: earbuds
@@ -181,9 +183,8 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB62925400
-  name: Fone Bluetooth 5.3 Tws Sem Fio com Microfone HD Anti Ruido A Prova D'água
-    Compatível iPhone Samsung Xiaomi Motorola Redmi Android iOs Para Esporte Academia
-    Trabalho Game e Entretenimento H'maston Pro.
+  name: Fone Bluetooth 5.3 Tws Sem Fio com Microfone HD Anti Ruido A Prova D'água Compatível iPhone Samsung
+    Xiaomi Motorola Redmi Android iOs Para Esporte Academia Trabalho Game e Entretenimento H'maston Pro.
   brand: Samsung
   category: headphones
   specs:
@@ -212,9 +213,8 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB63086747
-  name: Basike Fone De Ouvido Bluetooth 6.0 Esportivo Sem Fio Gancho Intra-auricular,estéreo,Com
-    display Led, Tws, Ipx5, Enc, Suporta Chamadas De Voz, Compatível Android E Ios,
-    Cor Preto
+  name: Basike Fone De Ouvido Bluetooth 6.0 Esportivo Sem Fio Gancho Intra-auricular,estéreo,Com display
+    Led, Tws, Ipx5, Enc, Suporta Chamadas De Voz, Compatível Android E Ios, Cor Preto
   brand: Basike
   category: headphones
   specs:
@@ -246,6 +246,7 @@
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 67,37
@@ -272,6 +273,7 @@
   category: headphones
   specs:
     anc: true
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 61,32
@@ -284,6 +286,7 @@
   category: headphones
   specs:
     anc: true
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 41,9
@@ -292,7 +295,7 @@
 - source: apify:mercadolivre
   external_id: MLB63859458
   name: Headphone Bluetooth Dgx Potente Cancelamento De Ruìdo Enc
-  brand: null
+  brand: DGX
   category: headphones
   specs:
     type: over-ear
@@ -309,6 +312,7 @@
   category: headphones
   specs:
     anc: true
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 35,68
@@ -316,12 +320,12 @@
     url: https://www.mercadolivre.com.br/fones-de-ouvido-bluetooth-kaidi-kd-780-som-de-qualidade-br-branco/p/MLB66568037
 - source: apify:mercadolivre
   external_id: MLB53917554
-  name: Lumva Fone De Ouvido Bluetooth Condução Aérea À Prova D'água Preto Fone Clip
-    Bluetooth
-  brand: null
+  name: Lumva Fone De Ouvido Bluetooth Condução Aérea À Prova D'água Preto Fone Clip Bluetooth
+  brand: Lumva
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: '68'
@@ -334,6 +338,7 @@
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: '64'
@@ -354,8 +359,8 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB57492226
-  name: Samsung Galaxy Buds Core, Fone De Ouvido, Sem Fio, Cancelamento De Ruído,
-    Interprete Inteligente Branco
+  name: Samsung Galaxy Buds Core, Fone De Ouvido, Sem Fio, Cancelamento De Ruído, Interprete Inteligente
+    Branco
   brand: Samsung
   category: headphones
   specs:
@@ -368,15 +373,15 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB61703575
-  name: Basike Fone de Ouvido Sem Fio Ear-Clip Ba-FON349 Bluetooth 6.0 , Cancelamento
-    de Ruídos, Estéreo, Bateria 30H, IPX5 Á Prova de Água, Ergonômico e Confortável,
-    Música e Ligações
+  name: Basike Fone de Ouvido Sem Fio Ear-Clip Ba-FON349 Bluetooth 6.0 , Cancelamento de Ruídos, Estéreo,
+    Bateria 30H, IPX5 Á Prova de Água, Ergonômico e Confortável, Música e Ligações
   brand: Basike
   category: headphones
   specs:
     anc: true
     battery_h: 30
     bluetooth: '6.0'
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 137,62
@@ -415,6 +420,7 @@
   category: headphones
   specs:
     anc: true
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: '46'
@@ -427,6 +433,7 @@
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 54,8
@@ -452,6 +459,7 @@
   specs:
     anc: true
     battery_h: 102
+    type: earbuds
   offers:
   - store: QCY
     price: '359'
@@ -459,9 +467,8 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-bluetooth-qcy-h3s-anc-102-horas-driver-duplo-cor-preto/p/MLB58035230
 - source: apify:mercadolivre
   external_id: MLB62775498
-  name: Fone De Ouvido Headphone Dapon H02d Bluetooth 5.1 Over-ear 22 Horas De Bateria
-    Violeta
-  brand: null
+  name: Fone De Ouvido Headphone Dapon H02d Bluetooth 5.1 Over-ear 22 Horas De Bateria Violeta
+  brand: Dapon
   category: headphones
   specs:
     type: over-ear
@@ -475,14 +482,14 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-headphone-dapon-h02d-bluetooth-51-over-ear-22-horas-de-bateria-violeta/p/MLB62775498
 - source: apify:mercadolivre
   external_id: MLB51384314
-  name: Fone de Ouvido Monster Open Ear AC601 Clip-ear Bluetooth 5.4 Azul com Microfone
-    e IPX6
+  name: Fone de Ouvido Monster Open Ear AC601 Clip-ear Bluetooth 5.4 Azul com Microfone e IPX6
   brand: Monster
   category: headphones
   specs:
     anc: false
     bluetooth: '5.4'
     microphone: true
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 115,5
@@ -504,9 +511,8 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-eardbud-aiwa-aws-eb-05-b-bluetooth-ipx4-24-horas-de-bateria/p/MLB47519001
 - source: apify:mercadolivre
   external_id: MLB43004336
-  name: Fone De Ouvido Headphone Dapon H02d Bluetooth 5.1 Over-ear 22 Horas De Bateria
-    Cor Azul
-  brand: null
+  name: Fone De Ouvido Headphone Dapon H02d Bluetooth 5.1 Over-ear 22 Horas De Bateria Cor Azul
+  brand: Dapon
   category: headphones
   specs:
     type: over-ear
@@ -520,15 +526,15 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-headphone-dapon-h02d-bluetooth-51-over-ear-22-horas-de-bateria-cor-azul/p/MLB43004336
 - source: apify:mercadolivre
   external_id: MLB44381441
-  name: Fone de Ouvido Bluetooth 5.3 soundcore P40i da Anker, Cancelamento de Ruído
-    Adaptativo, Graves Poderosos, 60H de Reprodução, Resistência à Água, IPX5 Resistência
-    à Água, Carregamento Sem Fio, Preto
+  name: Fone de Ouvido Bluetooth 5.3 soundcore P40i da Anker, Cancelamento de Ruído Adaptativo, Graves
+    Poderosos, 60H de Reprodução, Resistência à Água, IPX5 Resistência à Água, Carregamento Sem Fio, Preto
   brand: Anker
   category: headphones
   specs:
     anc: true
     battery_h: 60
     bluetooth: '5.3'
+    type: earbuds
   offers:
   - store: Soundcore
     price: 319,2
@@ -549,9 +555,9 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-tws-wf200-preto-pulse-ph432/p/MLB44957705
 - source: apify:mercadolivre
   external_id: MLB65261030
-  name: Fone De Ouvido Headset Gamer Sem Fio OLAFVI CT790 Wireless Microfone Cancelamento
-    De Ruído Pc Videogame Computador
-  brand: null
+  name: Fone De Ouvido Headset Gamer Sem Fio OLAFVI CT790 Wireless Microfone Cancelamento De Ruído Pc
+    Videogame Computador
+  brand: Olafvi
   category: headphones
   specs:
     type: over-ear
@@ -564,12 +570,12 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-headset-gamer-sem-fio-olafvi-ct790-wireless-microfone-cancelamento-de-ruido-pc-videogame-computador/p/MLB65261030
 - source: apify:mercadolivre
   external_id: MLB30542106
-  name: Fone Bluetooth Compatível Com Ios, Android, Samsung E iPhone Cor Branco B
-    Basto
+  name: Fone Bluetooth Compatível Com Ios, Android, Samsung E iPhone Cor Branco B Basto
   brand: Samsung
   category: headphones
   specs:
     anc: true
+    type: earbuds
   offers:
   - store: B Basto
     price: 39,75
@@ -578,7 +584,7 @@
 - source: apify:mercadolivre
   external_id: MLB54153037
   name: Fone De Ouvido Bluetooth Tws | Sonorus Harry Potter - Iwill Branco
-  brand: null
+  brand: Iwill
   category: headphones
   specs:
     type: earbuds
@@ -616,9 +622,8 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-sem-fio-bluetooth-inear-duplo-50-tws-visor/up/MLBU3572690289
 - source: apify:mercadolivre
   external_id: MLB54307438
-  name: Headphone Dapon H02D Pro ANC Over Ear Bluetooth 6.0 Cancelamento De Ruído
-    Cor Cinza
-  brand: null
+  name: Headphone Dapon H02D Pro ANC Over Ear Bluetooth 6.0 Cancelamento De Ruído Cor Cinza
+  brand: Dapon
   category: headphones
   specs:
     type: over-ear
@@ -631,9 +636,9 @@
     url: https://www.mercadolivre.com.br/headphone-dapon-h02d-pro-anc-over-ear-bluetooth-60-cancelamento-de-ruido-cor-cinza/p/MLB54307438
 - source: apify:mercadolivre
   external_id: MLB62802757
-  name: Fone De Ouvido Bluetooth Sem Fio Headset Gamer Olafvi Captain 780 Com Fio
-    USB 5.3 PS5 PC 7.1 LED RGB
-  brand: null
+  name: Fone De Ouvido Bluetooth Sem Fio Headset Gamer Olafvi Captain 780 Com Fio USB 5.3 PS5 PC 7.1 LED
+    RGB
+  brand: Olafvi
   category: headphones
   specs:
     type: over-ear
@@ -650,6 +655,7 @@
   category: headphones
   specs:
     anc: true
+    type: earbuds
   offers:
   - store: JBL
     price: 244,58
@@ -689,6 +695,7 @@
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: '258'
@@ -702,6 +709,7 @@
   specs:
     anc: true
     bluetooth: '5.4'
+    type: earbuds
   offers:
   - store: QCY
     price: 163,93
@@ -709,9 +717,8 @@
     url: https://www.mercadolivre.com.br/fone-qcy-n30-anc-bluetooth-54-cancelamento-de-ruido-ipx4-cor-preto/p/MLB47588999
 - source: apify:mercadolivre
   external_id: MLB67965056
-  name: Fone de Ouvido A'Gold FN-BJ3 TWS Bluetooth Com Microfone e Estojo de Carregamento
-    Branco
-  brand: null
+  name: Fone de Ouvido A'Gold FN-BJ3 TWS Bluetooth Com Microfone e Estojo de Carregamento Branco
+  brand: A'Gold
   category: headphones
   specs:
     type: earbuds
@@ -729,6 +736,7 @@
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: '209'
@@ -736,9 +744,8 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-open-ear-miniso-ms188-bluetooth-com-tradutor-ia-e-tela-touch/p/MLB52123288
 - source: apify:mercadolivre
   external_id: MLB40570225
-  name: Fone De Ouvido Headphone Dapon H02d Bluetooth 5.1 Over-ear 22 Horas De Bateria
-    Rosa
-  brand: null
+  name: Fone De Ouvido Headphone Dapon H02d Bluetooth 5.1 Over-ear 22 Horas De Bateria Rosa
+  brand: Dapon
   category: headphones
   specs:
     type: over-ear
@@ -753,10 +760,11 @@
 - source: apify:mercadolivre
   external_id: MLB68638963
   name: Daoyee Fone Bluetooth Esportivo Condução Óssea Ouvido Aberto Para Corrida
-  brand: null
+  brand: Daoyee
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 199,8
@@ -764,9 +772,8 @@
     url: https://www.mercadolivre.com.br/daoyee-fone-bluetooth-esportivo-conduco-ossea-ouvido-aberto-para-corrida/p/MLB68638963
 - source: apify:mercadolivre
   external_id: MLB54254902
-  name: Headphone Dapon H02D Pro ANC Over Ear Bluetooth 6.0 Cancelamento De Ruído
-    Cor Preto
-  brand: null
+  name: Headphone Dapon H02D Pro ANC Over Ear Bluetooth 6.0 Cancelamento De Ruído Cor Preto
+  brand: Dapon
   category: headphones
   specs:
     type: over-ear
@@ -779,9 +786,8 @@
     url: https://www.mercadolivre.com.br/headphone-dapon-h02d-pro-anc-over-ear-bluetooth-60-cancelamento-de-ruido-cor-preto/p/MLB54254902
 - source: apify:mercadolivre
   external_id: MLB62770991
-  name: Fone De Ouvido Headphone Dapon H02d Bluetooth 5.1 Over-ear 22 Horas De Bateria
-    Azul Bebê
-  brand: null
+  name: Fone De Ouvido Headphone Dapon H02d Bluetooth 5.1 Over-ear 22 Horas De Bateria Azul Bebê
+  brand: Dapon
   category: headphones
   specs:
     type: over-ear
@@ -796,7 +802,7 @@
 - source: apify:mercadolivre
   external_id: MLB67627636
   name: Fone de Ouvido JSKJ Esportivo OWS TWS sem Fio com Bluetooth e Microfone, Preto
-  brand: null
+  brand: JSKJ
   category: headphones
   specs:
     type: earbuds
@@ -814,6 +820,7 @@
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 174,77
@@ -821,10 +828,9 @@
     url: https://www.mercadolivre.com.br/x7s-fones-de-ouvido-de-conducao-ossea-para-natacao-mp3-32g/up/MLBU3827202955
 - source: apify:mercadolivre
   external_id: MLB18651962
-  name: Fone De Ouvido Sem Fio Preto Com Luz Led Bluetooth Fone De Ouvido Sem Fio
-    In-ear A6s Tgha6s Preto Bluetooth Fone De Ouvido Bluetooth Fone De Ouvido Premium
-    In-ear A6s Bluetooh Fone Sem Fio Fergusom
-  brand: null
+  name: Fone De Ouvido Sem Fio Preto Com Luz Led Bluetooth Fone De Ouvido Sem Fio In-ear A6s Tgha6s Preto
+    Bluetooth Fone De Ouvido Bluetooth Fone De Ouvido Premium In-ear A6s Bluetooh Fone Sem Fio Fergusom
+  brand: Fergusom
   category: headphones
   specs:
     type: in-ear
@@ -841,6 +847,7 @@
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 125,4
@@ -848,13 +855,13 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-ear-cuff-sem-fio-philips-bluetooth-preto-taq2000bk00/p/MLB53538776
 - source: apify:mercadolivre
   external_id: MLB67291937
-  name: Fone Ouvido Bluetooth Compatível Com Iphone X Xr 11 12 13 14 15 16 17 Xs Pro
-    Max Plus Samsung S20 S23 S24 Xiaomi Motorola Android Ios Sem Fio Prova DAgua Wireless
-    Tipo C Cancelamento Ruido Celular
+  name: Fone Ouvido Bluetooth Compatível Com Iphone X Xr 11 12 13 14 15 16 17 Xs Pro Max Plus Samsung
+    S20 S23 S24 Xiaomi Motorola Android Ios Sem Fio Prova DAgua Wireless Tipo C Cancelamento Ruido Celular
   brand: Samsung
   category: headphones
   specs:
     anc: true
+    type: earbuds
   offers:
   - store: PRO PHONE SEE
     price: 40,24
@@ -896,6 +903,7 @@
     anc: false
     bluetooth: '5.1'
     microphone: true
+    type: earbuds
   offers:
   - store: QCY
     price: 168,62
@@ -909,6 +917,7 @@
   specs:
     anc: false
     bluetooth: '5.0'
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 59,9
@@ -929,14 +938,15 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB51699115
-  name: Fone de Ouvido Bluetooth Sem Fio com Microfone Cancelamento de Ruído Ativo
-    Prova d'água 32h Bateria Case 3500mAh Esportivo Android iPhone Leve e Confortável
+  name: Fone de Ouvido Bluetooth Sem Fio com Microfone Cancelamento de Ruído Ativo Prova d'água 32h Bateria
+    Case 3500mAh Esportivo Android iPhone Leve e Confortável
   brand: null
   category: headphones
   specs:
     anc: true
     battery_h: 32
     microphone: true
+    type: earbuds
   offers:
   - store: 4Leader
     price: 134,89
@@ -958,8 +968,7 @@
     url: https://www.mercadolivre.com.br/fone-qcy-buds-t43-bluetooth-53-enc-ipx4-cor-preto/p/MLB50002371
 - source: apify:mercadolivre
   external_id: MLB70390534
-  name: Fone de Ouvido Inova In-ear Sem Fio Bluetooth 6.0 Preto com Microfone e Case
-    Carregador Portátil
+  name: Fone de Ouvido Inova In-ear Sem Fio Bluetooth 6.0 Preto com Microfone e Case Carregador Portátil
   brand: Inova
   category: headphones
   specs:
@@ -974,9 +983,9 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-inova-in-ear-sem-fio-bluetooth-60-preto-com-microfone-e-case-carregador-portatil/p/MLB70390534
 - source: apify:mercadolivre
   external_id: MLB66276306
-  name: Fone de Ouvido Bela Voz In-Ear D14 Bluetooth 5.4 sem Fio Esportivo com Cancelamento
-    de Ruído e Microfone
-  brand: null
+  name: Fone de Ouvido Bela Voz In-Ear D14 Bluetooth 5.4 sem Fio Esportivo com Cancelamento de Ruído e
+    Microfone
+  brand: Bela Voz
   category: headphones
   specs:
     type: in-ear
@@ -990,9 +999,9 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-bela-voz-in-ear-d14-bluetooth-54-sem-fio-esportivo-com-cancelamento-de-ruido-e-microfone/p/MLB66276306
 - source: apify:mercadolivre
   external_id: MLB53398167
-  name: Fone De Ouvido Bluetooth 5.0 TWS Sem Fio Hardline In Ear Touch mantém a estabilidade
-    HD Compatível Android Bateria Longa
-  brand: null
+  name: Fone De Ouvido Bluetooth 5.0 TWS Sem Fio Hardline In Ear Touch mantém a estabilidade HD Compatível
+    Android Bateria Longa
+  brand: Hardline
   category: headphones
   specs:
     type: in-ear
@@ -1011,6 +1020,7 @@
   specs:
     anc: false
     battery_h: 50
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 57,5
@@ -1024,6 +1034,7 @@
   specs:
     anc: false
     bluetooth: '3'
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 82,2
@@ -1031,9 +1042,8 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-bluetooth-3a-geracao-pro-para-xiaomi-samsung/up/MLBU3484097669
 - source: apify:mercadolivre
   external_id: MLB66129738
-  name: Fone de Ouvido Davely A520 In-Ear Bluetooth para Esporte com Gancho e LED
-    Azul
-  brand: null
+  name: Fone de Ouvido Davely A520 In-Ear Bluetooth para Esporte com Gancho e LED Azul
+  brand: Davely
   category: headphones
   specs:
     type: in-ear
@@ -1059,10 +1069,11 @@
 - source: apify:mercadolivre
   external_id: MLB68721116
   name: Lumva Super Mini Fone Bluetooth Sleep Redução De Ruídopreto
-  brand: null
+  brand: Lumva
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 71,78
@@ -1070,9 +1081,8 @@
     url: https://www.mercadolivre.com.br/lumva-super-mini-fone-bluetooth-sleep-reduco-de-ruidopreto/p/MLB68721116
 - source: apify:mercadolivre
   external_id: MLB38176139
-  name: Fone de Ouvido Bluetooth 5.4 soundcore P30i da Anker, Cancelamento de Ruído
-    Adaptativo, Graves Poderosos, 45H de Reprodução, Estojo 2-em-1 com Suporte para
-    Celular, IP54, Fone sem fio TWS, Preto
+  name: Fone de Ouvido Bluetooth 5.4 soundcore P30i da Anker, Cancelamento de Ruído Adaptativo, Graves
+    Poderosos, 45H de Reprodução, Estojo 2-em-1 com Suporte para Celular, IP54, Fone sem fio TWS, Preto
   brand: Anker
   category: headphones
   specs:
@@ -1087,14 +1097,14 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-bluetooth-54-soundcore-p30i-da-anker-cancelamento-de-ruido-adaptativo-graves-poderosos-45h-de-reproduco-estojo-2-em-1-com-suporte-para-celular-ip54-fone-sem-fio-tws-preto/p/MLB38176139
 - source: apify:mercadolivre
   external_id: MLB40556246
-  name: Fone de Ouvido Sem Fio para Treinos Soundcore da Anker Sport X20 ANC adaptativo
-    3.0 Ganchos Ajustáveis Graves Intensos IP68 À Prova de Suor e Poeira 48H de Reprodução
-    Fones para Academia Cor Preto
+  name: Fone de Ouvido Sem Fio para Treinos Soundcore da Anker Sport X20 ANC adaptativo 3.0 Ganchos Ajustáveis
+    Graves Intensos IP68 À Prova de Suor e Poeira 48H de Reprodução Fones para Academia Cor Preto
   brand: Anker
   category: headphones
   specs:
     anc: true
     battery_h: 48
+    type: earbuds
   offers:
   - store: Soundcore
     price: '482'
@@ -1120,6 +1130,7 @@
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: JBL
     price: '1612'
@@ -1128,10 +1139,11 @@
 - source: apify:mercadolivre
   external_id: MLB22631011
   name: Fone de Ouvido Power Tech Bluetooth E10 Preto com PowerBank à Prova d'Água
-  brand: null
+  brand: Power Tech
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 33,72
@@ -1139,9 +1151,9 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-power-tech-bluetooth-e10-preto-com-powerbank-prova-dagua/p/MLB22631011
 - source: apify:mercadolivre
   external_id: MLB48564939
-  name: Fone de Ouvido Davely D981 TWS Sem Fio Bluetooth 5.0 In-Ear Preto com Estojo
-    de Carregamento para Android e iPhone
-  brand: null
+  name: Fone de Ouvido Davely D981 TWS Sem Fio Bluetooth 5.0 In-Ear Preto com Estojo de Carregamento para
+    Android e iPhone
+  brand: Davely
   category: headphones
   specs:
     type: in-ear
@@ -1154,8 +1166,8 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-davely-d981-tws-sem-fio-bluetooth-50-in-ear-preto-com-estojo-de-carregamento-para-android-e-iphone/p/MLB48564939
 - source: apify:mercadolivre
   external_id: MLB66526083
-  name: Fone Bluetooth 5.3 Tws Sem Fio Esportivo Compatível Com iPhone Samsung Xiaomi
-    Motorola Com Gancho Premium Bitvendo Xt80 Cor Perola
+  name: Fone Bluetooth 5.3 Tws Sem Fio Esportivo Compatível Com iPhone Samsung Xiaomi Motorola Com Gancho
+    Premium Bitvendo Xt80 Cor Perola
   brand: Samsung
   category: headphones
   specs:
@@ -1175,6 +1187,7 @@
   specs:
     anc: false
     bluetooth: '5.3'
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 23,73
@@ -1196,7 +1209,7 @@
 - source: apify:mercadolivre
   external_id: MLB68764856
   name: Fone de Ouvido JSKJ TWS AD-A520 Bluetooth Esportivo com ANC e Gancho
-  brand: null
+  brand: JSKJ
   category: headphones
   specs:
     type: earbuds
@@ -1208,9 +1221,8 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-jskj-tws-ad-a520-bluetooth-esportivo-com-anc-e-gancho/p/MLB68764856
 - source: apify:mercadolivre
   external_id: MLB29725014
-  name: Fone de Ouvido Bluetooth Soundcore Anker Q20i ANC Híbrido Fone Sem Fio Headset
-    Gamer com Cancelamento de Ruído 60H Bateria Hi-Res App Multiponto Headphone Graves
-    Potentes Dobrável Carga Rápida Azul
+  name: Fone de Ouvido Bluetooth Soundcore Anker Q20i ANC Híbrido Fone Sem Fio Headset Gamer com Cancelamento
+    de Ruído 60H Bateria Hi-Res App Multiponto Headphone Graves Potentes Dobrável Carga Rápida Azul
   brand: Anker
   category: headphones
   specs:
@@ -1250,8 +1262,7 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB71933429
-  name: Fone de Ouvido Headset Sem Fio Bluetooth 5.3 com Microfone e Cancelamento
-    de Ruído para Home Office
+  name: Fone de Ouvido Headset Sem Fio Bluetooth 5.3 com Microfone e Cancelamento de Ruído para Home Office
   brand: null
   category: headphones
   specs:
@@ -1266,8 +1277,7 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB15345937
-  name: Fone De Ouvido Headset Gamer Havit H2002d P3 Para PS3/PS4/PS5/XBOX/PC Cor
-    Preto
+  name: Fone De Ouvido Headset Gamer Havit H2002d P3 Para PS3/PS4/PS5/XBOX/PC Cor Preto
   brand: Havit
   category: headphones
   specs:
@@ -1298,6 +1308,7 @@
   category: headphones
   specs:
     anc: false
+    type: earbuds
   offers:
   - store: Mercado Livre
     price: 39,4
@@ -1305,8 +1316,8 @@
     url: https://www.mercadolivre.com.br/y10-wireless-neckband-earphones-with-microphone-in-ear-sport/p/MLB2057389807
 - source: apify:mercadolivre
   external_id: MLB63093753
-  name: Headset Gamer Sem Fio Quantum 650 JBL Quantum Spatial Sound, Bluetooth 5.3,
-    45h de Bateria e Microfone Removível - Preto
+  name: Headset Gamer Sem Fio Quantum 650 JBL Quantum Spatial Sound, Bluetooth 5.3, 45h de Bateria e Microfone
+    Removível - Preto
   brand: JBL
   category: headphones
   specs:
@@ -1373,9 +1384,9 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB66266830
-  name: Fone De Ouvido Headset Gamer Pc Rgb Com Microfone Xbox Playstation Videogame
-    Jogos Computador Free Fire Cs Go Call Of Duty Landara
-  brand: null
+  name: Fone De Ouvido Headset Gamer Pc Rgb Com Microfone Xbox Playstation Videogame Jogos Computador
+    Free Fire Cs Go Call Of Duty Landara
+  brand: Landara
   category: headphones
   specs:
     type: over-ear
@@ -1416,10 +1427,9 @@
     url: https://www.mercadolivre.com.br/headset-gamer-h10-com-microfone-fio-usb-e-35mm/up/MLBU4113032620
 - source: apify:mercadolivre
   external_id: MLB51645707
-  name: Fone De Ouvido Headset Office Usb Microfone Reunião Empresa Call Computador
-    Telefone Pc Notebook Microfone Para Reunião Home Office Jogos Trabalho Empresa
-    Marca Voreon
-  brand: null
+  name: Fone De Ouvido Headset Office Usb Microfone Reunião Empresa Call Computador Telefone Pc Notebook
+    Microfone Para Reunião Home Office Jogos Trabalho Empresa Marca Voreon
+  brand: Voreon
   category: headphones
   specs:
     type: over-ear
@@ -1459,9 +1469,9 @@
     url: https://www.mercadolivre.com.br/headset-gamer-redragon-zeus-lite-preto-drivers-53mm-com-microfone-removivel/p/MLB48468943
 - source: apify:mercadolivre
   external_id: MLB74279775
-  name: Fone De Ouvido Headset Gamer Sem Fio Olafvi Captain 700 Pro Over-ear Microfone
-    Cancelamento Ruído Pc Videogame
-  brand: null
+  name: Fone De Ouvido Headset Gamer Sem Fio Olafvi Captain 700 Pro Over-ear Microfone Cancelamento Ruído
+    Pc Videogame
+  brand: Olafvi
   category: headphones
   specs:
     type: over-ear
@@ -1500,9 +1510,8 @@
     url: https://www.mercadolivre.com.br/headset-hp-dhh-1601-drivers-40mm-conector-p2-35mm-cabo-2m-preto/p/MLB22150105
 - source: apify:mercadolivre
   external_id: MLB33981251
-  name: Fone de Ouvido Bluetooth Soundcore Anker Q20i ANC Híbrido Fone Sem Fio Headset
-    Gamer com Cancelamento de Ruído 60H Bateria Hi-Res App Multiponto Headphone Graves
-    Potentes Dobrável Carga Rápida Preto
+  name: Fone de Ouvido Bluetooth Soundcore Anker Q20i ANC Híbrido Fone Sem Fio Headset Gamer com Cancelamento
+    de Ruído 60H Bateria Hi-Res App Multiponto Headphone Graves Potentes Dobrável Carga Rápida Preto
   brand: Anker
   category: headphones
   specs:
@@ -1516,9 +1525,9 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB63649509
-  name: Fone De Ouvido Gamer Headset USB Olafvi Captain 300 Com Fio Branco Microfone
-    Cancelamento De Ruído PS5 PS4 PC Switch
-  brand: null
+  name: Fone De Ouvido Gamer Headset USB Olafvi Captain 300 Com Fio Branco Microfone Cancelamento De Ruído
+    PS5 PS4 PC Switch
+  brand: Olafvi
   category: headphones
   specs:
     type: over-ear
@@ -1531,8 +1540,8 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB51237791
-  name: Fone de Ouvido Basike FON-041 Headset Bluetooth Sem Fio Com Cancelamento de
-    Ruído e Bateria de 30 Horas (Rosa)
+  name: Fone de Ouvido Basike FON-041 Headset Bluetooth Sem Fio Com Cancelamento de Ruído e Bateria de
+    30 Horas (Rosa)
   brand: Basike
   category: headphones
   specs:
@@ -1546,9 +1555,8 @@
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
 - source: apify:mercadolivre
   external_id: MLB47834868
-  name: Basike Headphone Fone De Ouvido Bluetooth Sem Fio Wireless Mini Dobrável Com
-    Microfone Anc Cancelamento De Ruido Hifi Aux Usb Para Gamer Pc Academia Over Ear
-    Headset On Ear Confortável Ajustável Preto
+  name: Basike Headphone Fone De Ouvido Bluetooth Sem Fio Wireless Mini Dobrável Com Microfone Anc Cancelamento
+    De Ruido Hifi Aux Usb Para Gamer Pc Academia Over Ear Headset On Ear Confortável Ajustável Preto
   brand: Basike
   category: headphones
   specs:
@@ -1575,8 +1583,7 @@
     url: https://www.mercadolivre.com.br/fortrek-hsl-102-fk-739a-fone-de-ouvido-over-ear-gamer-cor-preto/p/MLB15356181
 - source: apify:mercadolivre
   external_id: MLB70040211
-  name: Headset Onikuma GT808 Gamer Sem Fio, Bluetooth 5.3 com Microfone e RGB para
-    PS5, Xbox, PC e Celular
+  name: Headset Onikuma GT808 Gamer Sem Fio, Bluetooth 5.3 com Microfone e RGB para PS5, Xbox, PC e Celular
   brand: Onikuma
   category: headphones
   specs:
@@ -1604,8 +1611,8 @@
     url: https://www.mercadolivre.com.br/headset-gamer-havit-h2002cu-usb-p2-drivers-53mm-cor-preto-e-cor-preto-e-roxo/p/MLB47198016
 - source: apify:mercadolivre
   external_id: MLB67662828
-  name: Fone De Ouvido Bluetooth Sem Fio Headset Regulável Corrida Treino Academia
-    Entrada P2 Mp3 Para Smartphone Pc Desktop Over-ear Cowin - Azul
+  name: Fone De Ouvido Bluetooth Sem Fio Headset Regulável Corrida Treino Academia Entrada P2 Mp3 Para
+    Smartphone Pc Desktop Over-ear Cowin - Azul
   brand: Cowin
   category: headphones
   specs:
@@ -1618,8 +1625,7 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-bluetooth-sem-fio-headset-regulavel-corrida-treino-academia-entrada-p2-mp3-para-smartphone-pc-desktop-over-ear-cowin-azul/p/MLB67662828
 - source: apify:mercadolivre
   external_id: MLB61233700
-  name: Fone De Ouvido Headset Gamer Havit H2015y P3 com Adaptador 2xP2 Para Ps4/ps5/pc
-    Preto
+  name: Fone De Ouvido Headset Gamer Havit H2015y P3 com Adaptador 2xP2 Para Ps4/ps5/pc Preto
   brand: Havit
   category: headphones
   specs:
@@ -1645,8 +1651,7 @@
     url: https://www.mercadolivre.com.br/headset-p3-hp-dhe-8009-194r3aa-cor-preto/p/MLB20250483
 - source: apify:mercadolivre
   external_id: MLB25471898
-  name: Headset Profissional Multilaser Pro USB - Com Microfone e Controle de Volume
-    - PH317
+  name: Headset Profissional Multilaser Pro USB - Com Microfone e Controle de Volume - PH317
   brand: Multilaser
   category: headphones
   specs:
@@ -1687,9 +1692,9 @@
     url: https://www.mercadolivre.com.br/headset-gamer-redragon-ares-pto-preto/p/MLB16056056
 - source: apify:mercadolivre
   external_id: MLB63210170
-  name: Headphone Gamer Sem Fio OLAFVI Captain 400 Bluetooth 5.3 com Microfone e Cancelamento
-    de Ruído para PS5 e PC
-  brand: null
+  name: Headphone Gamer Sem Fio OLAFVI Captain 400 Bluetooth 5.3 com Microfone e Cancelamento de Ruído
+    para PS5 e PC
+  brand: Olafvi
   category: headphones
   specs:
     type: over-ear
@@ -1703,9 +1708,8 @@
     url: https://www.mercadolivre.com.br/headphone-gamer-sem-fio-olafvi-captain-400-bluetooth-53-com-microfone-e-cancelamento-de-ruido-para-ps5-e-pc/p/MLB63210170
 - source: apify:mercadolivre
   external_id: MLB62789777
-  name: Olafvi Fone de Ouvido Bluetooth Sem Fio Headset Gamer BL 5.3 Preto Capitão
-    780 7.1 LED RGB
-  brand: null
+  name: Olafvi Fone de Ouvido Bluetooth Sem Fio Headset Gamer BL 5.3 Preto Capitão 780 7.1 LED RGB
+  brand: Olafvi
   category: headphones
   specs:
     type: over-ear
@@ -1717,8 +1721,7 @@
     url: https://www.mercadolivre.com.br/olafvi-fone-de-ouvido-bluetooth-sem-fio-headset-gamer-bl-53-preto-capito-780-71-led-rgb/p/MLB62789777
 - source: apify:mercadolivre
   external_id: MLB27417618
-  name: Fone Headset Gamer HAVIT H2230d P2 P3 3,5MM Microfone Removível Consoles PC
-    Preto
+  name: Fone Headset Gamer HAVIT H2230d P2 P3 3,5MM Microfone Removível Consoles PC Preto
   brand: Havit
   category: headphones
   specs:
@@ -1745,8 +1748,8 @@
     url: https://www.mercadolivre.com.br/headset-over-ear-gamer-oneodio-pro-10-preto-con-conector-p2-e-p10/p/MLB23169605
 - source: apify:mercadolivre
   external_id: MLB65623976
-  name: Headset Gamer Sem Fio Quantum 950 JBL com Quantum Spatial Sound, ANC Adaptativo,
-    Bluetooth 5.3 e Até 50h de Bateria
+  name: Headset Gamer Sem Fio Quantum 950 JBL com Quantum Spatial Sound, ANC Adaptativo, Bluetooth 5.3
+    e Até 50h de Bateria
   brand: JBL
   category: headphones
   specs:
@@ -1773,9 +1776,8 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-branco-35mm-h2015se-white-marca-havit/p/MLB58542220
 - source: apify:mercadolivre
   external_id: MLB55775026
-  name: Fone De Ouvido Headset Office Usb Microfone Reunião Empresa Call Computador
-    Telefone Pc Notebook Microfone Para Reunião Home Office Jogos Trabalho Empresa
-    Telemarketing
+  name: Fone De Ouvido Headset Office Usb Microfone Reunião Empresa Call Computador Telefone Pc Notebook
+    Microfone Para Reunião Home Office Jogos Trabalho Empresa Telemarketing
   brand: null
   category: headphones
   specs:
@@ -1789,8 +1791,8 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-headset-office-usb-microfone-reunio-empresa-call-computador-telefone-pc-notebook-microfone-para-reunio-home-office-jogos-trabalho-empresa-telemarketing/p/MLB55775026
 - source: apify:mercadolivre
   external_id: MLB67662833
-  name: Fone De Ouvido Bluetooth Sem Fio Headset Regulável Corrida Treino Academia
-    Entrada P2 Mp3 Para Smartphone Pc Desktop Over-ear Cowin - Preto
+  name: Fone De Ouvido Bluetooth Sem Fio Headset Regulável Corrida Treino Academia Entrada P2 Mp3 Para
+    Smartphone Pc Desktop Over-ear Cowin - Preto
   brand: Cowin
   category: headphones
   specs:
@@ -1842,8 +1844,8 @@
     url: https://www.mercadolivre.com.br/fone-headset-gamer-profissional-mento-rgb-h270-rgb-redragon-cor-preto/p/MLB19777755
 - source: apify:mercadolivre
   external_id: MLB47685036
-  name: Headset Gamer Mizar ELG, 3D Surround 7.1, Drivers de 50mm, Microfone Omnidirecional,
-    Earpads de Malha Esportiva, Iluminação RGB, Preto, HGMZ
+  name: Headset Gamer Mizar ELG, 3D Surround 7.1, Drivers de 50mm, Microfone Omnidirecional, Earpads de
+    Malha Esportiva, Iluminação RGB, Preto, HGMZ
   brand: ELG
   category: headphones
   specs:
@@ -1857,8 +1859,8 @@
     url: https://www.mercadolivre.com.br/headset-gamer-mizar-elg-3d-surround-71-drivers-de-50mm-microfone-omnidirecional-earpads-de-malha-esportiva-iluminaco-rgb-preto-hgmz/p/MLB47685036
 - source: apify:mercadolivre
   external_id: MLB67662830
-  name: Fone De Ouvido Bluetooth Sem Fio Headset Regulável Corrida Treino Academia
-    Entrada P2 Mp3 Para Smartphone Pc Desktop Over-ear Cowin - Branco
+  name: Fone De Ouvido Bluetooth Sem Fio Headset Regulável Corrida Treino Academia Entrada P2 Mp3 Para
+    Smartphone Pc Desktop Over-ear Cowin - Branco
   brand: Cowin
   category: headphones
   specs:
@@ -1871,8 +1873,7 @@
     url: https://www.mercadolivre.com.br/fone-de-ouvido-bluetooth-sem-fio-headset-regulavel-corrida-treino-academia-entrada-p2-mp3-para-smartphone-pc-desktop-over-ear-cowin-branco/p/MLB67662830
 - source: apify:mercadolivre
   external_id: MLB62832105
-  name: Fone De Ouvido Headphone Sem Fio Bluetooth 5.3 Gamer Super Bass Over Ear Dobrável
-    Headset
+  name: Fone De Ouvido Headphone Sem Fio Bluetooth 5.3 Gamer Super Bass Over Ear Dobrável Headset
   brand: null
   category: headphones
   specs:
@@ -1899,9 +1900,8 @@
     url: https://www.mercadolivre.com.br/headset-huginn-warrior-branco-ph700/p/MLB41519754
 - source: apify:mercadolivre
   external_id: MLB60958334
-  name: Fone De Ouvido Bluetooth Soundcore Anker Q20i Anc Híbrido Fone Sem Fio Headset
-    Gamer Com Cancelamento De Ruído 60h Bateria Hi-res App Multiponto Headphone Graves
-    Potentes Dobrável Carga Rápida Branco
+  name: Fone De Ouvido Bluetooth Soundcore Anker Q20i Anc Híbrido Fone Sem Fio Headset Gamer Com Cancelamento
+    De Ruído 60h Bateria Hi-res App Multiponto Headphone Graves Potentes Dobrável Carga Rápida Branco
   brand: Anker
   category: headphones
   specs:
@@ -1940,9 +1940,8 @@
     url: https://www.mercadolivre.com.br/headset-sem-fio-logitech-zone-vibe-100-grafite/p/MLB21713407
 - source: apify:mercadolivre
   external_id: MLB29023672
-  name: HAVIT Fone de Ouvido Headset Gamer FUXI-H3 Quad-Mode (com fio e sem fio, Wireless
-    2,4GHz, Bluetooth, Cabo USB-C, Cabo Auxiliar 3.5mm). Surround, Baixa Latência
-    - Cinza
+  name: HAVIT Fone de Ouvido Headset Gamer FUXI-H3 Quad-Mode (com fio e sem fio, Wireless 2,4GHz, Bluetooth,
+    Cabo USB-C, Cabo Auxiliar 3.5mm). Surround, Baixa Latência - Cinza
   brand: Havit
   category: headphones
   specs:
@@ -1955,8 +1954,7 @@
     url: https://www.mercadolivre.com.br/havit-fone-de-ouvido-headset-gamer-fuxi-h3-quad-mode-com-fio-e-sem-fio-wireless-24ghz-bluetooth-cabo-usb-c-cabo-auxiliar-35mm-surround-baixa-latncia-cinza/p/MLB29023672
 - source: apify:mercadolivre
   external_id: MLB45123097
-  name: Headset Gamer Fallen Morcego Pro Bluetooth e Wireless 2.4ghz 7.1 Branco e
-    Preto
+  name: Headset Gamer Fallen Morcego Pro Bluetooth e Wireless 2.4ghz 7.1 Branco e Preto
   brand: Fallen
   category: headphones
   specs:
@@ -2008,8 +2006,7 @@
     url: https://www.mercadolivre.com.br/headset-gamer-wireless-warrior-ph703-preto/p/MLB62821170
 - source: apify:mercadolivre
   external_id: MLB73634593
-  name: Headset Gamer Samzhe Gomer RGB USB 7.1 Surround Profissional Com Microfone
-    Para PC e PS5
+  name: Headset Gamer Samzhe Gomer RGB USB 7.1 Surround Profissional Com Microfone Para PC e PS5
   brand: Samzhe
   category: headphones
   specs:
@@ -2078,7 +2075,7 @@
 - source: apify:mercadolivre
   external_id: MLB52731643
   name: Fone Bluetooth 5.3 Bribel Gamer In-ear À Prova D'Água IPX7 com Microfone
-  brand: null
+  brand: Bribel
   category: headphones
   specs:
     type: in-ear
@@ -2160,8 +2157,8 @@
     url: https://www.mercadolivre.com.br/headset-qcy-h3-anc-adaptativo-bluetooth-53-multiponto-60h-cor-preto/p/MLB28965708
 - source: apify:mercadolivre
   external_id: MLB69178864
-  name: Fone De Ouvido Headphone Sem Fio Bluetooth 5.3 Gamer Super Bass Over Ear Dobrável
-    Headset Branco Audiophile
+  name: Fone De Ouvido Headphone Sem Fio Bluetooth 5.3 Gamer Super Bass Over Ear Dobrável Headset Branco
+    Audiophile
   brand: null
   category: headphones
   specs:

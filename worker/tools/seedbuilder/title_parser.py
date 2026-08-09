@@ -81,6 +81,29 @@ BRANDS: dict[str, list[str]] = {
         "Positivo",
         "Bright",
         "Dazz",
+        # Marcas menores do marketplace. Sem elas, 58 dos 157 fones do seed eram
+        # rejeitados por "marca ausente" — o maior motivo de descarte da ingestão,
+        # bem acima das specs. Todas saem literalmente do título do anúncio.
+        "Olafvi",
+        "Dapon",
+        "JSKJ",
+        "Lumva",
+        "Davely",
+        "Stagesound",
+        "Stage",
+        "Amby",
+        "HTC",
+        "DGX",
+        "Iwill",
+        "A'Gold",
+        "Daoyee",
+        "Bribel",
+        "Voreon",
+        "Landara",
+        "Bela Voz",
+        "Hardline",
+        "Power Tech",
+        "Fergusom",
     ],
 }
 
@@ -258,6 +281,26 @@ def parse_notebook(title: str) -> dict:
     return specs
 
 
+# Formatos que o marketplace descreve por como o fone PRENDE na orelha (clipe,
+# gancho, condução óssea/aérea, "open ear"). Nenhum casa com in/on/over-ear; no
+# enum da categoria o vizinho mais próximo é `earbuds`.
+_CLIP_ABERTO = [
+    "ear-clip",
+    "ear clip",
+    "clip-ear",
+    "clip ear",
+    "ear cuff",
+    "fone clip",
+    "com clipe",
+    "open ear",
+    "open-ear",
+    "ouvido aberto",
+    "conducao aerea",
+    "conducao ossea",
+    "ows",
+]
+
+
 def parse_headphone(title: str) -> dict:
     low = _ascii(title)
     specs: dict = {}
@@ -270,8 +313,16 @@ def parse_headphone(title: str) -> dict:
         specs["type"] = "in-ear"
     elif any(t in low for t in ["earbud", "eardbud", "tws", "buds"]):
         specs["type"] = "earbuds"
+    elif any(t in low for t in _CLIP_ABERTO):
+        specs["type"] = "earbuds"
     elif "headset" in low or "headphone" in low:
         specs["type"] = "over-ear"
+    elif any(t in low for t in ["sem fio", "wireless", "bluetooth"]):
+        # Último recurso: "fone de ouvido sem fio/bluetooth" sem NENHUM outro
+        # marcador de formato é, nesse catálogo, TWS em praticamente 100% dos
+        # casos — os over-ear se anunciam como headphone/headset e caem no ramo
+        # acima. Fica por último de propósito: qualquer marcador explícito ganha.
+        specs["type"] = "earbuds"
 
     # anc é boolean: ausência de menção = False (nunca "desconhecido").
     specs["anc"] = any(
