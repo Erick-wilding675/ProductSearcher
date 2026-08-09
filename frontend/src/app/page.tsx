@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { LoadingList } from "@/components/states/loading-list";
@@ -14,10 +14,12 @@ import { ThemeToggle } from "@/components/ThemeToggle/ThemeToggle";
 import { search } from "@/lib/api";
 import type { SearchResultItem } from "@/lib/api";
 
-export default function HomePage() {
+function SearchPageContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [query, setQuery] = useState("");
+  // `?q=` pré-preenche a busca (link "ver no ProductSearcher" da extensão, RF-54).
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const [category, setCategory] = useState("");
   const [priceMax, setPriceMax] = useState("");
   const [brand, setBrand] = useState("");
@@ -27,10 +29,12 @@ export default function HomePage() {
   const [error, setError] = useState<string | null>(null);
 
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+  const [searched, setSearched] = useState(false);
 
   async function handleSearch() {
     setLoading(true);
     setError(null);
+    setSearched(true);
 
     try {
       const response = await search({
@@ -53,6 +57,14 @@ export default function HomePage() {
       setLoading(false);
     }
   }
+
+  useEffect(() => {
+    if (searchParams.get("q")) {
+      handleSearch();
+    }
+    // Roda só na entrada vinda da extensão; buscas seguintes usam handleSearch direto.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   function handleClearFilters() {
     setCategory("");
@@ -146,10 +158,14 @@ export default function HomePage() {
           )}
 
           {!loading && !error && results.length === 0 && (
-             <EmptyState
-                title="Nenhum resultado encontrado"
-                description="Faça uma busca para encontrar produtos."
-              />
+            <EmptyState
+              title={searched ? "Nenhum resultado encontrado" : "Comece uma busca"}
+              description={
+                searched
+                  ? "Tente outros termos ou limpe os filtros."
+                  : "Busque por produtos para ver os resultados aqui."
+              }
+            />
           )}
 
           <div className="space-y-4">
@@ -195,5 +211,13 @@ export default function HomePage() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function HomePage() {
+  return (
+    <Suspense fallback={<LoadingList />}>
+      <SearchPageContent />
+    </Suspense>
   );
 }

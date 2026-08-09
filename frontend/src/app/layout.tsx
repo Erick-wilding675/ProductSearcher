@@ -15,9 +15,25 @@ export const metadata: Metadata = {
   description: "Descoberta, comparação e análise inteligente de produtos.",
 };
 
+// Aplica o tema antes da primeira pintura: sem isso a página pisca clara antes do
+// React hidratar e o toggle reler a escolha salva.
+const aplicarTemaSalvo = `
+(function () {
+  try {
+    var salvo = localStorage.getItem("theme");
+    var escuro = salvo ? salvo === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    document.documentElement.classList.toggle("dark", escuro);
+  } catch (e) {}
+})();
+`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="pt-BR" className={inter.variable}>
+    <html lang="pt-BR" className={inter.variable} suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: aplicarTemaSalvo }} />
+      </head>
       <body className="font-sans">{children}</body>
     </html>
   );
