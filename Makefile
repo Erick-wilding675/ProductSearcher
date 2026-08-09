@@ -2,7 +2,7 @@
 # Backend (api/worker): ruff + pytest. Frontend: eslint + prettier.
 # Objetivo: lint/format/test rodando com um comando (RNF reprodutibilidade).
 .DEFAULT_GOAL := help
-.PHONY: help install lint format format-check test up down logs ci
+.PHONY: help install lint format format-check test up down logs ci migrate seed
 
 help: ## Lista os comandos disponíveis
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | \
@@ -33,6 +33,12 @@ test: ## Roda os testes (pytest) da api e do worker
 	cd worker && pytest -q
 
 ci: lint test ## Replica localmente o que a CI roda (lint + test)
+
+migrate: ## Aplica as migrations no banco de DATABASE_URL (alembic upgrade head)
+	cd api && alembic upgrade head
+
+seed: ## Carrega o catálogo seed no banco de DATABASE_URL
+	cd worker && python -m ingestion.pipeline
 
 up: ## Sobe o ambiente local (Postgres + API)
 	docker compose up -d --build

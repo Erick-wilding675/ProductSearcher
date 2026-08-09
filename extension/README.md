@@ -97,14 +97,60 @@ O `content_scripts.matches` restringe a execução a `google.com/search` e
 
 ## Rodar em dev
 
-1. Suba a API: `docker compose up -d db api` na raiz (ver `../api/README.md`)
-2. `chrome://extensions` → ative **Modo do desenvolvedor** → **Carregar sem compactação**
-   → aponte para esta pasta
-3. Busque "melhor notebook gamer" no Google
+A extensão só aparece quando a API responde **com catálogo**. Sem produtos,
+`/categories` volta vazio, nenhuma busca cai em cobertura (RF-51) e a extensão
+fica calada de propósito — o que parece defeito e não é. Então garanta a API
+primeiro.
 
-Apontando para outro backend: ajuste `API_BASE_URL` em `src/shared/config.js` **e**
-`host_permissions` no `manifest.json` — trocar só um dos dois faz toda requisição
-falhar por permissão.
+### 1. Suba a API com dados
+
+**Opção A — contra o Supabase** (mais rápida; o catálogo já está lá):
+
+```bash
+# na raiz, com o DATABASE_URL do Supabase no .env
+uvicorn app.main:app --reload --port 8000 --app-dir api
+```
+
+**Opção B — tudo local:**
+
+```bash
+docker compose up -d db     # só o Postgres
+make migrate                # cria o schema — o compose NÃO faz isso
+make seed                   # carrega o catálogo
+docker compose up -d api
+```
+
+> O serviço `api` do compose aponta para o Postgres do próprio compose e
+> **ignora** o `DATABASE_URL` do `.env`. Misturar as duas opções é a forma mais
+> fácil de subir uma API conectada num banco vazio.
+
+Confira antes de seguir — tem que vir `product_count > 0`:
+
+```bash
+curl localhost:8000/categories
+```
+
+### 2. Carregue a extensão
+
+1. `chrome://extensions` → ative **Modo do desenvolvedor**
+2. **Carregar sem compactação** → aponte para esta pasta (`extension/`)
+3. Opcional: `npm run dev` no `frontend/` para o link "ver todos" abrir de fato
+
+### 3. Teste
+
+| Busca no Google | Esperado |
+| --- | --- |
+| `melhor notebook gamer` | painel com o top 3 de notebooks |
+| `fone bluetooth com anc` | painel com o top 3 de fones |
+| `receita de bolo` | **nada** — fora de cobertura, nem chega à API |
+
+Se nada aparecer, abra o console do service worker em `chrome://extensions` →
+**Service worker**. Falha de `/categories` é logada lá com o motivo.
+
+### Apontando para outro backend
+
+Ajuste `API_BASE_URL` em `src/shared/config.js` **e** `host_permissions` no
+`manifest.json` — trocar só um dos dois faz toda requisição falhar por permissão.
 
 ## Testes
 
