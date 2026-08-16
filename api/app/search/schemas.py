@@ -52,6 +52,33 @@ class SearchResponse(BaseModel):
     criteria: list[RankingCriterion] = Field(default_factory=list)
     results: list[SearchResultItem]
 
+class SpecOptionValue(BaseModel):
+    """Um valor disponível para uma spec no pool atual de candidatos."""
+
+    value: str | int | float | bool
+    count: int = Field(ge=1)
+
+
+class SpecOption(BaseModel):
+    """Uma spec disponível para priorização."""
+
+    key: str
+    label: str
+    values: list[SpecOptionValue]
+
+
+class SpecOptionsResponse(BaseModel):
+    """Specs e valores encontrados no pool atual da busca."""
+
+    specs: list[SpecOption] = Field(default_factory=list)
+
+class RankByOption(Enum):
+    """Critério de priorização do ranking."""
+
+    relevance = "relevance"
+    price = "price"
+    brand = "brand"
+    spec = "spec"
 
 class SortOption(Enum):
     """Ordenações válidas do /search (contrato explícito no OpenAPI)."""

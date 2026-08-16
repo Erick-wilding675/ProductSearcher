@@ -4,7 +4,7 @@ Só as colunas usadas na leitura — a migration inicial (`7d5fdc583693`) é a f
 verdade do schema. Novos endpoints estendem este módulo com as tabelas que precisarem.
 """
 
-from sqlalchemy import Column, Computed, ForeignKey, Integer, MetaData, Numeric, Table, Text
+from sqlalchemy import Boolean, Column, Computed, ForeignKey, Integer, MetaData, Numeric, Table, Text
 from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 
 metadata = MetaData()
@@ -22,6 +22,19 @@ categories = Table(
     Column("id", UUID(as_uuid=True), primary_key=True),
     Column("slug", Text, nullable=False),
     Column("name", Text, nullable=False),
+)
+
+category_attribute_schema = Table(
+    "category_attribute_schema",
+    metadata,
+    Column("id", UUID(as_uuid=True), primary_key=True),
+    Column("category_id", UUID(as_uuid=True), ForeignKey("categories.id"), nullable=False),
+    Column("attribute_key", Text, nullable=False),
+    Column("label", Text, nullable=False),
+    Column("data_type", Text, nullable=False),
+    Column("allowed_values", JSONB),
+    Column("unit", Text),
+    Column("required", Boolean, nullable=False),
 )
 
 brands = Table(

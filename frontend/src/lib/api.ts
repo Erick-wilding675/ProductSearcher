@@ -2,7 +2,8 @@
 // Os tipos espelham os schemas Pydantic do backend — ao mexer em api/app/**/schemas.py
 // (ou em search/comparison.py), atualize aqui junto. Ver docs/architecture.md.
 
-const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 /**
  * Valor monetário. Chega como **string** ("4590.00"), não number: o backend usa
@@ -26,9 +27,10 @@ export interface RankingFactor {
 
 /** Critério usado pelo ranking, com peso e rótulo pronto para a UI (RF-31). */
 export interface RankingCriterion {
-  /** `relevance` | `price` | `attributes`. */
+  /** `relevance` | `price` | `attributes` | `preference`. */
   factor: string;
   weight: number;
+
   /** `false` quando a consulta não ativa esse critério. */
   active: boolean;
   description: string;
@@ -41,12 +43,16 @@ export interface SearchResultItem {
   name: string;
   category: string;
   brand: string;
+
   /** Menor preço entre as ofertas; `null` quando o produto não tem oferta. */
   min_price: Money | null;
+
   /** Specs do produto (mesmo formato usado na comparação). */
   specs: Record<string, unknown>;
+
   /** Score final do ranking, em [0,1] (RF-30). */
   score: number;
+
   /** O porquê da posição, fator a fator (RF-31). */
   factors: Record<string, RankingFactor>;
 }
@@ -55,28 +61,90 @@ export interface SearchResultItem {
 export interface SearchResponse {
   page: number;
   page_size: number;
+
   /**
    * Candidatos considerados pelo ranking — **não** o total de produtos que casam
    * no banco. O retrieval limita o pool (ADR-0007), e só o que entra nele é
    * ranqueável e paginável.
    */
   total: number;
+
   /** Critérios que justificam a ordenação (RF-31). */
   criteria: RankingCriterion[];
+
   results: SearchResultItem[];
 }
 
-export type SortOption = "relevance" | "price_asc" | "price_desc" | "name";
+export type RankByOption =
+  | "relevance"
+  | "price"
+  | "brand"
+  | "spec";
+
+export type RankSpecValue =
+  | string
+  | number
+  | boolean;
+
+export type SortOption =
+  | "relevance"
+  | "price_asc"
+  | "price_desc"
+  | "name";
 
 export interface SearchParams {
   q?: string;
   category?: string;
   priceMax?: number;
   brand?: string;
+
   /** Filtro estruturado por specs (RF-12). Ex.: `{ ram_gb: 16, anc: true }`. */
   attrs?: Record<string, unknown>;
+
+  /**
+   * Critério de priorização do ranking.
+   *
+   * - relevance: comportamento padrão;
+   * - price: usado pela UI em conjunto com sort=price_asc;
+   * - brand: requer rankBrand;
+   * - spec: requer rankSpec + rankSpecValue.
+   */
+  rankBy?: RankByOption;
+
+  /** Slug da marca priorizada quando `rankBy === "brand"`. */
+  rankBrand?: string;
+
+  /** Chave da especificação priorizada quando `rankBy === "spec"`. */
+  rankSpec?: string;
+
+  /** Valor da especificação priorizada quando `rankBy === "spec"`. */
+  rankSpecValue?: RankSpecValue;
+
   sort?: SortOption;
   page?: number;
+}
+
+export interface SpecOptionValue {
+  value: string | number | boolean;
+  count: number;
+}
+
+export interface SpecOption {
+  key: string;
+  label: string;
+  values: SpecOptionValue[];
+}
+
+export interface SpecOptionsResponse {
+  specs: SpecOption[];
+}
+
+export interface SpecOptionsParams {
+  q?: string;
+  category?: string;
+  priceMax?: number;
+  brand?: string;
+  attrs?: Record<string, unknown>;
 }
 
 // ---------------------------------------------------------------- catálogo
@@ -132,8 +200,10 @@ export interface CompareProductInfo {
 /** Uma linha da tabela de comparação (`ComparedAttribute`). */
 export interface ComparedAttribute {
   key: string;
+
   /** Valores na MESMA ordem de `products`; `null` quando o produto não tem o atributo. */
   values: unknown[];
+
   /** `true` quando nem todos os produtos têm o mesmo valor — destaque da linha. */
   differ: boolean;
 }
@@ -142,8 +212,10 @@ export interface ComparedAttribute {
 export interface CompareResult {
   category: string;
   products: CompareProductInfo[];
+
   /** Id do mais barato. `null` em empate ou quando ninguém tem preço. */
   best_value_id: string | null;
+
   attributes: ComparedAttribute[];
 }
 
@@ -154,6 +226,7 @@ export class ApiError extends Error {
   constructor(
     readonly status: number,
     readonly detail: string,
+
     /** Correlaciona com o log do backend (header `X-Request-ID`). */
     readonly requestId: string | null
   ) {
@@ -162,89 +235,303 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, init);
+async function request<T>(
+  path: string,
+  init?: RequestInit
+): Promise<T> {
+  const res = await fetch(
+    `${BASE_URL}${path}`,
+    init
+  );
+
   if (!res.ok) {
     // O FastAPI responde {"detail": ...}; em 422 `detail` é uma lista de erros.
     const detail = await res
       .json()
       .then((body) => {
-        const d = (body as { detail?: unknown }).detail;
-        return typeof d === "string" ? d : JSON.stringify(d);
+        const d = (
+          body as {
+            detail?: unknown;
+          }
+        ).detail;
+
+        return typeof d === "string"
+          ? d
+          : JSON.stringify(d);
       })
       .catch(() => res.statusText);
-    throw new ApiError(res.status, detail, res.headers.get("X-Request-ID"));
+
+    throw new ApiError(
+      res.status,
+      detail,
+      res.headers.get("X-Request-ID")
+    );
   }
+
   return res.json() as Promise<T>;
 }
 
 // ---------------------------------------------------------------- endpoints
 
 /**
- * `GET /search` — busca textual (FTS PT-BR) + filtros + ordenação + paginação.
+ * `GET /search` — busca textual (FTS PT-BR) + filtros + ranking +
+ * ordenação + paginação.
+ *
  * `signal` permite cancelar a requisição anterior em busca conforme digita.
  */
-export function search(params: SearchParams, signal?: AbortSignal): Promise<SearchResponse> {
+export function search(
+  params: SearchParams,
+  signal?: AbortSignal
+): Promise<SearchResponse> {
   const qs = new URLSearchParams();
-  if (params.q) qs.set("q", params.q);
-  if (params.category) qs.set("category", params.category);
-  if (params.priceMax != null) qs.set("price_max", String(params.priceMax));
-  if (params.brand) qs.set("brand", params.brand);
-  if (params.attrs && Object.keys(params.attrs).length > 0) {
-    qs.set("attrs", JSON.stringify(params.attrs));
+
+  if (params.q) {
+    qs.set("q", params.q);
   }
-  if (params.sort) qs.set("sort", params.sort);
-  if (params.page) qs.set("page", String(params.page));
-  return request<SearchResponse>(`/search?${qs.toString()}`, { signal });
+
+  if (params.category) {
+    qs.set(
+      "category",
+      params.category
+    );
+  }
+
+  if (params.priceMax != null) {
+    qs.set(
+      "price_max",
+      String(params.priceMax)
+    );
+  }
+
+  if (params.brand) {
+    qs.set(
+      "brand",
+      params.brand
+    );
+  }
+
+  if (
+    params.attrs
+    && Object.keys(params.attrs).length > 0
+  ) {
+    qs.set(
+      "attrs",
+      JSON.stringify(params.attrs)
+    );
+  }
+
+  if (params.rankBy) {
+    qs.set(
+      "rank_by",
+      params.rankBy
+    );
+  }
+
+  if (params.rankBrand) {
+    qs.set(
+      "rank_brand",
+      params.rankBrand
+    );
+  }
+
+  if (params.rankSpec) {
+    qs.set(
+      "rank_spec",
+      params.rankSpec
+    );
+  }
+
+  if (params.rankSpecValue !== undefined) {
+    qs.set(
+      "rank_spec_value",
+      String(params.rankSpecValue)
+    );
+  }
+
+  if (params.sort) {
+    qs.set(
+      "sort",
+      params.sort
+    );
+  }
+
+  if (params.page) {
+    qs.set(
+      "page",
+      String(params.page)
+    );
+  }
+
+  return request<SearchResponse>(
+    `/search?${qs.toString()}`,
+    {
+      signal,
+    }
+  );
+}
+
+/**
+ * `GET /spec-options` — specs e respectivos valores disponíveis no pool
+ * atual de candidatos.
+ *
+ * A preferência de ranking não é enviada para este endpoint: as opções devem
+ * refletir a busca e os filtros atuais, antes da priorização.
+ */
+export function getSpecOptions(
+  params: SpecOptionsParams,
+  signal?: AbortSignal
+): Promise<SpecOptionsResponse> {
+  const qs = new URLSearchParams();
+
+  if (params.q) {
+    qs.set(
+      "q",
+      params.q
+    );
+  }
+
+  if (params.category) {
+    qs.set(
+      "category",
+      params.category
+    );
+  }
+
+  if (params.priceMax != null) {
+    qs.set(
+      "price_max",
+      String(params.priceMax)
+    );
+  }
+
+  if (params.brand) {
+    qs.set(
+      "brand",
+      params.brand
+    );
+  }
+
+  if (
+    params.attrs
+    && Object.keys(params.attrs).length > 0
+  ) {
+    qs.set(
+      "attrs",
+      JSON.stringify(params.attrs)
+    );
+  }
+
+  return request<SpecOptionsResponse>(
+    `/spec-options?${qs.toString()}`,
+    {
+      signal,
+    }
+  );
 }
 
 /** `GET /categories` — categorias com ao menos um produto. */
-export function getCategories(signal?: AbortSignal): Promise<Category[]> {
-  return request<Category[]>("/categories", { signal });
+export function getCategories(
+  signal?: AbortSignal
+): Promise<Category[]> {
+  return request<Category[]>(
+    "/categories",
+    {
+      signal,
+    }
+  );
 }
 
 /**
  * `GET /brands` — marcas com ao menos um produto, para montar o filtro de marca.
  * `category` (slug) restringe às marcas daquela categoria.
  */
-export function getBrands(category?: string, signal?: AbortSignal): Promise<Brand[]> {
-  const qs = category ? `?category=${encodeURIComponent(category)}` : "";
-  return request<Brand[]>(`/brands${qs}`, { signal });
+export function getBrands(
+  category?: string,
+  signal?: AbortSignal
+): Promise<Brand[]> {
+  const qs = category
+    ? `?category=${encodeURIComponent(category)}`
+    : "";
+
+  return request<Brand[]>(
+    `/brands${qs}`,
+    {
+      signal,
+    }
+  );
 }
 
 /** `GET /products/{id}` — detalhe com specs e ofertas. */
-export function getProduct(id: string, signal?: AbortSignal): Promise<ProductDetail> {
-  return request<ProductDetail>(`/products/${encodeURIComponent(id)}`, {
-    signal,
-  });
+export function getProduct(
+  id: string,
+  signal?: AbortSignal
+): Promise<ProductDetail> {
+  return request<ProductDetail>(
+    `/products/${encodeURIComponent(id)}`,
+    {
+      signal,
+    }
+  );
 }
 
 /**
  * `POST /compare` — 2 a 4 produtos da MESMA categoria.
+ *
  * A ordem de `productIds` é a ordem das colunas e dos `values` de cada atributo.
  * Categorias diferentes → 400; id inexistente → 404.
  */
-export function compare(productIds: string[], signal?: AbortSignal): Promise<CompareResult> {
-  return request<CompareResult>("/compare", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ product_ids: productIds }),
-    signal,
-  });
+export function compare(
+  productIds: string[],
+  signal?: AbortSignal
+): Promise<CompareResult> {
+  return request<CompareResult>(
+    "/compare",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        product_ids: productIds,
+      }),
+      signal,
+    }
+  );
 }
 
 // ---------------------------------------------------------------- helpers
 
 /** Converte o valor monetário para number. `null` quando não há preço. */
-export function parsePrice(value: Money | null): number | null {
-  if (value == null) return null;
+export function parsePrice(
+  value: Money | null
+): number | null {
+  if (value == null) {
+    return null;
+  }
+
   const n = Number(value);
-  return Number.isFinite(n) ? n : null;
+
+  return Number.isFinite(n)
+    ? n
+    : null;
 }
 
 /** Formata em BRL. `fallback` (default "—") quando não há preço. */
-export function formatPrice(value: Money | null, fallback = "—"): string {
+export function formatPrice(
+  value: Money | null,
+  fallback = "—"
+): string {
   const n = parsePrice(value);
-  if (n == null) return fallback;
-  return n.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+
+  if (n == null) {
+    return fallback;
+  }
+
+  return n.toLocaleString(
+    "pt-BR",
+    {
+      style: "currency",
+      currency: "BRL",
+    }
+  );
 }

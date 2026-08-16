@@ -11,6 +11,7 @@
     ram_gb: 8
     screen_in: 15.6
     weight_kg: 2.38
+    gpu: RTX 3050
   offers:
   - store: Mercado Livre
     price: '5794'
@@ -67,8 +68,9 @@
   catalog_sku: 83KH0001BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB52721936
   name: Notebook Asus Tuf Gaming F16, Nvidia Rtx 3050, Intel Core 5 210h 2,2 Ghz, 8gb Ram, 512gb Ssd,
@@ -82,6 +84,7 @@
     ram_gb: 8
     screen_in: 16.0
     touchscreen: false
+    gpu: RTX 3050
   offers:
   - store: Mercado Livre
     price: '4914'
@@ -105,8 +108,9 @@
   catalog_sku: FX607VJ-RL002
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB65809062
   name: Notebook Gamer Dell Alienware C7 16gb Rtx 4050 W11 - A35 Azul-escuro
@@ -120,6 +124,7 @@
     weight_kg: 2.49
     touchscreen: false
     cpu: Intel Core 7 240H
+    gpu: RTX 4050
   offers:
   - store: Dell
     price: '10998'
@@ -135,8 +140,9 @@
   catalog_sku: AC16-C7240H-A35
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB65833925
   name: Notebook Dell Alienware 16 Aurora Ac16250 Intel Core I7 240h 16gb De Ram Geforce Rtx 3050 Windows
@@ -151,6 +157,7 @@
     screen_in: 16.0
     weight_kg: 2.49
     touchscreen: false
+    gpu: RTX 3050
   offers:
   - store: Dell
     price: '8644'
@@ -181,8 +188,9 @@
   catalog_sku: AC16-C7240H-A30
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB51233304
   name: Notebook Lenovo IdeaPad Slim 3 15IRH10 Intel Core i5-13420H 8GB 512GB SSD Windows 11 15.3" - 83NS0002BR
@@ -408,8 +416,9 @@
   catalog_sku: 83NS0002BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB53429614
   name: Notebook Lenovo Ideapad I5-13420h 8gb 1tb Ssd15.3 Fhd Linux Cinza
@@ -454,8 +463,9 @@
   catalog_sku: 83K1004QAR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB67549457
   name: Notebook Gamer Acer Nitro V 16 Core i7 RTX 5060 32GB RAM e SSD 512GB com Tela 16" WUXGA 180Hz
@@ -469,6 +479,7 @@
     screen_in: 16.0
     weight_kg: 2.5
     touchscreen: false
+    gpu: RTX 5060
   offers:
   - store: Mercado Livre
     price: '7386'
@@ -515,8 +526,9 @@
   catalog_sku: ANV16-72-7809-B
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB68344553
   name: Notebook Acer Gamer Nitro V15 Ryzen 7 7735hs 16gb Rtx4050 1tb Ssd Linux Tela 165hz Full Hd 15.6
@@ -529,11 +541,17 @@
     storage_type: SSD
     ram_gb: 16
     screen_in: 16.0
+    gpu: RTX 4050
   offers:
   - store: Vikings
     price: '6304'
     currency: BRL
     url: https://www.mercadolivre.com.br/notebook-acer-gamer-nitro-v15-ryzen-7-7735hs-16gb-rtx4050-1tb-ssd-linux-tela-165hz-full-hd-156-anv15-41-r8zp/p/MLB68344553
+  - store: VIKINGS_DIGITAL
+    store_url: http://perfil.mercadolivre.com.br/VIKINGS_DIGITAL
+    price: '12499'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/p/MLB68344553
   model: ANV15-41-R8ZP
   description: "A Notebook Acer Gamer Nitro V15 ANV15-41-R8ZP é a escolha ideal para gamers e profissionais\
     \ que buscam desempenho e qualidade. Equipado com um processador AMD Ryzen 7 7735HS e uma placa de\
@@ -574,8 +592,9 @@
   catalog_parent_id: MLB68344549
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB52934530
   name: Notebook Acer Aspire Go 15 AG15-71P-5939 - Intel Core i5-13420H 13ª Geração • 8GB DDR5 • 256GB
@@ -719,8 +738,9 @@
   catalog_sku: NX.JF6AL.004
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB53547163
   name: Notebook Acer Aspire GO 15 AG15-71P-58MD Intel® Core™ i5-13420H 13ªGeração 512SSD 8GB RAM DDR5
@@ -860,8 +880,9 @@
   catalog_sku: NX.JG7AL.001
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB54176209
   name: Notebook Gamer Acer Nitro V15 ANV15-52-737P Intel® Core™ i7-13620H 13ªG 16GB RAM 512GB SSD RTX4050
@@ -876,6 +897,7 @@
     screen_in: 15.6
     weight_kg: 2.11
     touchscreen: false
+    gpu: RTX 4050
   offers:
   - store: Acer
     price: '6999'
@@ -1120,8 +1142,9 @@
   catalog_sku: NH.U1TAL.001
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB63112463
   name: Notebook Gamer Predator Helios Neo 16 Phn16-73-76TF Com IA Intel® Core Ultra 7 255HX 16GB 512SSD
@@ -1136,6 +1159,7 @@
     screen_in: 16.0
     weight_kg: 3.0
     touchscreen: false
+    gpu: RTX 5070
   offers:
   - store: Acer
     price: '11199'
@@ -1463,8 +1487,9 @@
   catalog_sku: NH.U2PAL.001
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB60407347
   name: Notebook Acer Nitro V15 Anv155251e4  Intel Core I5-13420h 13ª Geração 16gb Ddr5 Nvidia Geforce
@@ -1479,11 +1504,22 @@
     screen_in: 15.6
     weight_kg: 2.11
     touchscreen: false
+    gpu: RTX 4050
   offers:
   - store: Mercado Livre
     price: '6981'
     currency: BRL
     url: https://click1.mercadolivre.com.br/mclics/clicks/external/MLB/count
+  - store: RENROD_MISC
+    store_url: http://perfil.mercadolivre.com.br/RENROD_MISC
+    price: '7178'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/p/MLB60407347
+  - store: Mercado Livre Eletronicos
+    store_url: http://perfil.mercadolivre.com.br/Mercado+Livre+Eletronicos
+    price: '7905'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/p/MLB60407347
   model: ANV15-52-51E4
   description: 'Sistema Operacional
 
@@ -1730,8 +1766,9 @@
   catalog_sku: NH.U0CAL.006
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB29126536
   name: Notebook Asus Vivobook Go 15 E1504, Amd Ryzen 5 7520u 2,8 Ghz, 8gb Ram, 256gb Ssd, Windows 11
@@ -1869,8 +1906,9 @@
   catalog_sku: E1504FA-NJ825W
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB65030699
   name: Notebook Gamer Asus Tuf Gaming A15, Amd Ryzen 7, Rtx 3050, 8gb Ram, 512gb Ssd, Linux Keepos, Graphite
@@ -1885,6 +1923,7 @@
     screen_in: 15.6
     weight_kg: 2.3
     touchscreen: false
+    gpu: RTX 3050
   offers:
   - store: Mercado Livre
     price: '4590'
@@ -1918,8 +1957,9 @@
   catalog_sku: FA506NCG-HN216
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB50302787
   name: Notebook Asus Vivobook 15 X1504va Intel Core I5 1334u 4 Gb Ram 256gb Ssd Windows 11 Home Tela
@@ -2080,8 +2120,9 @@
   catalog_sku: X1504VA-NJ1723W
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB73480206
   name: Notebook Gamer ASUS TUF Gaming A16, AMD Ryzen 7, RTX 4050, 16GB RAM, 512GB SSD, Linux KeepOS,
@@ -2096,6 +2137,7 @@
     screen_in: 16.0
     weight_kg: 2.2
     touchscreen: false
+    gpu: RTX 4050
   offers:
   - store: Asus
     price: '7499'
@@ -2169,8 +2211,9 @@
   catalog_sku: FA607NUQ-RL167
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB56952040
   name: HP Pavilion Gamer Core 5 120U 16GB RAM 1TB SSD Intel Graphics Windows 11 Instalado Laptop 17-CN4153
@@ -2217,8 +2260,9 @@
   catalog_sku: B87ZZUA
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB67492952
   name: Notebook Lenovo ThinkBook 16 G7 com Ryzen 7, 16GB de RAM e SSD de 512GB
@@ -2281,8 +2325,9 @@
   catalog_sku: 21MW0006US-B
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB2095745144
   name: Nimo 15.6  Ips Fhd-gaming-laptop,amd Ryzen 5 6600h
@@ -2324,8 +2369,9 @@
     SKU: B0GMX4KWRN'
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB51234660
   name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i5-13420h 8gb 256gb Ssd Windows 11 15.3 - 83ns0003br
@@ -2359,8 +2405,9 @@
   catalog_sku: 83ns0003br
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB70158724
   name: Notebook Asus Gaming V16 V3607vh Nvidia Rtx 5050 Intel Core 5 16gb Ram 512gb Ssd Windows 11 Home
@@ -2375,6 +2422,7 @@
     screen_in: 16.0
     weight_kg: 1.95
     touchscreen: false
+    gpu: RTX 5050
   offers:
   - store: Asus
     price: '7688'
@@ -2436,8 +2484,9 @@
   catalog_sku: V3607VH-RP106W
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB70421874
   name: Notebook Asus Tuf Gamer F16 Fx607vu Nvidia Rtx 4050 Intel Core 5 210h 16gb Ram 512gb Ssd Linux
@@ -2452,6 +2501,7 @@
     screen_in: 16.0
     weight_kg: 2.2
     touchscreen: false
+    gpu: RTX 4050
   offers:
   - store: Asus
     price: '6834'
@@ -2528,8 +2578,9 @@
   catalog_sku: FX607VU-RL385
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB59293588
   name: Notebook Asus Vivobook S14 Ai Pc, Intel Core Ultra 5, 32gb Ram, 1tb Ssd, Windows 11 Home, Tela
@@ -2590,8 +2641,9 @@
   catalog_sku: S3407CA-LY115W
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB68481578
   name: Notebook Gamer Acer Predator Helios Neo 16 PHN16-72-75TX • Intel Core i7-14700HX 14ª Geração •
@@ -2606,6 +2658,7 @@
     screen_in: 16.0
     weight_kg: 2.6
     touchscreen: false
+    gpu: RTX 4070
   offers:
   - store: Acer
     price: '9499'
@@ -2683,8 +2736,9 @@
   catalog_sku: NH.QTVAL.003
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB51233306
   name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i5-13420h 16gb 512gb Ssd Windows 11 15.3 - 83ns0001br
@@ -2729,8 +2783,9 @@
   catalog_sku: 83NS0001BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB43497024
   name: Notebook Gamer Predator Helios Neo / Phn16-72-74vx / Intel® Core I7-14700hx De 14ªgeração / 16gb
@@ -2744,6 +2799,7 @@
     ram_gb: 16
     screen_in: 16.0
     touchscreen: false
+    gpu: RTX 4070
   offers:
   - store: Vikings
     price: '9214'
@@ -2808,8 +2864,9 @@
   catalog_sku: NH.QTVAL.001
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB51332653
   name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i7-13620h 16gb 512gb Ssd Linux 15.3 - 83nss00100
@@ -2859,8 +2916,9 @@
   catalog_sku: 83nss00100
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB73480193
   name: Notebook ASUS TUF Gamer A16 FA607NUQ NVIDIA RTX 4050 AMD Ryzen 7 8GB RAM 512GB SSD Linux 16" LCD
@@ -2875,6 +2933,7 @@
     screen_in: 16.0
     weight_kg: 2.2
     touchscreen: false
+    gpu: RTX 4050
   offers:
   - store: Asus
     price: '5979'
@@ -2947,8 +3006,9 @@
   catalog_sku: FA607NUQ-RL035
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB70538747
   name: Notebook Gamer Acer Nitro V15 ANV15-41-R6J0 AMD Ryzen 7 7735HS 8GB RAM 512GB SSD RTX 4050 Linux
@@ -2963,6 +3023,7 @@
     screen_in: 15.6
     weight_kg: 2.0
     touchscreen: false
+    gpu: RTX 4050
   offers:
   - store: Acer
     price: '5414'
@@ -2996,8 +3057,9 @@
   catalog_sku: NH.U20AL.004
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB42265058
   name: Notebook Lenovo Yoga Slim 7i Intel Core Ultra 5 125H 16gb RAM 512gb SSD Windows 11 Home Tela 14"
@@ -3051,8 +3113,9 @@
   catalog_sku: 83GM0003BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB46180713
   name: Notebook Gamer Predator Helios Neo 16 PHN16-73-96SW Com IA Intel® Core™ Ultra 9 275HX 32GB 1TB
@@ -3065,6 +3128,7 @@
     storage_type: SSD
     ram_gb: 32
     screen_in: 16.0
+    gpu: RTX 5070
   offers:
   - store: Acer
     price: '13999'
@@ -3379,8 +3443,9 @@
   catalog_parent_id: MLB46180710
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB52934844
   name: Notebook Acer Aspire Go 15 AG15-71PT-58SX | Intel Core i5-13420H 13ª Geração | 8GB DDR5 | 512GB
@@ -3456,8 +3521,9 @@
   catalog_sku: NX.JGCAL.001
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB44296157
   name: Acer Predator Helios Neo PHN16-72-99MY Intel Ci9 14ªGeração 32GB 1TB SSD RTX4070 Windows11 Cor
@@ -3472,6 +3538,7 @@
     screen_in: 16.0
     weight_kg: 2.6
     touchscreen: false
+    gpu: RTX 4070
   offers:
   - store: Acer
     price: '10999'
@@ -3789,8 +3856,9 @@
   catalog_sku: NH.QTVAL.002
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB55558763
   name: Notebook Acer Gamer Nitro V15 Core I7 13ª Ger. 32gb 512ssd Rtx4050 6gb Nvidia Geforce Tela 15.6
@@ -3805,6 +3873,7 @@
     screen_in: 15.6
     weight_kg: 2.1
     touchscreen: false
+    gpu: RTX 4050
   offers:
   - store: Vikings
     price: '7759'
@@ -3863,8 +3932,9 @@
   catalog_sku: NH.U1TAL.003
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB72018722
   name: Notebook Gamer Acer Nitro V15 Anv15-52-778t Intel Core I7-13620h De 13ªg 8gb Ram 512gb Ssd Rtx4050
@@ -3878,6 +3948,7 @@
     ram_gb: 8
     screen_in: 15.6
     weight_kg: 2.0
+    gpu: RTX 4050
   offers:
   - store: Acer
     price: '6999'
@@ -3959,8 +4030,9 @@
   catalog_sku: NH.U1TAL.005
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB63144634
   name: Notebook ASUS Vivobook IA PC S14 S3407CA Intel Core Ultra 5 225H 16GB Ram 1TB SSD Windows 11 Tela
@@ -4026,8 +4098,9 @@
   catalog_sku: S3407CA-LY114W
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB37396835
   name: Notebook Gamer Acer Nitro V ANV15-51-57WS Intel® Core™ i5-13420H 13ªGeração 512SSD 8GB Nvidia®
@@ -4042,6 +4115,7 @@
     screen_in: 15.6
     weight_kg: 2.11
     touchscreen: false
+    gpu: RTX 3050
   offers:
   - store: 2Eletro
     price: '5605'
@@ -4254,8 +4328,9 @@
   catalog_sku: NH.QQDAL.004
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB51233295
   name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i7-13620h 8gb 512gb Ssd Windows 11 15.3 - 83ns0004br
@@ -4345,8 +4420,9 @@
   catalog_sku: 83NS0004BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB52907398
   name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i5-13420h 8gb 512gb Ssd Linux 15.3 - 83nss00000
@@ -4376,8 +4452,9 @@
   catalog_sku: 83NSS00000
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB17828535
   name: Apple Macbook Pro (16 polegadas, Intel Core i7, 512 GB de SSD) - Cinza-espacial
@@ -4420,8 +4497,9 @@
   catalog_sku: MVVJ2E/A
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB46010329
   name: Notebook Gamer Lenovo LOQ 15irx9 Intel Core i5-13450HX 16gb 512gb SSD RTX 3050 Windows 11 - 83kh0006br
@@ -4491,8 +4569,9 @@
   catalog_sku: 83KH0006BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB66416759
   name: Notebook Lenovo Ideapad Slim 3 15arp10 Amd Ryzen 7 7735hs 24gb 512gb Ssd Windows 11 15.3 - 83mm0003bo
@@ -4512,6 +4591,11 @@
     price: '5299'
     currency: BRL
     url: https://www.mercadolivre.com.br/notebook-lenovo-ideapad-slim-3-15arp10-amd-ryzen-7-7735hs-24gb-512gb-ssd-windows-11-153-83mm0003bo-luna-grey/p/MLB66416759
+  - store: LENOVO BR
+    store_url: http://perfil.mercadolivre.com.br/LENOVO+BR
+    price: '5451.06'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/p/MLB66416759
   model: IdeaPad Slim 3 15ARP10
   description: "Estilo, velocidade e resistência em um laptop elegante\n\nMantenha-se em movimento com\
     \ o elegante e estiloso laptop Lenovo IdeaPad Slim 3 de 15\". Projetados para se adaptar ao seu ritmo\
@@ -4549,8 +4633,9 @@
   catalog_sku: 83MM0003BO
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB62320878
   name: Notebook Lenovo Slim3 R7 8gb 256GB Ssd 15.3 Fhd Linux
@@ -4586,8 +4671,9 @@
   catalog_sku: IdeaPad Slim 3 15ARP10
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB52935778
   name: Notebook Acer Aspire Go 15 AG15-71P-5405 – Intel Core i5-13420H 13ª Geração • 16GB DDR5 • 512GB
@@ -4642,8 +4728,9 @@
   catalog_sku: NX.JH7AL.002
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB62305743
   name: Notebook Ideapad Slim 3 Ryzen 7 7735hs 8gb 512gb Ssd Amd Radeon Graphics 15.3 (1920x1200) Linux
@@ -4733,8 +4820,9 @@
   catalog_sku: 83MMS00100
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB46018205
   name: Notebook Gamer Lenovo LOQ-e 15iax9e Intel Core i5-12450hx 16gb 512gb Ssd Rtx 3050 Windows 11 15.6
@@ -4748,6 +4836,7 @@
     ram_gb: 16
     screen_in: 15.6
     weight_kg: 1.77
+    gpu: RTX 3050
   offers:
   - store: 2Eletro
     price: '6322'
@@ -4978,8 +5067,9 @@
   catalog_sku: 83ME0007BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB54279932
   name: Notebook Gamer Acer Nitro V15 ANV15-52-790M Intel® Core™ i7-13620H 13ªG 16GB RAM 512GB SSD RTX4060
@@ -4994,6 +5084,7 @@
     screen_in: 15.6
     weight_kg: 2.11
     touchscreen: false
+    gpu: RTX 4060
   offers:
   - store: Acer
     price: '7899'
@@ -5163,8 +5254,9 @@
   catalog_sku: NH.U1UAL.002
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB54468742
   name: Notebook Acer Aspire Go 15 AG15-71P-53D9 Intel® Core I5-13420h 13ªg 16GB Ram 512SSD Linux 15.6
@@ -5184,6 +5276,11 @@
     price: '4499'
     currency: BRL
     url: https://www.mercadolivre.com.br/notebook-acer-aspire-go-15-ag15-71p-53d9-intel-core-i5-13420h-13g-16gb-ram-512ssd-linux-156-full-hd-1920-x-1080/p/MLB54468742
+  - store: ACERAGPOFICIAL
+    store_url: http://perfil.mercadolivre.com.br/ACERAGPOFICIAL
+    price: '4299'
+    currency: BRL
+    url: https://www.mercadolivre.com.br/p/MLB54468742
   model: AG15-71P-53D9
   description: O Acer Aspire Go15 AG1571P53D9 é um notebook voltado para usuários que precisam de desempenho
     estável nas atividades diárias. Vem com processador Intel Core i513420H de 13ª geração, com oito núcleos,
@@ -5198,8 +5295,9 @@
   catalog_sku: NX.JH6AL.001
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB73480457
   name: Notebook ASUS TUF Gamer A16 FA607NUQ NVIDIA RTX 4050 AMD Ryzen 7 16GB RAM 512GB SSD Windows 11
@@ -5214,6 +5312,7 @@
     screen_in: 16.0
     weight_kg: 2.2
     touchscreen: false
+    gpu: RTX 4050
   offers:
   - store: Asus
     price: '7261'
@@ -5287,8 +5386,9 @@
   catalog_sku: FA607NUQ-RL019W
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB51764304
   name: Notebook Gamer Rog Strix G16 G615jpr Nvidia Rtx 5070 Intel Core I9 14900hx 32gb Ram 1tb Ssd Windows
@@ -5485,8 +5585,9 @@
   catalog_sku: G615JPRS5001W
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB51232872
   name: Notebook Lenovo Ideapad Slim 3 15irh10 Intel Core i7-13620h 24gb 512gb Ssd Windows 11 15.3 - 83ns0008br
@@ -5531,8 +5632,9 @@
   catalog_sku: 83NS0008BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB60328685
   name: Notebook Acer Aspire Go 15 AG15-71P-76Z8 | Intel Core i7-13620H 13ª Geração • 16GB RAM DDR5 •
@@ -5622,8 +5724,9 @@
   catalog_sku: NX.JH7AL.003
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB67323478
   name: Notebook Gamer Acer Nitro V15 com Intel Core i5-13420H, 8GB RAM e RTX 4050 de 6GB, SSD 512GB e
@@ -5725,8 +5828,9 @@
   catalog_sku: ANV15-52-56PD
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB52361455
   name: Notebook Acer Nitro V15 Anv15-52-96aq Intel® Core I9-13900h De 13° G 16gb 512gb Ssd Rtx4060 Windows
@@ -5741,6 +5845,7 @@
     screen_in: 15.6
     weight_kg: 2.11
     touchscreen: false
+    gpu: RTX 4060
   offers:
   - store: Acer
     price: '8999'
@@ -5998,8 +6103,9 @@
   catalog_sku: NH.U0DAL.002
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB62785722
   name: Notebook VAIO FH15 Intel Core i7 - 13ª Gen RTX 4050 Linux - 32GB RAM DDR5 1TB SSD Wi-Fi 6 Tela
@@ -6058,8 +6164,9 @@
   catalog_sku: VJFH52F11X-B2821H
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB67258163
   name: Notebook Lenovo V14 G5 Irl Intel Core i5-13420h 8gb 256gb SSD Windows 11 14 - 83uv000fbo Preto
@@ -6114,8 +6221,9 @@
   catalog_sku: 83UV000FBO
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB67142027
   name: Notebook Lenovo V14 G5 Irl Intel Core I5-13420h 16gb 512gb Ssd Windows 11 14 - 83uv000pbo Preto
@@ -6173,8 +6281,9 @@
   catalog_sku: 83UV000PBO
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB54358498
   name: Notebook Gamer Acer Nitro V15 ANV15-52-52VN Intel® Core™ i5-13420H 13ªG 512 GB SSD 16 GB RAM RTX
@@ -6189,6 +6298,7 @@
     screen_in: 15.6
     weight_kg: 2.11
     touchscreen: false
+    gpu: RTX 4060
   offers:
   - store: Acer
     price: '7999'
@@ -6354,8 +6464,9 @@
   catalog_sku: NH.U1UAL.001
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB67084809
   name: NOTEBOOK ACER ASPIRE GO 15 I5-13420H, RAM 8GB, SSD 256GB, 15,6" FULL HD, LINUX – AG15-71P-54J6
@@ -6419,8 +6530,9 @@
   catalog_sku: AG15-71P-54J6
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB52134575
   name: Notebook Asus Tuf Gaming F16 Fx607vu Rtx4050 Intel Core 5 210h 8gb Ram 512gb Ssd Linux Keepos
@@ -6618,8 +6730,9 @@
   catalog_sku: FX607VU-RL054
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB52690298
   name: Notebook Asus V16 V3607vu Nvidia Rtx 4050 Intel Core 5 210h 16gb Ram 512gb Ssd Windows 11 Home
@@ -6823,8 +6936,9 @@
   catalog_sku: V3607VU-RP306W
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB5772091782
   name: Notebook Lenovo Intel I5 Ideapad Slim 3 Tela 15.3 83ns0002br
@@ -7068,8 +7182,9 @@
   catalog_sku: 83GM0005BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB6550556370
   name: Notebook Gamer Lenovo  Loq Ci5 Rtx3050 512gb 16gb W11 +ubook
@@ -7328,8 +7443,9 @@
   catalog_sku: NH.U20AL.001
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB67147530
   name: Notebook Lenovo V15 G5 Irl Intel Core I5-13420h 8gb 256gb Ssd Windows 11 Pro 15.6 - 83uw0001bo
@@ -7428,8 +7544,9 @@
   catalog_sku: 83UW0001BO
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB54140205
   name: Notebook Asus Vivobook S14 S3407va Intel Core I7 13620h 8gb Ram 512gb Ssd Linux Keepos Tela 14
@@ -7609,8 +7726,9 @@
   catalog_sku: S3407VA-LY055
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB66848323
   name: Notebook Gamer Acer Predator Helios Neo PHN16-73-76H8 | Intel Core Ultra 7 255HX • 32GB DDR5 •
@@ -7668,8 +7786,9 @@
   catalog_sku: NH.U2PAL.004
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB2044750881
   name: Notebook Gamer Acer Nitro V15 ANV15-41-R8ZP | Ryzen 7 7735HS • RTX 4050 6GB • 16GB RAM • SSD 1TB
@@ -7684,6 +7803,7 @@
     screen_in: 15.6
     weight_kg: 2.11
     touchscreen: false
+    gpu: RTX 4050
   offers:
   - store: Vikings
     price: '7199'
@@ -7728,8 +7848,9 @@
   catalog_sku: NH.U20AL.003
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB4465709369
   name: Notebook Acer Gadget E10 Intel I5-12450h 16gb 512gb 2k Win11
@@ -7795,8 +7916,9 @@
   catalog_sku: B1503CVA_BR-S70007X
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB4690311585
   name: Notebook Lenovo V15 G5 I5-13420h 16gb 512gb Ssd W11 Pro
@@ -7861,8 +7983,9 @@
   catalog_sku: 83NS0000BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB70420780
   name: Notebook ASUS V16 Gamer V3607VM NVIDIA RTX 5060 Intel Core 5 16GB RAM 512GB SSD Windows 11 Home
@@ -7877,6 +8000,7 @@
     screen_in: 16.0
     weight_kg: 1.95
     touchscreen: false
+    gpu: RTX 5060
   offers:
   - store: Asus
     price: '8543'
@@ -7938,8 +8062,9 @@
   catalog_sku: V3607VH-RP106W
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB46213020
   name: Notebook Gamer Lenovo Legion Go S Branco, Ryzen 7, 32GB RAM, SSD 1TB, Tela Touch 8" WUXGA 120Hz
@@ -7973,8 +8098,9 @@
   catalog_parent_id: MLB46213017
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB4655192689
   name: Dell Latitude 5531, I7, 16gb Ram, 1tb Ssd, Nvidia Mx550
@@ -8045,8 +8171,9 @@
   catalog_sku: 83KJ001VBR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB4856838319
   name: Notebook Vaio Fe16 Core I5 Linux 16gb 512gb Ssd 16  Wuxga
@@ -8147,8 +8274,9 @@
   catalog_sku: DC15-C3100-A20
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB70040749
   name: Notebook Dell Dc15-i51334u-a50 15.6 Fhd I5 8gb 512gb Win 11 Preto
@@ -8191,8 +8319,9 @@
   catalog_sku: DC15-I51334U-A50
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB54103769
   name: Notebook Positivo Vision C15m Intel Celeron N4500 Windows 11 Home 4gb Ram 128gb Emmc Tela 15  Full
@@ -8260,8 +8389,9 @@
   catalog_sku: C4128B-15
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB54096680
   name: Notebook Positivo Vision C15m Para Produtividade Com Intel Celeron, 8gb Ram E Ssd De 128gb Cinza
@@ -8324,8 +8454,9 @@
   catalog_sku: C8128B-15
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB4220839621
   name: Notebook Dell Precision 15 3571 I7-12th 16gb Ram 256gb Ssd (Novo com caixa aberta)
@@ -8405,8 +8536,9 @@
     \ make short work of everyday tasks, including schoolwork and light gaming."
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB4087972789
   name: Notebook Lenovo Thinkpad | Core I5 | 8gb Ram | Ssd 120gb (Recondicionado)
@@ -8544,8 +8676,9 @@
   catalog_sku: 17-cn3003dx
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB2080169965
   name: Laptop Hp Pavilion 17  Tela De 17,3''  Intel Core I3 N305
@@ -8646,8 +8779,9 @@
     for comfortable typing, ideal for long study sessions and everyday tasks.'
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB5785005390
   name: Notebook Lenovo Ideapad Intel Celeron 82vx0001br
@@ -8946,8 +9080,9 @@
     \ tarefas diárias que envolvem processamento gráfico."
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB2010866410
   name: Notebook Lenovo Ideapad Intel Celeron - N4020, 4GB RAM, 128SSD, Windows 11 Home C/office, Tela
@@ -8993,8 +9128,9 @@
   catalog_sku: 82VX0001BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true
 - source: apify:mercadolivre
   external_id: MLB6858695202
   name: Notebook Lenovo Ideapad Intel Celeron
@@ -9152,5 +9288,6 @@
   catalog_sku: 82VX0001BR
   enrichment:
     status: ok
-    date: '2026-08-09'
+    date: '2026-08-16'
     identity: true
+    gpu: true

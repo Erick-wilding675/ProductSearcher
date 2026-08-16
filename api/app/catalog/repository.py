@@ -19,7 +19,17 @@ from app.catalog.schemas import (
     OfferOut,
     ProductDetailOut,
 )
-from app.catalog.tables import brands, categories, offers, product_specs, products, stores
+
+from app.catalog.tables import (
+    brands,
+    categories,
+    category_attribute_schema,
+    offers,
+    product_specs,
+    products,
+    stores,
+)
+
 from app.core.db import get_session
 
 
@@ -37,6 +47,7 @@ def _to_uuids(ids: list[str]) -> list[UUID]:
 class CatalogRepository(Protocol):
     def get_categories(self) -> list[CategoryOut]: ...
     def get_brands(self, category: str | None = None) -> list[BrandOut]: ...
+    def get_attribute_labels(self, category: str) -> dict[str, str]: ...
     def get_product(self, product_id: str) -> ProductDetailOut | None: ...
     def get_products_by_ids(self, ids: list[str]) -> list[CompareProduct]: ...
 
@@ -98,6 +109,30 @@ class SqlCatalogRepository:
         return [
             BrandOut(slug=row.slug, name=row.name, product_count=row.product_count) for row in rows
         ]
+
+    def get_attribute_labels(self, category: str) -> dict[str, str]:
+        """Rótulos das specs declaradas para uma categoria."""
+
+        stmt = (
+            select(
+                category_attribute_schema.c.attribute_key,
+                category_attribute_schema.c.label,
+            )
+            .select_from(category_attribute_schema)
+            .join(
+                categories,
+                categories.c.id == category_attribute_schema.c.category_id,
+            )
+            .where(categories.c.slug == category)
+            .order_by(category_attribute_schema.c.attribute_key)
+        )
+
+        rows = self._session.execute(stmt).all()
+
+        return {
+            row.attribute_key: row.label
+            for row in rows
+        }
 
     def get_product(self, product_id: str) -> ProductDetailOut | None:
         """Detalhe do produto: dados base + specs (JSONB) + ofertas com link.

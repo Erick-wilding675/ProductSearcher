@@ -4,6 +4,7 @@
     "name": "Notebooks",
     "attributes": [
       { "attribute_key": "cpu", "label": "Processador", "data_type": "text", "allowed_values": null, "unit": null, "required": false },
+      { "attribute_key": "gpu", "label": "Placa de vídeo", "data_type": "text", "allowed_values": null, "unit": null, "required": false },
       { "attribute_key": "ram_gb", "label": "Memória (GB)", "data_type": "number", "allowed_values": null, "unit": "GB", "required": false },
       { "attribute_key": "storage_gb", "label": "Armazenamento (GB)", "data_type": "number", "allowed_values": null, "unit": "GB", "required": false },
       { "attribute_key": "storage_type", "label": "Tipo de Armazenamento", "data_type": "enum", "allowed_values": ["SSD", "HDD", "eMMC"], "unit": null, "required": false },
@@ -12,6 +13,7 @@
       { "attribute_key": "touchscreen", "label": "Tela touchscreen", "data_type": "boolean", "allowed_values": null, "unit": null, "required": false }
     ]
   },
+
   {
     "slug": "headphones",
     "name": "Fones de ouvido",
