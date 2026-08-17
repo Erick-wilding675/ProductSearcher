@@ -48,16 +48,20 @@ PAUSA_S = 0.15
 def _marca_enriquecimento(produto: dict, status: str) -> None:
     """Carimba a procedência: o que foi de 1ª mão (API) e o que não deu.
 
-    `identity` registra que **perguntamos** pela identidade — e não que a fonte a
-    tinha. Alguns produtos de catálogo não têm pai (são o topo da família), e sem
-    essa distinção eles seriam reconsultados para sempre.
+    `identity` registra que perguntamos pela identidade.
+    `gpu` registra que notebooks já passaram pela rodada que consulta GPU.
     """
-    produto["enrichment"] = {
+    marca = {
         "status": status,
         "date": date.today().isoformat(),
         "identity": True,
     }
-    produto.pop("_enrichment", None)  # nome antigo, de antes da identidade
+
+    if status == "ok" and produto.get("category") == "notebooks":
+        marca["gpu"] = True
+
+    produto["enrichment"] = marca
+    produto.pop("_enrichment", None)
 
 
 def _marcado(produto: dict) -> dict:
@@ -67,10 +71,19 @@ def _marcado(produto: dict) -> dict:
 
 def _ja_tentado(produto: dict, *, retry_stale: bool) -> bool:
     marca = _marcado(produto)
+
     if marca.get("status") == "ok":
-        # Rodadas anteriores ao ADR-0009 não perguntaram pela identidade; essas
-        # valem reconsultar uma vez.
-        return bool(marca.get("identity"))
+        # Rodadas anteriores ao ADR-0009 não perguntaram pela identidade.
+        if not marca.get("identity"):
+            return False
+
+        # Notebooks enriquecidos antes da inclusão de GPU precisam passar
+        # pela API mais uma vez.
+        if produto.get("category") == "notebooks" and not marca.get("gpu"):
+            return False
+
+        return True
+
     return bool(marca) and not retry_stale
 
 

@@ -81,6 +81,36 @@ def _text(value: str | None) -> str | None:
     return (value or "").strip() or None
 
 
+def _gpu(value: str | None) -> str | None:
+    """Normaliza GPU dedicada: 'RTX 4050 6 GB GDDR6' → 'RTX 4050'."""
+    if not value:
+        return None
+
+    match = re.search(
+        r"\b(RTX|GTX|RX|Arc)\s*(\d{3,4})\s*(Ti|XT|SUPER)?\b",
+        value,
+        re.IGNORECASE,
+    )
+
+    if not match:
+        return None
+
+    family = match.group(1)
+    model = match.group(2)
+    suffix = match.group(3)
+
+    if family.lower() == "arc":
+        family = "Arc"
+    else:
+        family = family.upper()
+
+    if suffix:
+        suffix = suffix.upper() if suffix.lower() != "ti" else "Ti"
+        return f"{family} {model} {suffix}"
+
+    return f"{family} {model}"
+
+
 def _boolean(value: str | None) -> bool:
     """A API responde ``'Sim'``/``'Não'`` (e às vezes ``'Yes'``)."""
     return (value or "").strip().lower() in {"sim", "yes", "true", "com"}
@@ -128,6 +158,10 @@ NOTEBOOK: dict[str, tuple[list[str], _Transform]] = {
     "ram_gb": (
         ["RAM_MEMORY_MODULE_TOTAL_CAPACITY", "RAM_MEMORY", "MEMORY_RAM", "RAM"],
         _number,
+    ),
+    "gpu": (
+        ["DEDICATED_GRAPHIC_CARD_MODEL", "DEDICATED_GRAPHIC_CARD_LINE"],
+        _gpu,
     ),
     "storage_gb": (
         [

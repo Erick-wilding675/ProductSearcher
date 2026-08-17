@@ -8,6 +8,15 @@ type ResultCardProps = {
   selectedForComparison: boolean;
   onCompareChange: (selected: boolean) => void;
   rank?: number;
+
+  /**
+   * Explicação da preferência que elevou este produto no ranking.
+   *
+   * Ex.:
+   * "Marca: Acer"
+   * "Placa de vídeo: RTX 4050"
+   */
+  preferenceDescription?: string;
 };
 
 function getRankLabel(rank: number): string {
@@ -27,6 +36,7 @@ function getFactorLabel(factor: string): string {
     relevance: "Relevância",
     price: "Preço",
     attributes: "Atributos",
+    preference: "Preferência",
   };
 
   return labels[factor] ?? factor;
@@ -35,7 +45,13 @@ function getFactorLabel(factor: string): string {
 function formatSpecKey(key: string): string {
   const labels: Record<string, string> = {
     ram_gb: "RAM",
-    storage_type: "Armazenamento",
+    storage_gb: "Armazenamento",
+    storage_type: "Tipo de armazenamento",
+    gpu: "Placa de vídeo",
+    cpu: "Processador",
+    weight_kg: "Peso",
+    screen_in: "Tela",
+    touchscreen: "Touchscreen",
     anc: "ANC",
     driver: "Driver",
     bluetooth: "Bluetooth",
@@ -67,9 +83,16 @@ export function ResultCard({
   selectedForComparison,
   onCompareChange,
   rank,
+  preferenceDescription,
 }: ResultCardProps) {
   const applicableFactors = Object.entries(product.factors).filter(
-    ([, factor]) => factor.applicable
+    ([key, factor]) => factor.applicable && key !== "preference"
+  );
+
+  const preferenceFactor = product.factors.preference;
+
+  const wasPrioritized = Boolean(
+    preferenceDescription && preferenceFactor?.applicable && preferenceFactor.score > 0
   );
 
   const specs = Object.entries(product.specs);
@@ -93,14 +116,15 @@ export function ResultCard({
           )}
 
           <p className="text-sm text-[var(--text-muted)]">
-            {product.brand} · {product.category}
+            {product.brand}
+            {" · "}
+            {product.category}
           </p>
 
           <h2 className="mt-1 text-base font-semibold leading-snug">{product.name}</h2>
         </div>
 
         <div className="shrink-0 text-left sm:text-right">
-          {/* Badge de ranking */}
           <span className="inline-flex rounded-full bg-[var(--accent-surface)] px-3 py-1 text-sm font-semibold text-[var(--primary)]">
             Ranking: {(product.score * 100).toFixed(0)}%
           </span>
@@ -108,6 +132,14 @@ export function ResultCard({
           <p className="mt-2 text-lg font-bold">{formatPrice(product.min_price)}</p>
         </div>
       </div>
+
+      {/* Explicação da preferência */}
+      {wasPrioritized && (
+        <div className="mt-3 rounded-md border border-[var(--border)] bg-[var(--accent-surface)] px-3 py-2 text-sm">
+          <span className="font-semibold text-[var(--primary)]">↑ Priorizado por</span>{" "}
+          {preferenceDescription}
+        </div>
+      )}
 
       {/* Specs */}
       {specs.length > 0 && (
