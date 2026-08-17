@@ -159,10 +159,6 @@ NOTEBOOK: dict[str, tuple[list[str], _Transform]] = {
         ["RAM_MEMORY_MODULE_TOTAL_CAPACITY", "RAM_MEMORY", "MEMORY_RAM", "RAM"],
         _number,
     ),
-    "gpu": (
-        ["DEDICATED_GRAPHIC_CARD_MODEL", "DEDICATED_GRAPHIC_CARD_LINE"],
-        _gpu,
-    ),
     "storage_gb": (
         [
             "TOTAL_DISK_CAPACITY",
@@ -176,7 +172,7 @@ NOTEBOOK: dict[str, tuple[list[str], _Transform]] = {
     "screen_in": (["DISPLAY_SIZE", "SCREEN_SIZE"], _inches),
     "weight_kg": (["WEIGHT", "PRODUCT_WEIGHT"], _kg),
     "touchscreen": (["WITH_TOUCH_SCREEN", "IS_TOUCHSCREEN", "WITH_TOUCHSCREEN"], _boolean),
-    # `cpu` não sai de um atributo só — ver `_compoe_cpu`.
+    # `cpu` e `gpu` não saem de um atributo só — ver `_compoe_cpu` e `_compoe_gpu`.
 }
 
 HEADPHONE: dict[str, tuple[list[str], _Transform]] = {
@@ -226,6 +222,32 @@ def _compoe_cpu(by_id: dict[str, str]) -> str | None:
     return " ".join(partes).strip() or None
 
 
+def _compoe_gpu(by_id: dict[str, str]) -> str | None:
+    """Monta a `gpu` juntando os atributos que o ML fragmenta.
+
+    `DEDICATED_GRAPHIC_CARD_MODEL` ora vem completo (``'RTX 4050'``), ora só com o
+    número (``'4050'``, ``'5070'``) — e aí a família fica no
+    `DEDICATED_GRAPHIC_CARD_LINE` (``'RTX'``, ``'GeForce RTX'``) ou no
+    `..._BRAND` (``'NVIDIA'``). Lendo só o MODEL, **5 de cada 12** notebooks com
+    GPU dedicada eram descartados por não ter o prefixo da família. Mesmo
+    princípio do `_compoe_cpu`.
+
+    O `_gpu` continua sendo o filtro, então nada é chutado: gráficos integrados
+    (``'Integrada'``, ``'UHD Grsp'``, ``'Não tem'``) seguem de fora, porque não
+    casam com família conhecida + número.
+    """
+    direto = _gpu(by_id.get("DEDICATED_GRAPHIC_CARD_MODEL"))
+    if direto:
+        return direto
+
+    partes = [
+        by_id.get("DEDICATED_GRAPHIC_CARD_BRAND"),
+        by_id.get("DEDICATED_GRAPHIC_CARD_LINE"),
+        by_id.get("DEDICATED_GRAPHIC_CARD_MODEL"),
+    ]
+    return _gpu(" ".join(parte for parte in partes if parte))
+
+
 def map_attributes(category: str, ml_attributes: list[dict]) -> dict:
     """Converte a ficha técnica do ML nos specs do nosso schema."""
     by_id = {(a.get("id") or "").upper(): a.get("value_name") for a in ml_attributes}
@@ -245,6 +267,10 @@ def map_attributes(category: str, ml_attributes: list[dict]) -> dict:
         cpu = _compoe_cpu(by_id)
         if cpu:
             specs["cpu"] = cpu
+
+        gpu = _compoe_gpu(by_id)
+        if gpu:
+            specs["gpu"] = gpu
 
     # Sem formato declarado, TWS resolve: é a tecnologia dos earbuds sem fio.
     if (

@@ -356,3 +356,48 @@ def test_build_monta_rawproduct():
     assert p["category"] == "notebooks"
     assert p["offers"][0]["price"] == "3999"
     assert p["specs"]["ram_gb"] == 8
+
+
+# --- gpu: o ML fragmenta a placa de vídeo em três atributos --------------------
+
+
+def test_map_attributes_gpu_completa_no_model():
+    attrs = [{"id": "DEDICATED_GRAPHIC_CARD_MODEL", "value_name": "RTX 4050"}]
+    assert map_attributes("notebooks", attrs)["gpu"] == "RTX 4050"
+
+
+def test_map_attributes_gpu_com_model_so_numerico():
+    # Caso real: MODEL vem '4050' e a família fica no LINE. Sem juntar, 5 de cada
+    # 12 notebooks com GPU dedicada eram descartados.
+    attrs = [
+        {"id": "DEDICATED_GRAPHIC_CARD_BRAND", "value_name": "NVIDIA"},
+        {"id": "DEDICATED_GRAPHIC_CARD_LINE", "value_name": "GeForce RTX"},
+        {"id": "DEDICATED_GRAPHIC_CARD_MODEL", "value_name": "4050"},
+    ]
+    assert map_attributes("notebooks", attrs)["gpu"] == "RTX 4050"
+
+
+def test_map_attributes_gpu_corta_o_sufixo_de_memoria():
+    attrs = [{"id": "DEDICATED_GRAPHIC_CARD_MODEL", "value_name": "RTX 4050 6 GB dedicado GDDR6"}]
+    assert map_attributes("notebooks", attrs)["gpu"] == "RTX 4050"
+
+
+def test_map_attributes_gpu_ignora_grafico_integrado():
+    # 'Integrada', 'UHD Grsp' e 'Não tem' não são GPU dedicada — descartar > chutar.
+    for lixo in ("Integrada", "UHD Grsp", "Não tem", "N/D"):
+        attrs = [
+            {"id": "DEDICATED_GRAPHIC_CARD_BRAND", "value_name": "INTEL"},
+            {"id": "DEDICATED_GRAPHIC_CARD_LINE", "value_name": "INTELUHD"},
+            {"id": "DEDICATED_GRAPHIC_CARD_MODEL", "value_name": lixo},
+        ]
+        assert "gpu" not in map_attributes("notebooks", attrs), lixo
+
+
+def test_map_attributes_gpu_nao_inventa_familia_a_partir_de_serie():
+    # 'RTX SÉRIE 50' + '5070' não pode virar 'RTX 50': sem número logo após a
+    # família, o valor é descartado.
+    attrs = [
+        {"id": "DEDICATED_GRAPHIC_CARD_LINE", "value_name": "RTX SÉRIE 50"},
+        {"id": "DEDICATED_GRAPHIC_CARD_MODEL", "value_name": "5070"},
+    ]
+    assert map_attributes("notebooks", attrs).get("gpu") != "RTX 50"

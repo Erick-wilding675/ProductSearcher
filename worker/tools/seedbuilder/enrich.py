@@ -45,11 +45,18 @@ CATALOGO_URL = "https://www.mercadolivre.com.br/p"
 PAUSA_S = 0.15
 
 
+# Versão da leitura de GPU. A rodada 1 lia só `DEDICATED_GRAPHIC_CARD_MODEL`, que
+# às vezes vem só com o número ('4050'), e descartava a placa por falta da
+# família — perdia 5 de cada 12 notebooks com GPU dedicada. Subir este número faz
+# os notebooks já enriquecidos passarem pela API mais uma vez.
+GPU_REV = 2
+
+
 def _marca_enriquecimento(produto: dict, status: str) -> None:
     """Carimba a procedência: o que foi de 1ª mão (API) e o que não deu.
 
     `identity` registra que perguntamos pela identidade.
-    `gpu` registra que notebooks já passaram pela rodada que consulta GPU.
+    `gpu` registra em qual versão da leitura de GPU o notebook passou.
     """
     marca = {
         "status": status,
@@ -58,7 +65,7 @@ def _marca_enriquecimento(produto: dict, status: str) -> None:
     }
 
     if status == "ok" and produto.get("category") == "notebooks":
-        marca["gpu"] = True
+        marca["gpu"] = GPU_REV
 
     produto["enrichment"] = marca
     produto.pop("_enrichment", None)
@@ -77,9 +84,9 @@ def _ja_tentado(produto: dict, *, retry_stale: bool) -> bool:
         if not marca.get("identity"):
             return False
 
-        # Notebooks enriquecidos antes da inclusão de GPU precisam passar
-        # pela API mais uma vez.
-        if produto.get("category") == "notebooks" and not marca.get("gpu"):
+        # Notebooks lidos por uma versão antiga da GPU voltam para a fila.
+        # `True` da rodada 1 vale 1 na comparação, então também é reconsultado.
+        if produto.get("category") == "notebooks" and int(marca.get("gpu") or 0) < GPU_REV:
             return False
 
         return True
