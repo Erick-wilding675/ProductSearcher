@@ -153,16 +153,9 @@ def compare(
 
     Devolve os specs alinhados, marcando quais atributos diferem entre os produtos.
     """
-    encontrados = {
-        p.id: p
-        for p in repo.get_products_by_ids(req.product_ids)
-    }
+    encontrados = {p.id: p for p in repo.get_products_by_ids(req.product_ids)}
 
-    faltando = [
-        pid
-        for pid in req.product_ids
-        if pid not in encontrados
-    ]
+    faltando = [pid for pid in req.product_ids if pid not in encontrados]
 
     if faltando:
         raise HTTPException(
@@ -170,10 +163,7 @@ def compare(
             detail=f"Produtos não encontrados: {faltando}",
         )
 
-    produtos = [
-        encontrados[pid]
-        for pid in req.product_ids
-    ]
+    produtos = [encontrados[pid] for pid in req.product_ids]
 
     if len({p.category for p in produtos}) > 1:
         raise HTTPException(

@@ -64,12 +64,7 @@ def test_search_retorna_pagina_e_repassa_filtros():
     service = _FakeSearchService(resposta)
 
     resp = _client(service).get(
-        "/search"
-        "?q=dell"
-        "&category=notebooks"
-        "&price_max=5000"
-        "&sort=price_asc"
-        "&page=2"
+        "/search?q=dell&category=notebooks&price_max=5000&sort=price_asc&page=2"
     )
 
     assert resp.status_code == 200
@@ -114,9 +109,7 @@ def test_search_rejeita_parametros_invalidos():
 def test_search_repassa_filtro_de_atributos():
     service = _FakeSearchService(_empty_response())
 
-    resp = _client(service).get(
-        '/search?attrs={"ram_gb":16,"anc":true}'
-    )
+    resp = _client(service).get('/search?attrs={"ram_gb":16,"anc":true}')
 
     assert resp.status_code == 200
 
@@ -131,28 +124,20 @@ def test_search_attrs_invalido_422():
     client = _client(service)
 
     # JSON inválido.
-    assert client.get(
-        "/search?attrs=notjson"
-    ).status_code == 422
+    assert client.get("/search?attrs=notjson").status_code == 422
 
     # JSON válido, mas não é objeto.
-    assert client.get(
-        "/search?attrs=[1,2]"
-    ).status_code == 422
+    assert client.get("/search?attrs=[1,2]").status_code == 422
 
 
 def test_rank_by_brand_exige_rank_brand():
     service = _FakeSearchService(_empty_response())
 
-    resp = _client(service).get(
-        "/search?q=notebook&rank_by=brand"
-    )
+    resp = _client(service).get("/search?q=notebook&rank_by=brand")
 
     assert resp.status_code == 422
 
-    assert resp.json()["detail"] == (
-        "rank_brand é obrigatório quando rank_by=brand"
-    )
+    assert resp.json()["detail"] == ("rank_brand é obrigatório quando rank_by=brand")
 
     # A validação acontece no router:
     # o service nem deve ser chamado.
@@ -162,12 +147,7 @@ def test_rank_by_brand_exige_rank_brand():
 def test_rank_by_brand_repassa_marca_ao_service():
     service = _FakeSearchService(_empty_response())
 
-    resp = _client(service).get(
-        "/search"
-        "?q=notebook"
-        "&rank_by=brand"
-        "&rank_brand=acer"
-    )
+    resp = _client(service).get("/search?q=notebook&rank_by=brand&rank_brand=acer")
 
     assert resp.status_code == 200
 
@@ -180,18 +160,11 @@ def test_rank_by_brand_repassa_marca_ao_service():
 def test_rank_by_spec_exige_rank_spec():
     service = _FakeSearchService(_empty_response())
 
-    resp = _client(service).get(
-        "/search"
-        "?q=notebook"
-        "&rank_by=spec"
-        "&rank_spec_value=RTX%204050"
-    )
+    resp = _client(service).get("/search?q=notebook&rank_by=spec&rank_spec_value=RTX%204050")
 
     assert resp.status_code == 422
 
-    assert resp.json()["detail"] == (
-        "rank_spec é obrigatório quando rank_by=spec"
-    )
+    assert resp.json()["detail"] == ("rank_spec é obrigatório quando rank_by=spec")
 
     assert service.recebido == {}
 
@@ -199,18 +172,11 @@ def test_rank_by_spec_exige_rank_spec():
 def test_rank_by_spec_exige_rank_spec_value():
     service = _FakeSearchService(_empty_response())
 
-    resp = _client(service).get(
-        "/search"
-        "?q=notebook"
-        "&rank_by=spec"
-        "&rank_spec=gpu"
-    )
+    resp = _client(service).get("/search?q=notebook&rank_by=spec&rank_spec=gpu")
 
     assert resp.status_code == 422
 
-    assert resp.json()["detail"] == (
-        "rank_spec_value é obrigatório quando rank_by=spec"
-    )
+    assert resp.json()["detail"] == ("rank_spec_value é obrigatório quando rank_by=spec")
 
     assert service.recebido == {}
 
@@ -219,11 +185,7 @@ def test_rank_by_spec_repassa_spec_e_valor_ao_service():
     service = _FakeSearchService(_empty_response())
 
     resp = _client(service).get(
-        "/search"
-        "?q=notebook%20gamer"
-        "&rank_by=spec"
-        "&rank_spec=gpu"
-        "&rank_spec_value=RTX%204050"
+        "/search?q=notebook%20gamer&rank_by=spec&rank_spec=gpu&rank_spec_value=RTX%204050"
     )
 
     assert resp.status_code == 200
@@ -249,10 +211,7 @@ def test_rank_spec_value_booleano_e_convertido(
     service = _FakeSearchService(_empty_response())
 
     resp = _client(service).get(
-        "/search"
-        "?rank_by=spec"
-        "&rank_spec=touchscreen"
-        f"&rank_spec_value={query_value}"
+        f"/search?rank_by=spec&rank_spec=touchscreen&rank_spec_value={query_value}"
     )
 
     assert resp.status_code == 200
@@ -264,12 +223,7 @@ def test_rank_spec_value_numerico_permanece_string():
 
     service = _FakeSearchService(_empty_response())
 
-    resp = _client(service).get(
-        "/search"
-        "?rank_by=spec"
-        "&rank_spec=ram_gb"
-        "&rank_spec_value=16"
-    )
+    resp = _client(service).get("/search?rank_by=spec&rank_spec=ram_gb&rank_spec_value=16")
 
     assert resp.status_code == 200
 
@@ -285,9 +239,7 @@ def test_rank_by_price_e_aceito():
 
     service = _FakeSearchService(_empty_response())
 
-    resp = _client(service).get(
-        "/search?q=notebook&rank_by=price"
-    )
+    resp = _client(service).get("/search?q=notebook&rank_by=price")
 
     assert resp.status_code == 200
 
@@ -302,13 +254,7 @@ def test_rank_by_e_sort_sao_independentes():
 
     service = _FakeSearchService(_empty_response())
 
-    resp = _client(service).get(
-        "/search"
-        "?q=notebook"
-        "&rank_by=brand"
-        "&rank_brand=acer"
-        "&sort=price_desc"
-    )
+    resp = _client(service).get("/search?q=notebook&rank_by=brand&rank_brand=acer&sort=price_desc")
 
     assert resp.status_code == 200
 

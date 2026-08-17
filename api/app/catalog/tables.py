@@ -4,7 +4,17 @@ Só as colunas usadas na leitura — a migration inicial (`7d5fdc583693`) é a f
 verdade do schema. Novos endpoints estendem este módulo com as tabelas que precisarem.
 """
 
-from sqlalchemy import Boolean, Column, Computed, ForeignKey, Integer, MetaData, Numeric, Table, Text
+from sqlalchemy import (
+    Boolean,
+    Column,
+    Computed,
+    ForeignKey,
+    Integer,
+    MetaData,
+    Numeric,
+    Table,
+    Text,
+)
 from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 
 metadata = MetaData()

@@ -80,6 +80,7 @@ def _storage_type(value: str | None) -> str | None:
 def _text(value: str | None) -> str | None:
     return (value or "").strip() or None
 
+
 def _gpu(value: str | None) -> str | None:
     """Normaliza GPU dedicada: 'RTX 4050 6 GB GDDR6' → 'RTX 4050'."""
     if not value:
@@ -176,7 +177,6 @@ NOTEBOOK: dict[str, tuple[list[str], _Transform]] = {
     "weight_kg": (["WEIGHT", "PRODUCT_WEIGHT"], _kg),
     "touchscreen": (["WITH_TOUCH_SCREEN", "IS_TOUCHSCREEN", "WITH_TOUCHSCREEN"], _boolean),
     # `cpu` não sai de um atributo só — ver `_compoe_cpu`.
-
 }
 
 HEADPHONE: dict[str, tuple[list[str], _Transform]] = {

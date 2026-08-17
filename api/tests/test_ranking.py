@@ -58,10 +58,7 @@ def test_ordenacao_deterministica_sob_embaralhamento():
         price_max=5000.0,
     )
 
-    ordem = [
-        i["id"]
-        for i in DeterministicRanking().rank(hits, intent)["items"]
-    ]
+    ordem = [i["id"] for i in DeterministicRanking().rank(hits, intent)["items"]]
 
     for _ in range(20):
         embaralhado = hits[:]
@@ -155,15 +152,9 @@ def test_cobertura_de_atributos_ordena_e_pontua():
         "half",
     ]
 
-    assert (
-        out["items"][0]["factors"]["attributes"]["score"]
-        == 1.0
-    )
+    assert out["items"][0]["factors"]["attributes"]["score"] == 1.0
 
-    assert (
-        out["items"][1]["factors"]["attributes"]["score"]
-        == 0.5
-    )
+    assert out["items"][1]["factors"]["attributes"]["score"] == 0.5
 
 
 def test_criterios_refletem_o_intent():
@@ -182,10 +173,7 @@ def test_criterios_refletem_o_intent():
         ),
     )
 
-    ativos = {
-        c["factor"]: c["active"]
-        for c in out["criteria"]
-    }
+    ativos = {c["factor"]: c["active"] for c in out["criteria"]}
 
     assert ativos == {
         "relevance": True,
@@ -195,10 +183,7 @@ def test_criterios_refletem_o_intent():
     }
 
     # Pesos expostos batem com a política.
-    assert {
-        c["factor"]: c["weight"]
-        for c in out["criteria"]
-    } == WEIGHTS
+    assert {c["factor"]: c["weight"] for c in out["criteria"]} == WEIGHTS
 
 
 def test_desempate_estavel_por_nome_depois_id():
@@ -266,10 +251,7 @@ def test_sem_sinais_score_zero_mas_ordena_por_desempate():
         Intent(raw=""),
     )
 
-    assert all(
-        i["score"] == 0.0
-        for i in out["items"]
-    )
+    assert all(i["score"] == 0.0 for i in out["items"])
 
     assert [i["id"] for i in out["items"]] == [
         "a",
@@ -307,15 +289,9 @@ def test_preferencia_por_marca_leva_matches_para_cima():
         "dell",
     ]
 
-    assert (
-        out["items"][0]["factors"]["preference"]["score"]
-        == 1.0
-    )
+    assert out["items"][0]["factors"]["preference"]["score"] == 1.0
 
-    assert (
-        out["items"][1]["factors"]["preference"]["score"]
-        == 0.0
-    )
+    assert out["items"][1]["factors"]["preference"]["score"] == 0.0
 
 
 def test_preferencia_por_spec_leva_matches_para_cima():
@@ -353,15 +329,9 @@ def test_preferencia_por_spec_leva_matches_para_cima():
         "3050",
     ]
 
-    assert (
-        out["items"][0]["factors"]["preference"]["score"]
-        == 1.0
-    )
+    assert out["items"][0]["factors"]["preference"]["score"] == 1.0
 
-    assert (
-        out["items"][1]["factors"]["preference"]["score"]
-        == 0.0
-    )
+    assert out["items"][1]["factors"]["preference"]["score"] == 0.0
 
 
 def test_preferencia_por_spec_e_case_insensitive():
@@ -384,10 +354,7 @@ def test_preferencia_por_spec_e_case_insensitive():
         rank_spec_value="rtx 4050",
     )
 
-    assert (
-        out["items"][0]["factors"]["preference"]["score"]
-        == 1.0
-    )
+    assert out["items"][0]["factors"]["preference"]["score"] == 1.0
 
 
 def test_sem_preferencia_preserva_ranking_anterior():
@@ -421,12 +388,6 @@ def test_sem_preferencia_preserva_ranking_anterior():
         rank_by="relevance",
     )
 
-    assert [i["id"] for i in antigo["items"]] == [
-        i["id"]
-        for i in explicito["items"]
-    ]
+    assert [i["id"] for i in antigo["items"]] == [i["id"] for i in explicito["items"]]
 
-    assert all(
-        item["factors"]["preference"]["applicable"] is False
-        for item in explicito["items"]
-    )
+    assert all(item["factors"]["preference"]["applicable"] is False for item in explicito["items"])

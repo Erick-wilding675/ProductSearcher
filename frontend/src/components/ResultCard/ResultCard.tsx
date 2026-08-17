@@ -59,38 +59,19 @@ function formatSpecKey(key: string): string {
     battery: "Bateria",
   };
 
-  return (
-    labels[key]
-    ?? key
-      .replace(/_/g, " ")
-      .replace(
-        /\b\w/g,
-        (letter) => letter.toUpperCase()
-      )
-  );
+  return labels[key] ?? key.replace(/_/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }
 
-function formatSpecValue(
-  value: unknown
-): string {
-  if (
-    value === null
-    || value === undefined
-  ) {
+function formatSpecValue(value: unknown): string {
+  if (value === null || value === undefined) {
     return "—";
   }
 
-  if (
-    typeof value === "boolean"
-  ) {
-    return value
-      ? "Sim"
-      : "Não";
+  if (typeof value === "boolean") {
+    return value ? "Sim" : "Não";
   }
 
-  if (
-    Array.isArray(value)
-  ) {
+  if (Array.isArray(value)) {
     return value.join(", ");
   }
 
@@ -104,53 +85,35 @@ export function ResultCard({
   rank,
   preferenceDescription,
 }: ResultCardProps) {
-  const applicableFactors =
-    Object.entries(
-      product.factors
-    ).filter(
-      ([key, factor]) =>
-        factor.applicable
-        && key !== "preference"
-    );
+  const applicableFactors = Object.entries(product.factors).filter(
+    ([key, factor]) => factor.applicable && key !== "preference"
+  );
 
-  const preferenceFactor =
-    product.factors.preference;
+  const preferenceFactor = product.factors.preference;
 
-  const wasPrioritized =
-    Boolean(
-      preferenceDescription
-      && preferenceFactor?.applicable
-      && preferenceFactor.score > 0
-    );
+  const wasPrioritized = Boolean(
+    preferenceDescription && preferenceFactor?.applicable && preferenceFactor.score > 0
+  );
 
-  const specs =
-    Object.entries(
-      product.specs
-    );
+  const specs = Object.entries(product.specs);
 
-  const isTopResult =
-    rank !== undefined
-    && rank <= 5;
+  const isTopResult = rank !== undefined && rank <= 5;
 
   return (
     <article
       className={`rounded-lg border bg-[var(--surface)] p-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md ${
-        isTopResult
-          ? "border-[var(--primary)]"
-          : "border-[var(--border)]"
+        isTopResult ? "border-[var(--primary)]" : "border-[var(--border)]"
       }`}
     >
       {/* Cabeçalho */}
       <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
         <div className="min-w-0">
           {/* Selo Top 5 */}
-          {isTopResult
-            && rank !== undefined
-            && (
-              <span className="mb-2 inline-flex rounded-full bg-[var(--accent-surface)] px-3 py-1 text-sm font-bold tracking-wide text-[var(--primary)] shadow-sm">
-                {getRankLabel(rank)}
-              </span>
-            )}
+          {isTopResult && rank !== undefined && (
+            <span className="mb-2 inline-flex rounded-full bg-[var(--accent-surface)] px-3 py-1 text-sm font-bold tracking-wide text-[var(--primary)] shadow-sm">
+              {getRankLabel(rank)}
+            </span>
+          )}
 
           <p className="text-sm text-[var(--text-muted)]">
             {product.brand}
@@ -158,32 +121,22 @@ export function ResultCard({
             {product.category}
           </p>
 
-          <h2 className="mt-1 text-base font-semibold leading-snug">
-            {product.name}
-          </h2>
+          <h2 className="mt-1 text-base font-semibold leading-snug">{product.name}</h2>
         </div>
 
         <div className="shrink-0 text-left sm:text-right">
           <span className="inline-flex rounded-full bg-[var(--accent-surface)] px-3 py-1 text-sm font-semibold text-[var(--primary)]">
-            Ranking:{" "}
-            {(product.score * 100).toFixed(0)}
-            %
+            Ranking: {(product.score * 100).toFixed(0)}%
           </span>
 
-          <p className="mt-2 text-lg font-bold">
-            {formatPrice(
-              product.min_price
-            )}
-          </p>
+          <p className="mt-2 text-lg font-bold">{formatPrice(product.min_price)}</p>
         </div>
       </div>
 
       {/* Explicação da preferência */}
       {wasPrioritized && (
         <div className="mt-3 rounded-md border border-[var(--border)] bg-[var(--accent-surface)] px-3 py-2 text-sm">
-          <span className="font-semibold text-[var(--primary)]">
-            ↑ Priorizado por
-          </span>{" "}
+          <span className="font-semibold text-[var(--primary)]">↑ Priorizado por</span>{" "}
           {preferenceDescription}
         </div>
       )}
@@ -191,37 +144,22 @@ export function ResultCard({
       {/* Specs */}
       {specs.length > 0 && (
         <div className="mt-3 flex flex-wrap gap-2">
-          {specs.map(
-            ([key, value]) => (
-              <span
-                key={key}
-                className="rounded-full bg-[var(--surface-alt)] px-3 py-1 text-sm"
-              >
-                <span className="font-medium">
-                  {formatSpecKey(key)}:
-                </span>{" "}
-                {formatSpecValue(value)}
-              </span>
-            )
-          )}
+          {specs.map(([key, value]) => (
+            <span key={key} className="rounded-full bg-[var(--surface-alt)] px-3 py-1 text-sm">
+              <span className="font-medium">{formatSpecKey(key)}:</span> {formatSpecValue(value)}
+            </span>
+          ))}
         </div>
       )}
 
       {/* Fatores do ranking */}
       {applicableFactors.length > 0 && (
         <div className="mt-4 flex flex-wrap gap-2">
-          {applicableFactors.map(
-            ([key, factor]) => (
-              <span
-                key={key}
-                className="rounded-full bg-[var(--accent-surface)] px-3 py-1 text-sm"
-              >
-                {getFactorLabel(key)}:{" "}
-                {(factor.score * 100).toFixed(0)}
-                %
-              </span>
-            )
-          )}
+          {applicableFactors.map(([key, factor]) => (
+            <span key={key} className="rounded-full bg-[var(--accent-surface)] px-3 py-1 text-sm">
+              {getFactorLabel(key)}: {(factor.score * 100).toFixed(0)}%
+            </span>
+          ))}
         </div>
       )}
 
@@ -230,16 +168,9 @@ export function ResultCard({
         <label className="flex cursor-pointer items-center gap-2 text-sm">
           <input
             type="checkbox"
-            checked={
-              selectedForComparison
-            }
-            onChange={(event) =>
-              onCompareChange(
-                event.target.checked
-              )
-            }
+            checked={selectedForComparison}
+            onChange={(event) => onCompareChange(event.target.checked)}
           />
-
           Comparar este produto
         </label>
 

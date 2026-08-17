@@ -85,7 +85,7 @@ def _ja_tentado(produto: dict, *, retry_stale: bool) -> bool:
         return True
 
     return bool(marca) and not retry_stale
-    
+
 
 def preenche_urls_faltantes(produto: dict) -> int:
     """Dá URL às ofertas que não têm, sem chamar a API. Devolve quantas preencheu.

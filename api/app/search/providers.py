@@ -71,11 +71,7 @@ class FtsSearchProvider:
         category = intent.category or filters.get("category")
         brand = filters.get("brand")
 
-        price_max = (
-            intent.price_max
-            if intent.price_max is not None
-            else filters.get("price_max")
-        )
+        price_max = intent.price_max if intent.price_max is not None else filters.get("price_max")
 
         attributes = intent.attributes or filters.get("attributes")
 
@@ -83,39 +79,25 @@ class FtsSearchProvider:
         # `plainto_tsquery` combina os termos com AND — "até R$5000" no texto exigiria
         # "ate"/"r"/"5000" no produto e zeraria o resultado.
         texto = intent.text or intent.raw
-        tsquery = (
-            func.plainto_tsquery("portuguese", texto)
-            if texto
-            else None
-        )
+        tsquery = func.plainto_tsquery("portuguese", texto) if texto else None
 
         min_price = func.min(offers.c.price)
 
         conditions = []
 
         if tsquery is not None:
-            conditions.append(
-                products.c.search_vector.op("@@")(tsquery)
-            )
+            conditions.append(products.c.search_vector.op("@@")(tsquery))
 
         if category:
-            conditions.append(
-                categories.c.slug == category
-            )
+            conditions.append(categories.c.slug == category)
 
         if brand:
-            conditions.append(
-                brands.c.slug == brand
-            )
+            conditions.append(brands.c.slug == brand)
 
         # Filtro estruturado por atributos (RF-12): containment JSONB (@>),
         # servido pelo índice GIN jsonb_path_ops.
         if attributes:
-            conditions.append(
-                product_specs.c.attributes.op("@>")(
-                    cast(attributes, JSONB)
-                )
-            )
+            conditions.append(product_specs.c.attributes.op("@>")(cast(attributes, JSONB)))
 
         rank_expr = (
             func.ts_rank(
@@ -170,30 +152,21 @@ class FtsSearchProvider:
         )
 
         if conditions:
-            stmt = stmt.where(
-                and_(*conditions)
-            )
+            stmt = stmt.where(and_(*conditions))
 
         if price_max is not None:
-            stmt = stmt.having(
-                min_price <= price_max
-            )
+            stmt = stmt.having(min_price <= price_max)
 
         stmt = stmt.order_by(
             func.coalesce(
                 rank_expr,
                 0.0,
             ).desc()
-        ).limit(
-            settings.search_candidate_pool
-        )
+        ).limit(settings.search_candidate_pool)
 
         rows = self._session.execute(stmt).all()
 
-        return [
-            _row_to_hit(row)
-            for row in rows
-        ]
+        return [_row_to_hit(row) for row in rows]
 
 
 def _row_to_hit(row) -> dict:

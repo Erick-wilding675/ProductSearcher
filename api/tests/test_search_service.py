@@ -119,18 +119,17 @@ def test_atributos_do_parser_e_da_ui_se_somam():
 def test_resposta_expoe_os_criterios_do_ranking():
     """RF-31: a UI precisa dos critérios para explicar a ordenação."""
 
-    service, _ = _service([
-        _hit("Dell XPS"),
-    ])
+    service, _ = _service(
+        [
+            _hit("Dell XPS"),
+        ]
+    )
 
     resposta = service.search(
         q="notebook",
     )
 
-    fatores = {
-        criterio.factor
-        for criterio in resposta.criteria
-    }
+    fatores = {criterio.factor for criterio in resposta.criteria}
 
     assert fatores == {
         "relevance",
@@ -139,16 +138,9 @@ def test_resposta_expoe_os_criterios_do_ranking():
         "preference",
     }
 
-    assert any(
-        criterio.active
-        for criterio in resposta.criteria
-    )
+    assert any(criterio.active for criterio in resposta.criteria)
 
-    preference = next(
-        criterio
-        for criterio in resposta.criteria
-        if criterio.factor == "preference"
-    )
+    preference = next(criterio for criterio in resposta.criteria if criterio.factor == "preference")
 
     assert preference.active is False
 
@@ -156,9 +148,11 @@ def test_resposta_expoe_os_criterios_do_ranking():
 def test_item_carrega_score_e_fatores():
     """RF-30/31: cada item explica a própria posição."""
 
-    service, _ = _service([
-        _hit("Dell XPS"),
-    ])
+    service, _ = _service(
+        [
+            _hit("Dell XPS"),
+        ]
+    )
 
     item = service.search(
         q="notebook",
@@ -177,16 +171,18 @@ def test_item_carrega_score_e_fatores():
 
 
 def test_ordem_default_e_a_do_ranking():
-    service, _ = _service([
-        _hit(
-            "Fraco",
-            rank=0.1,
-        ),
-        _hit(
-            "Forte",
-            rank=0.9,
-        ),
-    ])
+    service, _ = _service(
+        [
+            _hit(
+                "Fraco",
+                rank=0.1,
+            ),
+            _hit(
+                "Forte",
+                rank=0.9,
+            ),
+        ]
+    )
 
     nomes = [
         item.name
@@ -222,16 +218,18 @@ def test_ordenacoes_explicitas(
     sort: str,
     esperado: list[str],
 ):
-    service, _ = _service([
-        _hit(
-            "Caro",
-            9000.0,
-        ),
-        _hit(
-            "Barato",
-            100.0,
-        ),
-    ])
+    service, _ = _service(
+        [
+            _hit(
+                "Caro",
+                9000.0,
+            ),
+            _hit(
+                "Barato",
+                100.0,
+            ),
+        ]
+    )
 
     nomes = [
         item.name
@@ -247,16 +245,18 @@ def test_ordenacoes_explicitas(
 def test_produto_sem_preco_vai_para_o_fim_na_ordenacao_por_preco():
     """Sem preço não é "mais barato" — senão ele lidera price_asc indevidamente."""
 
-    service, _ = _service([
-        _hit(
-            "Sem preco",
-            None,
-        ),
-        _hit(
-            "Com preco",
-            500.0,
-        ),
-    ])
+    service, _ = _service(
+        [
+            _hit(
+                "Sem preco",
+                None,
+            ),
+            _hit(
+                "Com preco",
+                500.0,
+            ),
+        ]
+    )
 
     nomes = [
         item.name
@@ -298,16 +298,15 @@ def test_paginacao_fatia_o_conjunto_ranqueado():
 
     assert p1.total == p2.total == PAGE_SIZE + 5
 
-    assert not (
-        {item.id for item in p1.results}
-        & {item.id for item in p2.results}
-    )
+    assert not ({item.id for item in p1.results} & {item.id for item in p2.results})
 
 
 def test_pagina_alem_do_fim_volta_vazia_sem_erro():
-    service, _ = _service([
-        _hit("Unico"),
-    ])
+    service, _ = _service(
+        [
+            _hit("Unico"),
+        ]
+    )
 
     resposta = service.search(
         q="notebook",
@@ -321,9 +320,11 @@ def test_pagina_alem_do_fim_volta_vazia_sem_erro():
 def test_busca_sem_texto_nao_quebra():
     """Navegação só por filtros (ex.: categoria na sidebar) não tem `q`."""
 
-    service, provider = _service([
-        _hit("Dell XPS"),
-    ])
+    service, provider = _service(
+        [
+            _hit("Dell XPS"),
+        ]
+    )
 
     resposta = service.search(
         category="notebooks",
@@ -336,18 +337,20 @@ def test_busca_sem_texto_nao_quebra():
 def test_search_service_repassa_preferencia_por_marca_ao_ranking():
     """A preferência por marca chega ao RankingService e altera a ordem."""
 
-    service, _ = _service([
-        _hit(
-            "Dell Forte",
-            rank=1.0,
-            brand_slug="dell",
-        ),
-        _hit(
-            "Acer Fraco",
-            rank=0.2,
-            brand_slug="acer",
-        ),
-    ])
+    service, _ = _service(
+        [
+            _hit(
+                "Dell Forte",
+                rank=1.0,
+                brand_slug="dell",
+            ),
+            _hit(
+                "Acer Fraco",
+                rank=0.2,
+                brand_slug="acer",
+            ),
+        ]
+    )
 
     resposta = service.search(
         q="notebook",
@@ -355,41 +358,35 @@ def test_search_service_repassa_preferencia_por_marca_ao_ranking():
         rank_brand="acer",
     )
 
-    assert [
-        item.name
-        for item in resposta.results
-    ] == [
+    assert [item.name for item in resposta.results] == [
         "Acer Fraco",
         "Dell Forte",
     ]
 
-    assert (
-        resposta.results[0]
-        .factors["preference"]
-        .score
-        == 1.0
-    )
+    assert resposta.results[0].factors["preference"].score == 1.0
 
 
 def test_search_service_repassa_preferencia_por_spec_ao_ranking():
     """A preferência por especificação chega ao ranking e reforça os matches."""
 
-    service, _ = _service([
-        _hit(
-            "RTX 3050",
-            rank=1.0,
-            attributes={
-                "gpu": "RTX 3050",
-            },
-        ),
-        _hit(
-            "RTX 4050",
-            rank=0.2,
-            attributes={
-                "gpu": "RTX 4050",
-            },
-        ),
-    ])
+    service, _ = _service(
+        [
+            _hit(
+                "RTX 3050",
+                rank=1.0,
+                attributes={
+                    "gpu": "RTX 3050",
+                },
+            ),
+            _hit(
+                "RTX 4050",
+                rank=0.2,
+                attributes={
+                    "gpu": "RTX 4050",
+                },
+            ),
+        ]
+    )
 
     resposta = service.search(
         q="notebook gamer",
@@ -398,17 +395,9 @@ def test_search_service_repassa_preferencia_por_spec_ao_ranking():
         rank_spec_value="RTX 4050",
     )
 
-    assert [
-        item.name
-        for item in resposta.results
-    ] == [
+    assert [item.name for item in resposta.results] == [
         "RTX 4050",
         "RTX 3050",
     ]
 
-    assert (
-        resposta.results[0]
-        .factors["preference"]
-        .score
-        == 1.0
-    )
+    assert resposta.results[0].factors["preference"].score == 1.0

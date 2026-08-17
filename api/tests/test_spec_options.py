@@ -65,30 +65,21 @@ def test_spec_options_retorna_valores_e_contagens():
         category="notebooks",
     )
 
-    specs = {
-        spec.key: spec
-        for spec in response.specs
-    }
+    specs = {spec.key: spec for spec in response.specs}
 
     assert set(specs) == {
         "gpu",
         "ram_gb",
     }
 
-    gpu_values = {
-        value.value: value.count
-        for value in specs["gpu"].values
-    }
+    gpu_values = {value.value: value.count for value in specs["gpu"].values}
 
     assert gpu_values == {
         "RTX 4050": 2,
         "RTX 3050": 1,
     }
 
-    ram_values = {
-        value.value: value.count
-        for value in specs["ram_gb"].values
-    }
+    ram_values = {value.value: value.count for value in specs["ram_gb"].values}
 
     assert ram_values == {
         16: 2,
@@ -115,10 +106,7 @@ def test_spec_options_ignora_specs_fora_do_schema_da_categoria():
         category="notebooks",
     )
 
-    assert [
-        spec.key
-        for spec in response.specs
-    ] == ["gpu"]
+    assert [spec.key for spec in response.specs] == ["gpu"]
 
 
 def test_spec_options_ignora_valores_complexos():
@@ -141,10 +129,7 @@ def test_spec_options_ignora_valores_complexos():
         category="notebooks",
     )
 
-    assert [
-        spec.key
-        for spec in response.specs
-    ] == ["gpu"]
+    assert [spec.key for spec in response.specs] == ["gpu"]
 
 
 def test_spec_options_remove_spec_de_alta_cardinalidade():
@@ -152,11 +137,7 @@ def test_spec_options_remove_spec_de_alta_cardinalidade():
         {
             "attributes": {
                 "cpu": f"CPU {i}",
-                "gpu": (
-                    "RTX 4050"
-                    if i % 2 == 0
-                    else "RTX 3050"
-                ),
+                "gpu": ("RTX 4050" if i % 2 == 0 else "RTX 3050"),
             }
         }
         for i in range(21)
@@ -174,10 +155,7 @@ def test_spec_options_remove_spec_de_alta_cardinalidade():
         category="notebooks",
     )
 
-    keys = {
-        spec.key
-        for spec in response.specs
-    }
+    keys = {spec.key for spec in response.specs}
 
     # 21 valores distintos ultrapassam MAX_SPEC_OPTION_VALUES = 20.
     assert "cpu" not in keys

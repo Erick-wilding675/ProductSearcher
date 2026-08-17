@@ -2,8 +2,7 @@
 // Os tipos espelham os schemas Pydantic do backend — ao mexer em api/app/**/schemas.py
 // (ou em search/comparison.py), atualize aqui junto. Ver docs/architecture.md.
 
-const BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 /**
  * Valor monetário. Chega como **string** ("4590.00"), não number: o backend usa
@@ -75,22 +74,11 @@ export interface SearchResponse {
   results: SearchResultItem[];
 }
 
-export type RankByOption =
-  | "relevance"
-  | "price"
-  | "brand"
-  | "spec";
+export type RankByOption = "relevance" | "price" | "brand" | "spec";
 
-export type RankSpecValue =
-  | string
-  | number
-  | boolean;
+export type RankSpecValue = string | number | boolean;
 
-export type SortOption =
-  | "relevance"
-  | "price_asc"
-  | "price_desc"
-  | "name";
+export type SortOption = "relevance" | "price_asc" | "price_desc" | "name";
 
 export interface SearchParams {
   q?: string;
@@ -235,14 +223,8 @@ export class ApiError extends Error {
   }
 }
 
-async function request<T>(
-  path: string,
-  init?: RequestInit
-): Promise<T> {
-  const res = await fetch(
-    `${BASE_URL}${path}`,
-    init
-  );
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  const res = await fetch(`${BASE_URL}${path}`, init);
 
   if (!res.ok) {
     // O FastAPI responde {"detail": ...}; em 422 `detail` é uma lista de erros.
@@ -255,17 +237,11 @@ async function request<T>(
           }
         ).detail;
 
-        return typeof d === "string"
-          ? d
-          : JSON.stringify(d);
+        return typeof d === "string" ? d : JSON.stringify(d);
       })
       .catch(() => res.statusText);
 
-    throw new ApiError(
-      res.status,
-      detail,
-      res.headers.get("X-Request-ID")
-    );
+    throw new ApiError(res.status, detail, res.headers.get("X-Request-ID"));
   }
 
   return res.json() as Promise<T>;
@@ -279,10 +255,7 @@ async function request<T>(
  *
  * `signal` permite cancelar a requisição anterior em busca conforme digita.
  */
-export function search(
-  params: SearchParams,
-  signal?: AbortSignal
-): Promise<SearchResponse> {
+export function search(params: SearchParams, signal?: AbortSignal): Promise<SearchResponse> {
   const qs = new URLSearchParams();
 
   if (params.q) {
@@ -290,84 +263,48 @@ export function search(
   }
 
   if (params.category) {
-    qs.set(
-      "category",
-      params.category
-    );
+    qs.set("category", params.category);
   }
 
   if (params.priceMax != null) {
-    qs.set(
-      "price_max",
-      String(params.priceMax)
-    );
+    qs.set("price_max", String(params.priceMax));
   }
 
   if (params.brand) {
-    qs.set(
-      "brand",
-      params.brand
-    );
+    qs.set("brand", params.brand);
   }
 
-  if (
-    params.attrs
-    && Object.keys(params.attrs).length > 0
-  ) {
-    qs.set(
-      "attrs",
-      JSON.stringify(params.attrs)
-    );
+  if (params.attrs && Object.keys(params.attrs).length > 0) {
+    qs.set("attrs", JSON.stringify(params.attrs));
   }
 
   if (params.rankBy) {
-    qs.set(
-      "rank_by",
-      params.rankBy
-    );
+    qs.set("rank_by", params.rankBy);
   }
 
   if (params.rankBrand) {
-    qs.set(
-      "rank_brand",
-      params.rankBrand
-    );
+    qs.set("rank_brand", params.rankBrand);
   }
 
   if (params.rankSpec) {
-    qs.set(
-      "rank_spec",
-      params.rankSpec
-    );
+    qs.set("rank_spec", params.rankSpec);
   }
 
   if (params.rankSpecValue !== undefined) {
-    qs.set(
-      "rank_spec_value",
-      String(params.rankSpecValue)
-    );
+    qs.set("rank_spec_value", String(params.rankSpecValue));
   }
 
   if (params.sort) {
-    qs.set(
-      "sort",
-      params.sort
-    );
+    qs.set("sort", params.sort);
   }
 
   if (params.page) {
-    qs.set(
-      "page",
-      String(params.page)
-    );
+    qs.set("page", String(params.page));
   }
 
-  return request<SearchResponse>(
-    `/search?${qs.toString()}`,
-    {
-      signal,
-    }
-  );
+  return request<SearchResponse>(`/search?${qs.toString()}`, {
+    signal,
+  });
 }
 
 /**
@@ -384,94 +321,54 @@ export function getSpecOptions(
   const qs = new URLSearchParams();
 
   if (params.q) {
-    qs.set(
-      "q",
-      params.q
-    );
+    qs.set("q", params.q);
   }
 
   if (params.category) {
-    qs.set(
-      "category",
-      params.category
-    );
+    qs.set("category", params.category);
   }
 
   if (params.priceMax != null) {
-    qs.set(
-      "price_max",
-      String(params.priceMax)
-    );
+    qs.set("price_max", String(params.priceMax));
   }
 
   if (params.brand) {
-    qs.set(
-      "brand",
-      params.brand
-    );
+    qs.set("brand", params.brand);
   }
 
-  if (
-    params.attrs
-    && Object.keys(params.attrs).length > 0
-  ) {
-    qs.set(
-      "attrs",
-      JSON.stringify(params.attrs)
-    );
+  if (params.attrs && Object.keys(params.attrs).length > 0) {
+    qs.set("attrs", JSON.stringify(params.attrs));
   }
 
-  return request<SpecOptionsResponse>(
-    `/spec-options?${qs.toString()}`,
-    {
-      signal,
-    }
-  );
+  return request<SpecOptionsResponse>(`/spec-options?${qs.toString()}`, {
+    signal,
+  });
 }
 
 /** `GET /categories` — categorias com ao menos um produto. */
-export function getCategories(
-  signal?: AbortSignal
-): Promise<Category[]> {
-  return request<Category[]>(
-    "/categories",
-    {
-      signal,
-    }
-  );
+export function getCategories(signal?: AbortSignal): Promise<Category[]> {
+  return request<Category[]>("/categories", {
+    signal,
+  });
 }
 
 /**
  * `GET /brands` — marcas com ao menos um produto, para montar o filtro de marca.
  * `category` (slug) restringe às marcas daquela categoria.
  */
-export function getBrands(
-  category?: string,
-  signal?: AbortSignal
-): Promise<Brand[]> {
-  const qs = category
-    ? `?category=${encodeURIComponent(category)}`
-    : "";
+export function getBrands(category?: string, signal?: AbortSignal): Promise<Brand[]> {
+  const qs = category ? `?category=${encodeURIComponent(category)}` : "";
 
-  return request<Brand[]>(
-    `/brands${qs}`,
-    {
-      signal,
-    }
-  );
+  return request<Brand[]>(`/brands${qs}`, {
+    signal,
+  });
 }
 
 /** `GET /products/{id}` — detalhe com specs e ofertas. */
-export function getProduct(
-  id: string,
-  signal?: AbortSignal
-): Promise<ProductDetail> {
-  return request<ProductDetail>(
-    `/products/${encodeURIComponent(id)}`,
-    {
-      signal,
-    }
-  );
+export function getProduct(id: string, signal?: AbortSignal): Promise<ProductDetail> {
+  return request<ProductDetail>(`/products/${encodeURIComponent(id)}`, {
+    signal,
+  });
 }
 
 /**
@@ -480,58 +377,42 @@ export function getProduct(
  * A ordem de `productIds` é a ordem das colunas e dos `values` de cada atributo.
  * Categorias diferentes → 400; id inexistente → 404.
  */
-export function compare(
-  productIds: string[],
-  signal?: AbortSignal
-): Promise<CompareResult> {
-  return request<CompareResult>(
-    "/compare",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        product_ids: productIds,
-      }),
-      signal,
-    }
-  );
+export function compare(productIds: string[], signal?: AbortSignal): Promise<CompareResult> {
+  return request<CompareResult>("/compare", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      product_ids: productIds,
+    }),
+    signal,
+  });
 }
 
 // ---------------------------------------------------------------- helpers
 
 /** Converte o valor monetário para number. `null` quando não há preço. */
-export function parsePrice(
-  value: Money | null
-): number | null {
+export function parsePrice(value: Money | null): number | null {
   if (value == null) {
     return null;
   }
 
   const n = Number(value);
 
-  return Number.isFinite(n)
-    ? n
-    : null;
+  return Number.isFinite(n) ? n : null;
 }
 
 /** Formata em BRL. `fallback` (default "—") quando não há preço. */
-export function formatPrice(
-  value: Money | null,
-  fallback = "—"
-): string {
+export function formatPrice(value: Money | null, fallback = "—"): string {
   const n = parsePrice(value);
 
   if (n == null) {
     return fallback;
   }
 
-  return n.toLocaleString(
-    "pt-BR",
-    {
-      style: "currency",
-      currency: "BRL",
-    }
-  );
+  return n.toLocaleString("pt-BR", {
+    style: "currency",
+    currency: "BRL",
+  });
 }

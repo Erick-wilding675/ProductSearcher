@@ -21,7 +21,6 @@ from typing import Protocol
 
 from app.search.intent import Intent
 
-
 WEIGHTS = {
     "relevance": 0.6,
     "price": 0.3,
@@ -150,11 +149,7 @@ def _factors(
     if wanted:
         have = hit.get("attributes") or {}
 
-        matched = sum(
-            1
-            for key, value in wanted.items()
-            if _attr_matches(have.get(key), value)
-        )
+        matched = sum(1 for key, value in wanted.items() if _attr_matches(have.get(key), value))
 
         factors["attributes"] = {
             "score": matched / len(wanted),
@@ -173,27 +168,15 @@ def _factors(
     # neste fator.
     if rank_by == "brand" and rank_brand:
         factors["preference"] = {
-            "score": (
-                1.0
-                if hit.get("brand_slug") == rank_brand
-                else 0.0
-            ),
+            "score": (1.0 if hit.get("brand_slug") == rank_brand else 0.0),
             "applicable": True,
         }
 
-    elif (
-        rank_by == "spec"
-        and rank_spec
-        and rank_spec_value is not None
-    ):
+    elif rank_by == "spec" and rank_spec and rank_spec_value is not None:
         have = (hit.get("attributes") or {}).get(rank_spec)
 
         factors["preference"] = {
-            "score": (
-                1.0
-                if _attr_matches(have, rank_spec_value)
-                else 0.0
-            ),
+            "score": (1.0 if _attr_matches(have, rank_spec_value) else 0.0),
             "applicable": True,
         }
 
@@ -209,11 +192,7 @@ def _factors(
 def _weighted_score(factors: dict) -> float:
     """Soma ponderada só sobre fatores aplicáveis, com renormalização dos pesos."""
 
-    total_w = sum(
-        WEIGHTS[name]
-        for name, factor in factors.items()
-        if factor["applicable"]
-    )
+    total_w = sum(WEIGHTS[name] for name, factor in factors.items() if factor["applicable"])
 
     if total_w == 0:
         return 0.0

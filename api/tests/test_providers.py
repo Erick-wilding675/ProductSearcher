@@ -35,17 +35,13 @@ class _FakeSession:
         return _FakeResult(self._rows)
 
     def _compiled(self):
-        return self.last_stmt.compile(
-            dialect=postgresql.dialect()
-        )
+        return self.last_stmt.compile(dialect=postgresql.dialect())
 
     def sql(self) -> str:
         return str(self._compiled())
 
     def bound_values(self) -> list:
-        return list(
-            self._compiled().params.values()
-        )
+        return list(self._compiled().params.values())
 
 
 def _row(**kw):
@@ -70,13 +66,13 @@ def _row(**kw):
 
 
 def test_mapeia_row_para_hit_com_tipos_normalizados():
-    session = _FakeSession([
-        _row(),
-    ])
-
-    hits = FtsSearchProvider(session).search(
-        Intent(raw="notebook dell")
+    session = _FakeSession(
+        [
+            _row(),
+        ]
     )
+
+    hits = FtsSearchProvider(session).search(Intent(raw="notebook dell"))
 
     assert len(hits) == 1
 
@@ -111,16 +107,16 @@ def test_mapeia_row_para_hit_com_tipos_normalizados():
 
 
 def test_min_price_none_e_fts_rank_none_viram_valores_seguros():
-    session = _FakeSession([
-        _row(
-            min_price=None,
-            fts_rank=None,
-        ),
-    ])
+    session = _FakeSession(
+        [
+            _row(
+                min_price=None,
+                fts_rank=None,
+            ),
+        ]
+    )
 
-    hit = FtsSearchProvider(session).search(
-        Intent(raw="x")
-    )[0]
+    hit = FtsSearchProvider(session).search(Intent(raw="x"))[0]
 
     assert hit["min_price"] is None
 
@@ -129,14 +125,7 @@ def test_min_price_none_e_fts_rank_none_viram_valores_seguros():
 
 
 def test_sem_hits_retorna_lista_vazia():
-    assert (
-        FtsSearchProvider(
-            _FakeSession([])
-        ).search(
-            Intent(raw="nada")
-        )
-        == []
-    )
+    assert FtsSearchProvider(_FakeSession([])).search(Intent(raw="nada")) == []
 
 
 def test_intent_tem_precedencia_sobre_filters_na_categoria_e_preco():
@@ -184,16 +173,11 @@ def test_filtros_de_ui_complementam_o_intent():
 def test_limita_ao_pool_de_candidatos():
     session = _FakeSession([])
 
-    FtsSearchProvider(session).search(
-        Intent(raw="notebook")
-    )
+    FtsSearchProvider(session).search(Intent(raw="notebook"))
 
     pool = settings.search_candidate_pool
 
-    assert (
-        f"LIMIT {pool}" in session.sql()
-        or pool in session.bound_values()
-    )
+    assert f"LIMIT {pool}" in session.sql() or pool in session.bound_values()
 
 
 def test_fts_usa_texto_sem_preco_e_nao_a_query_crua():
@@ -205,13 +189,9 @@ def test_fts_usa_texto_sem_preco_e_nao_a_query_crua():
 
     session = _FakeSession([])
 
-    intent = RuleBasedIntentParser().parse(
-        "notebook gamer até R$5000"
-    )
+    intent = RuleBasedIntentParser().parse("notebook gamer até R$5000")
 
-    FtsSearchProvider(session).search(
-        intent
-    )
+    FtsSearchProvider(session).search(intent)
 
     valores = session.bound_values()
 
@@ -221,11 +201,7 @@ def test_fts_usa_texto_sem_preco_e_nao_a_query_crua():
     # O preço vira filtro.
     assert 5000.0 in valores
 
-    assert not any(
-        isinstance(value, str)
-        and "5000" in value
-        for value in valores
-    )
+    assert not any(isinstance(value, str) and "5000" in value for value in valores)
 
 
 def test_hit_carrega_os_atributos_para_o_ranking():
@@ -235,13 +211,13 @@ def test_hit_carrega_os_atributos_para_o_ranking():
     final sem discriminar nada.
     """
 
-    session = _FakeSession([
-        _row(),
-    ])
+    session = _FakeSession(
+        [
+            _row(),
+        ]
+    )
 
-    hit = FtsSearchProvider(session).search(
-        Intent(raw="notebook")
-    )[0]
+    hit = FtsSearchProvider(session).search(Intent(raw="notebook"))[0]
 
     assert hit["attributes"] == {
         "ram_gb": 16,
@@ -252,31 +228,31 @@ def test_hit_carrega_os_atributos_para_o_ranking():
 def test_hit_carrega_brand_slug_para_preferencia_de_marca():
     """O ranking por marca usa slug, não o nome de exibição."""
 
-    session = _FakeSession([
-        _row(
-            brand="Acer",
-            brand_slug="acer",
-        ),
-    ])
+    session = _FakeSession(
+        [
+            _row(
+                brand="Acer",
+                brand_slug="acer",
+            ),
+        ]
+    )
 
-    hit = FtsSearchProvider(session).search(
-        Intent(raw="notebook")
-    )[0]
+    hit = FtsSearchProvider(session).search(Intent(raw="notebook"))[0]
 
     assert hit["brand"] == "Acer"
     assert hit["brand_slug"] == "acer"
 
 
 def test_produto_sem_specs_nao_quebra_o_hit():
-    session = _FakeSession([
-        _row(
-            attributes=None,
-        ),
-    ])
+    session = _FakeSession(
+        [
+            _row(
+                attributes=None,
+            ),
+        ]
+    )
 
-    hit = FtsSearchProvider(session).search(
-        Intent(raw="notebook")
-    )[0]
+    hit = FtsSearchProvider(session).search(Intent(raw="notebook"))[0]
 
     assert hit["attributes"] == {}
 
@@ -306,15 +282,11 @@ def test_atributos_do_intent_tambem_filtram():
 
     session = _FakeSession([])
 
-    intent = RuleBasedIntentParser().parse(
-        "notebook 16gb ram ssd"
-    )
+    intent = RuleBasedIntentParser().parse("notebook 16gb ram ssd")
 
     assert intent.attributes
 
-    FtsSearchProvider(session).search(
-        intent
-    )
+    FtsSearchProvider(session).search(intent)
 
     assert "@>" in session.sql()
 
@@ -324,8 +296,6 @@ def test_sem_atributos_nao_filtra_por_specs():
 
     session = _FakeSession([])
 
-    FtsSearchProvider(session).search(
-        Intent(raw="notebook")
-    )
+    FtsSearchProvider(session).search(Intent(raw="notebook"))
 
     assert "@>" not in session.sql()

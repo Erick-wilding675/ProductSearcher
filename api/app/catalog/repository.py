@@ -19,7 +19,6 @@ from app.catalog.schemas import (
     OfferOut,
     ProductDetailOut,
 )
-
 from app.catalog.tables import (
     brands,
     categories,
@@ -29,7 +28,6 @@ from app.catalog.tables import (
     products,
     stores,
 )
-
 from app.core.db import get_session
 
 
@@ -129,10 +127,7 @@ class SqlCatalogRepository:
 
         rows = self._session.execute(stmt).all()
 
-        return {
-            row.attribute_key: row.label
-            for row in rows
-        }
+        return {row.attribute_key: row.label for row in rows}
 
     def get_product(self, product_id: str) -> ProductDetailOut | None:
         """Detalhe do produto: dados base + specs (JSONB) + ofertas com link.

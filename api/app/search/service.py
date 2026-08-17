@@ -119,14 +119,8 @@ class SearchService:
             page=page,
             page_size=PAGE_SIZE,
             total=len(itens),
-            criteria=[
-                RankingCriterion(**criterion)
-                for criterion in ranqueado["criteria"]
-            ],
-            results=[
-                _para_item(hit)
-                for hit in itens[inicio : inicio + PAGE_SIZE]
-            ],
+            criteria=[RankingCriterion(**criterion) for criterion in ranqueado["criteria"]],
+            results=[_para_item(hit) for hit in itens[inicio : inicio + PAGE_SIZE]],
         )
 
     def spec_options(
@@ -268,17 +262,10 @@ def _para_item(hit: dict) -> SearchResultItem:
         name=hit["name"],
         category=hit["category"],
         brand=hit["brand"],
-        min_price=(
-            Decimal(str(preco))
-            if preco is not None
-            else None
-        ),
+        min_price=(Decimal(str(preco)) if preco is not None else None),
         specs=hit.get("attributes") or {},
         score=hit.get("score", 0.0),
-        factors={
-            key: RankingFactor(**value)
-            for key, value in (hit.get("factors") or {}).items()
-        },
+        factors={key: RankingFactor(**value) for key, value in (hit.get("factors") or {}).items()},
     )
 
 
