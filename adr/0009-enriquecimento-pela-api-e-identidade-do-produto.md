@@ -125,6 +125,29 @@ Dois problemas que só apareceram com o catálogo maior:
   `prepare_threshold=None` no `connect_args` resolve. **Isso afetava a API em
   produção**, não só o teste.
 
+### D9 — `rank_by=price` resolve a ordenação no servidor
+
+Adendo de 2026-08-09, na revisão do seletor de critério de relevância.
+
+O `rank_by` entra no ranking como um fator de preferência, mas **preço não é um
+peso — é uma ordem absoluta** ("do menor para o maior, sempre"). Como o fator de
+preferência só existe para marca e especificação, `rank_by=price` era aceito e
+**ignorado**: só a web app se comportava certo, porque mandava `sort=price_asc`
+junto. Qualquer outro cliente da API — a extensão, por exemplo, e o ADR-0003
+prevê dois clientes — não via efeito nenhum.
+
+Agora o `sort` não tem default no router (`SortOption | None`), e o service
+resolve: `sort` explícito manda; sem ele, `rank_by=price` aplica `price_asc`.
+Isso preserva a decisão de manter os dois controles com papéis distintos — a
+escolha do usuário continua tendo a última palavra — sem deixar um parâmetro do
+contrato sem efeito.
+
+No mesmo passe, o peso do fator de preferência subiu de `1.0` para `2.0`. Com
+`1.0` ele empatava com a soma de todos os outros (`0.6 + 0.3 + 0.1`): num caso
+com teto de preço e atributo pedido, o item da marca escolhida ganhava por
+`0.003` e, no limite, empatava e perdia no desempate por relevância. Agora a
+dominância é por construção, e um teste trava a invariante.
+
 ## Benefícios
 
 | | Antes | Depois |
