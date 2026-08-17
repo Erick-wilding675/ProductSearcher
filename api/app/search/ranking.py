@@ -10,11 +10,18 @@ Modelo de score (soma ponderada, só sobre os fatores aplicáveis ao intent):
     relevance   peso 0.6  relevância textual (fts_rank normalizado no conjunto)
     price       peso 0.3  aderência ao teto de preço
     attributes  peso 0.1  cobertura dos atributos pedidos no intent
-    preference  peso 1.0  preferência explícita por marca ou especificação
+    preference  peso 2.0  preferência explícita por marca ou especificação
 
 Fatores não aplicáveis (ex.: sem `price_max`, sem `attributes`, sem preferência)
 saem da conta e os pesos são renormalizados, para não penalizar consultas sem
 aquele sinal.
+
+O peso da preferência é **maior que a soma de todos os outros** de propósito: é o
+que garante que um item escolhido pelo usuário fique na frente de um item que
+ganha em todo o resto. Com 1.0 (igual à soma) a garantia valia por margem de
+0.003 e virava empate no pior caso, decidido pelo desempate de relevância — ou
+seja, o item da marca pedida podia perder. Ver `test_preferencia_vence_mesmo_
+com_todos_os_outros_fatores_no_maximo`.
 """
 
 from typing import Protocol
@@ -25,7 +32,8 @@ WEIGHTS = {
     "relevance": 0.6,
     "price": 0.3,
     "attributes": 0.1,
-    "preference": 1.0,
+    # > 0.6 + 0.3 + 0.1. Ver a nota sobre dominância no topo do módulo.
+    "preference": 2.0,
 }
 
 

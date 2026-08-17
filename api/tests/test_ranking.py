@@ -391,3 +391,59 @@ def test_sem_preferencia_preserva_ranking_anterior():
     assert [i["id"] for i in antigo["items"]] == [i["id"] for i in explicito["items"]]
 
     assert all(item["factors"]["preference"]["applicable"] is False for item in explicito["items"])
+
+
+def test_preferencia_vence_mesmo_com_todos_os_outros_fatores_no_maximo():
+    """A preferência tem de dominar, não empatar.
+
+    Com peso 1.0 (igual à soma de relevance+price+attributes) o item preferido
+    empatava com um item que ganhasse em todos os outros fatores, e o desempate
+    por relevância entregava a primeira posição ao item errado — furando a regra
+    de "o top 5 deve ter a maior quantidade possível da marca escolhida".
+    """
+    intent = Intent(
+        raw="notebook 16gb ate 5000",
+        text="notebook",
+        price_max=5000.0,
+        attributes={"ram_gb": 16},
+    )
+
+    hits = [
+        # Ganha em relevância, preço e atributos — mas não é da marca pedida.
+        {
+            "id": "outro",
+            "slug": "outro",
+            "name": "Outro",
+            "category": "notebooks",
+            "brand": "Dell",
+            "brand_slug": "dell",
+            "min_price": 0.0,
+            "fts_rank": 1.0,
+            "attributes": {"ram_gb": 16},
+        },
+        # É da marca pedida e perde em tudo o mais.
+        {
+            "id": "damarca",
+            "slug": "damarca",
+            "name": "Da marca",
+            "category": "notebooks",
+            "brand": "Acer",
+            "brand_slug": "acer",
+            "min_price": 5000.0,
+            "fts_rank": 0.0,
+            "attributes": {},
+        },
+    ]
+
+    resultado = DeterministicRanking().rank(hits, intent, rank_by="brand", rank_brand="acer")
+
+    assert [item["id"] for item in resultado["items"]] == ["damarca", "outro"]
+    # Sem empate: a diferença tem de ser folgada, não decidida no desempate.
+    assert resultado["items"][0]["score"] > resultado["items"][1]["score"]
+
+
+def test_peso_da_preferencia_domina_os_demais():
+    """Trava a invariante em vez de deixá-la implícita nos números."""
+    outros = WEIGHTS["relevance"] + WEIGHTS["price"] + WEIGHTS["attributes"]
+
+    assert WEIGHTS["preference"] > outros
