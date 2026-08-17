@@ -233,8 +233,11 @@ def test_rank_spec_value_numerico_permanece_string():
 def test_rank_by_price_e_aceito():
     """Preço é um critério válido de priorização.
 
-    A escolha automática de `sort=price_asc` pertence à integração da UI;
-    o contrato HTTP continua mantendo `rank_by` e `sort` independentes.
+    O router **não** resolve a ordenação: ele repassa `sort=None` quando o
+    cliente não pediu uma, e quem decide é o `_sort_efetivo` no service. Deixar
+    a regra só na UI faria `rank_by=price` virar um parâmetro aceito e ignorado
+    para qualquer outro cliente da API — a extensão, por exemplo (ADR-0003 tem
+    dois clientes). O requisito é absoluto: "do menor para o maior, sempre".
     """
 
     service = _FakeSearchService(_empty_response())
@@ -245,8 +248,8 @@ def test_rank_by_price_e_aceito():
 
     assert service.recebido["rank_by"] == "price"
 
-    # Sem `sort` explícito, o contrato HTTP mantém seu default.
-    assert service.recebido["sort"] == "relevance"
+    # Sem `sort` explícito o router não inventa um: quem resolve é o service.
+    assert service.recebido["sort"] is None
 
 
 def test_rank_by_e_sort_sao_independentes():

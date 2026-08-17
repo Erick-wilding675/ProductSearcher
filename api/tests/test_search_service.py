@@ -401,3 +401,59 @@ def test_search_service_repassa_preferencia_por_spec_ao_ranking():
     ]
 
     assert resposta.results[0].factors["preference"].score == 1.0
+
+
+# --- rank_by=price precisa ordenar do servidor --------------------------------
+
+
+def _hit_preco(pid, nome, preco, rank=0.5):
+    return {
+        "id": pid,
+        "slug": pid,
+        "name": nome,
+        "category": "notebooks",
+        "brand": "Dell",
+        "brand_slug": "dell",
+        "min_price": preco,
+        "fts_rank": rank,
+        "attributes": {},
+    }
+
+
+class _ProviderPrecos:
+    def search(self, intent, filters=None, page=1):
+        return [
+            _hit_preco("caro", "Caro", 5000.0, rank=1.0),
+            _hit_preco("barato", "Barato", 100.0, rank=0.1),
+            _hit_preco("medio", "Medio", 900.0, rank=0.5),
+        ]
+
+
+def _servico_precos():
+    return SearchService(RuleBasedIntentParser(), _ProviderPrecos(), DeterministicRanking())
+
+
+def test_rank_by_price_ordena_do_menor_para_o_maior_sem_sort_explicito():
+    """O requisito de preço é absoluto, não um peso no score.
+
+    Antes, `rank_by=price` era aceito e ignorado: o fator de preferência só
+    existe para marca e spec. Só a web app funcionava, porque mandava
+    `sort=price_asc` junto — quem chamasse a API direto não via efeito nenhum.
+    """
+    resposta = _servico_precos().search(q="notebook", rank_by="price")
+
+    assert [item.name for item in resposta.results] == ["Barato", "Medio", "Caro"]
+
+
+def test_sort_explicito_tem_precedencia_sobre_rank_by_price():
+    # Dois controles com papéis distintos: a escolha do usuário manda no default.
+    resposta = _servico_precos().search(q="notebook", rank_by="price", sort="price_desc")
+
+    assert [item.name for item in resposta.results] == ["Caro", "Medio", "Barato"]
+
+
+def test_sem_rank_by_a_ordem_segue_o_ranking():
+    # Regressão: nada muda para quem não usa a preferência.
+    resposta = _servico_precos().search(q="notebook")
+
+    assert [item.name for item in resposta.results] == ["Caro", "Medio", "Barato"]

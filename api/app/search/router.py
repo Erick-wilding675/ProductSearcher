@@ -29,7 +29,10 @@ def search(
     rank_brand: str | None = None,
     rank_spec: str | None = None,
     rank_spec_value: str | None = None,
-    sort: SortOption = SortOption.relevance,
+    # Sem default no servidor: assim dá para distinguir "o usuário escolheu
+    # Relevância" de "não veio ordenação", e `rank_by=price` pode aplicar a ordem
+    # crescente que o requisito pede. Ver `_sort_efetivo`.
+    sort: SortOption | None = None,
     page: int = Query(1, ge=1),
     attrs: str | None = Query(
         None,
@@ -70,7 +73,7 @@ def search(
         price_max=price_max,
         brand=brand,
         attributes=_parse_attrs(attrs),
-        sort=sort.value,
+        sort=sort.value if sort else None,
         page=page,
         rank_by=rank_by.value,
         rank_brand=rank_brand,

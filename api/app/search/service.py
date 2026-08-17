@@ -63,7 +63,7 @@ class SearchService:
         price_max: float | None = None,
         brand: str | None = None,
         attributes: dict[str, Any] | None = None,
-        sort: str = "relevance",
+        sort: str | None = None,
         page: int = 1,
         rank_by: str = "relevance",
         rank_brand: str | None = None,
@@ -101,7 +101,7 @@ class SearchService:
 
         itens = _ordena(
             ranqueado["items"],
-            sort,
+            _sort_efetivo(sort, rank_by),
         )
 
         inicio = (page - 1) * PAGE_SIZE
@@ -210,6 +210,24 @@ class SearchService:
         return SpecOptionsResponse(
             specs=specs,
         )
+
+
+def _sort_efetivo(sort: str | None, rank_by: str) -> str:
+    """Resolve a ordenação final quando o cliente não pediu uma explicitamente.
+
+    `rank_by=price` significa "do menor para o maior" — o requisito é absoluto,
+    não um peso no score. Sem isto o parâmetro seria aceito e **ignorado**: o
+    fator de preferência só existe para marca e especificação, então
+    `/search?rank_by=price` não mudava nada para quem chama a API direto (a
+    extensão, por exemplo). A web app já mandava `sort=price_asc` junto e por
+    isso não sentia o problema.
+
+    Um `sort` explícito continua tendo a última palavra: são dois controles com
+    papéis distintos, e a escolha do usuário manda sobre o default.
+    """
+    if sort:
+        return sort
+    return "price_asc" if rank_by == "price" else "relevance"
 
 
 def _ordena(
