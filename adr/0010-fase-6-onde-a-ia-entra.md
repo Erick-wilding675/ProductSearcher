@@ -327,13 +327,125 @@ novo), as que o parser não categorizou, e as de necessidade — estas mostrando
 lado a lado o que o usuário digitou e o `parsed_intent->>'text'` que de fato foi
 ao `plainto_tsquery`, que é o problema da fase em uma linha.
 
-**Pendências de D1, ambas bloqueadas por acesso ao banco:**
+**Pendências de D1 — resolvidas em 19/08/2026, de outra rede.** As duas
+dependiam só de alcançar o Supabase. Segue o que a execução revelou.
 
-- `cleanup_orphans --dry-run` (os 141 órfãos) não rodou: a rede em uso não
-  alcança o Supabase — DNS falha para o host direto e o pooler (6543) dá timeout.
-- Sem banco, a suíte **pula** (a fixture `search_service` do `conftest.py` faz
-  `skip`) e o baseline não foi medido. Os agregados estão `xfail(strict=False)`
-  justamente para não travar `make test` enquanto isso.
+#### O cleanup rodou — e o script tinha um defeito latente
+
+`cleanup_orphans` nunca havia executado o caminho de escrita: o `--dry-run` sai
+antes de `remove()`. Na primeira execução real ele morreu com
+`syntax error at or near "$1"`. Causa: `sa.text("... in :ids")` recebendo uma
+coleção entrega **um** parâmetro ao psycopg, e o SQL vira `in $1`. Faltava
+`bindparam(..., expanding=True)`. Corrigido com o helper `_delete_por_ids`, que
+concentra os seis `delete ... in :ids` do arquivo.
+
+Vale como lição além do arquivo: **caminho que o `--dry-run` não percorre não
+está testado**. O mesmo raciocínio motivou exercitar as quatro consultas do
+`search_insights` direto contra o Postgres (todas executam; ver abaixo).
+
+A transação abortou inteira, sem apagar nada — a atomicidade do `engine.begin()`
+funcionou. Com a correção:
+
+    removido: price_history 141, offers 141, product_specs 141, products 141
+              reviews 0, stores 0, brands 0
+    atributos de schema removidos: 1
+
+Catálogo: **376 → 235 produtos** (118 notebooks + 117 fones), exatamente o que o
+seed produz. `stores` e `brands` não perderam linha — toda loja e marca dos
+órfãos ainda é referenciada por produto vivo.
+
+#### O cleanup era mesmo pré-requisito, e dá para provar
+
+D1 afirmava que medir com o catálogo sujo "produz número que não vale nada".
+Medido dos dois lados, o **acaso** — o denominador de toda a suíte — se desloca
+até 18 pontos:
+
+| predicado | acaso com os 141 órfãos | acaso limpo | na calibração do YAML |
+| --- | --- | --- | --- |
+| jogos | 14% | 24% | 28% |
+| trabalho | 68% | 50% | 44% |
+| reunião | 25% | 37% | 34% |
+| academia | 16% | 25% | 22% |
+| portabilidade | 9% | 15% | 15% |
+
+Sujo, "trabalho" aparentava 68% de acaso — na faixa que a própria D1 descartou
+por não medir nada. Limpo, volta para perto da calibração feita sobre o YAML.
+
+#### Baseline medido (19/08/2026, catálogo limpo, 235 produtos)
+
+    caso                   consulta                                top5  prec  acaso  total
+    jogos                  notebook para jogos                      4/5   80%   24%     28
+    edição de vídeo        notebook para edicao de video            0/0    0%   18%      0
+    trabalho               notebook para trabalho no escritorio     0/0    0%   50%      0
+    faculdade              notebook para faculdade                  0/0    0%   24%      0
+    portabilidade          notebook leve para viagem                0/0    0%   15%      0
+    programação            notebook para programacao                0/0    0%   43%      0
+    academia               fone para academia                       2/5   40%   25%     15
+    corrida                fone para correr                         3/5   60%   25%     14
+    reunião                fone para reuniao online                 0/0    0%   37%      0
+    viagem                 fone para viagem de aviao                0/0    0%   14%      0
+    bateria                fone com bateria para o dia todo         0/5    0%   22%     15
+
+**cobertura@5 = 27%** (meta 80%) · **precisão média@5 = 16%** (alvo 60%, acaso
+27%). Os dois controles passam e `test_relevance.py` segue 13/13 — o arreio está
+certo, e a metade "produto conhecido" continua 100%. É o placar que a fase tem
+de virar.
+
+#### O achado anterior estava errado pela metade
+
+O parágrafo acima ("o baseline provavelmente **não é zero**") não se confirmou:
+**7 das 11 consultas devolvem literalmente zero**. A varredura offline que
+sugeriu recall procurou as palavras que a *copy* usa ("gamer", "trabalho",
+"reunião") — não as que o **usuário digita**. São conjuntos diferentes, e a
+diferença é o item seguinte.
+
+#### O defeito não é (só) semântico: é acento
+
+Causa medida dos zeros: `to_tsvector('portuguese', …)` **não dobra acento** e a
+extensão `unaccent` **não está instalada**. O corpus é copy de marketplace,
+escrita com acento; a consulta em pt-BR costuma vir sem. Os dois nunca se
+encontram:
+
+| termo | docs sem acento | docs com acento |
+| --- | --- | --- |
+| reuniao / reunião | 0 | 3 |
+| edicao / edição | 0 | 10 |
+| programacao / programação | 0 | 13 |
+| escritorio / escritório | 0 | 15 |
+| aviao / avião | 0 | 1 |
+| video / vídeo | 20 | 69 |
+
+E o `plainto_tsquery` combina com **AND** (ADR-0007 D2.1), então basta um termo
+sem acento na consulta para zerar o conjunto inteiro: "notebook para trabalho no
+escritorio" vira `'notebook' & 'trabalh' & 'escritori'`, e `escritori` casa nada.
+`faculdade` é o contraexemplo honesto — 0 dos dois lados: ali o vocabulário
+realmente não existe no corpus, e só D2/D3 resolvem.
+
+**Quanto isso vale, medido:** repetindo a suíte com as mesmas consultas
+acentuadas (proxy do que o `unaccent` faria, e um piso — o fix real também ajuda
+o sentido inverso):
+
+| | hoje | só com acento resolvido |
+| --- | --- | --- |
+| cobertura@5 | 27% | **55%** |
+| precisão média@5 | 16% | **36%** |
+
+Mais da metade do caminho até a meta, **sem IA nenhuma**. Isso não muda o mérito
+de D2, mas muda a contabilidade: medir D2 antes de corrigir o acento creditaria
+ao LLM um ganho que era de `unaccent`. **Decisão pendente antes de D2** — o fix
+mexe na expressão do índice FTS (migration) e por isso não entrou em D1, que é
+instrumento, não correção.
+
+#### `searches` continua vazio
+
+`search_insights` rodou contra o banco real: a tabela tem **0 linhas**, e a
+ferramenta sai pelo atalho com a explicação certa. Ninguém usou a busca contra
+este banco fora dos testes (que usam `NullSearchLog`), e não há deploy — Fase 7.
+Como o atalho impede que qualquer das quatro consultas execute, elas foram
+exercitadas direto contra o Postgres: as quatro rodam sem erro de SQL. A
+evidência de consulta real, porém, **só existe depois do deploy** — até lá a
+suíte continua medindo a busca contra a nossa imaginação, como o próprio
+cabeçalho da ferramenta admite.
 
 ### D6, primeira metade (19/08/2026, commit `8c562d7`)
 
