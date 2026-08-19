@@ -13,5 +13,6 @@ Registro das decisões arquiteturais do ProductSearcher. Cada ADR documenta **co
 | [0007](0007-pipeline-busca-retrieval-ranking.md) | Pipeline de busca: retrieval (SearchProvider) + ranking (RankingService) | Aceito |
 | [0008](0008-cobertura-do-seed-parser-e-specs-opcionais.md) | Cobertura do seed: parser de título e specs opcionais | Aceito (parcialmente revisto pelo 0009) |
 | [0009](0009-enriquecimento-pela-api-e-identidade-do-produto.md) | Enriquecimento pela API do ML e identidade do produto | Aceito |
+| [0010](0010-fase-6-onde-a-ia-entra.md) | Fase 6: onde a IA entra (e onde não entra) | Aceito (em construção) |
 
 > Novos ADRs seguem o `template.md`. Numeração sequencial. A fonte de verdade também vive no Notion (Document Hub).

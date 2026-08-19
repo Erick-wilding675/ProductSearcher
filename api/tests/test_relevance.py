@@ -16,6 +16,11 @@ casar por igualdade.
 
 Ao trocar o seed, recalibre os casos: um `expected` que não existe mais no catálogo
 mede zero e derruba o KPI sem que a busca tenha piorado.
+
+Escopo: aqui só entra consulta de **produto conhecido** — o usuário já sabe o que
+quer. Consulta de **necessidade** ("notebook para edição de vídeo"), cujo gabarito
+é um conjunto de produtos aceitáveis e não um nome, vive em
+`test_relevance_use_cases.py` (ADR-0010 D1).
 """
 
 import pytest
