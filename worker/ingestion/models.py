@@ -52,10 +52,15 @@ class AttributeSpec(BaseModel):
 
     attribute_key: str
     label: str
-    data_type: str  # "text" | "number" | "boolean" | "enum"
+    # "enum_multi" é o enum de **vários** valores: o produto recebe uma lista de
+    # rótulos do conjunto fechado (ver `use_case`, ADR-010 D2). Lista, e não
+    # escalar, porque um notebook serve para jogos **e** edição de vídeo — e
+    # porque o filtro de busca é containment JSONB (`@>`), que casa "contém este
+    # rótulo" sem precisar saber os outros.
+    data_type: str  # "text" | "number" | "boolean" | "enum" | "enum_multi"
     unit: str | None = None
     required: bool = False
-    allowed_values: list[str] | None = None  # só para enum
+    allowed_values: list[str] | None = None  # só para enum e enum_multi
 
 
 class Category(BaseModel):

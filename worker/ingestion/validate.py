@@ -50,6 +50,16 @@ def _tipo_ok(spec: AttributeSpec, value: Any) -> bool:
         return isinstance(value, bool)
     if spec.data_type == "enum":
         return value in (spec.allowed_values or [])
+    if spec.data_type == "enum_multi":
+        # Conjunto FECHADO: rótulo fora da lista é rejeitado, não ignorado. É a
+        # guarda que o ADR-010 D2 exige para o rótulo vindo de LLM — sem ela, um
+        # rótulo alucinado entraria no catálogo em silêncio.
+        permitidos = set(spec.allowed_values or [])
+        return (
+            isinstance(value, list)
+            and len(value) > 0
+            and all(isinstance(v, str) and v in permitidos for v in value)
+        )
     return False
 
 
