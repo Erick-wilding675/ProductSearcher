@@ -157,7 +157,7 @@ def _factors(
     if wanted:
         have = hit.get("attributes") or {}
 
-        matched = sum(1 for key, value in wanted.items() if _attr_matches(have.get(key), value))
+        matched = sum(1 for key, value in wanted.items() if attr_matches(have.get(key), value))
 
         factors["attributes"] = {
             "score": matched / len(wanted),
@@ -184,7 +184,7 @@ def _factors(
         have = (hit.get("attributes") or {}).get(rank_spec)
 
         factors["preference"] = {
-            "score": (1.0 if _attr_matches(have, rank_spec_value) else 0.0),
+            "score": (1.0 if attr_matches(have, rank_spec_value) else 0.0),
             "applicable": True,
         }
 
@@ -258,8 +258,13 @@ def _criteria(
     ]
 
 
-def _attr_matches(have, want) -> bool:
-    """Casamento de atributo tolerante a tipo (string/num/bool), case-insensitive."""
+def attr_matches(have, want) -> bool:
+    """Casamento de atributo tolerante a tipo (string/num/bool), case-insensitive.
+
+    Pública (e não `_attr_matches`) porque a explicação em `app/ai/service.py`
+    precisa da **mesma** regra para dizer quais atributos foram atendidos.
+    Reimplementar lá deixaria a prosa divergir do score com o tempo.
+    """
 
     if have is None:
         return False

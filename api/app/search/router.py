@@ -107,7 +107,7 @@ def _parse_attrs(attrs: str | None) -> dict | None:
 def _parse_rank_spec_value(value: str | None):
     """Converte booleanos da query para o tipo usado no ranking.
 
-    Números e textos permanecem como string porque `_attr_matches` já faz a
+    Números e textos permanecem como string porque `attr_matches` já faz a
     comparação tolerante entre string/número.
     """
     if value is None:
