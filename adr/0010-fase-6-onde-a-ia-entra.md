@@ -334,3 +334,39 @@ ao `plainto_tsquery`, que é o problema da fase em uma linha.
 - Sem banco, a suíte **pula** (a fixture `search_service` do `conftest.py` faz
   `skip`) e o baseline não foi medido. Os agregados estão `xfail(strict=False)`
   justamente para não travar `make test` enquanto isso.
+
+### D6, primeira metade (19/08/2026, commit `8c562d7`)
+
+Antecipada porque não depende de banco nem de rede — e porque este ADR já a
+tinha identificado como **pré-requisito esquecido**: `DeterministicAIService.
+explain` era `raise NotImplementedError` desde a Fase 3.
+
+Como nada chamava `explain`, o contrato de `context` também nunca tinha sido
+definido. Ficou sendo **exatamente o que o ranking já produz** — `score`,
+`factors`, `intent` — e nada além. A camada não consulta banco, não recalcula
+score e não conhece o catálogo.
+
+Isso é a decisão de projeto, não uma simplificação: é o que torna o
+`LLMAIService` seguro de construir depois. Um LLM que recebe o produto inteiro
+pode elogiar a bateria; um que recebe só os fatores só pode narrar os fatores, e
+a prosa não tem como contradizer o número exibido ao lado dela. A restrição está
+escrita como **teste**, não como comentário.
+
+Quatro regras de fidelidade, cada uma com teste em `api/tests/test_ai_service.py`:
+
+1. **Score parcial não vira frase absoluta.** `relevance` é normalizada pelo
+   maior `fts_rank` do conjunto: 0,62 vira "62% do melhor casamento desta
+   busca", não "é o que mais se aproxima". A primeira versão escrita aqui tinha
+   esse defeito — afirmava o superlativo com score parcial.
+2. **Atributo com chave presente e valor divergente não é atributo atendido.**
+   Pedir `ram_gb=16` e o item ter 8 não pode virar "tem o que você pediu". Para
+   a prosa não divergir do score com o tempo, `attr_matches` deixou de ser
+   privada em `ranking.py` e é a **mesma** função nos dois lugares.
+3. **O que ficou de fora é declarado** ("preço não entrou: você não informou um
+   teto"). Omitir faria o usuário supor um cuidado que o ranking não teve
+   naquela consulta.
+4. **Preço vira folga em reais** quando o teto veio no `context`: "R$ 701,00
+   abaixo do teto" é verificável pelo usuário; "0,86" não é.
+
+`LLMAIService.explain` segue `NotImplementedError` — RF-61 continua condicional
+a D2/D4 —, agora com mensagem que aponta o substituto e o contrato a herdar.
