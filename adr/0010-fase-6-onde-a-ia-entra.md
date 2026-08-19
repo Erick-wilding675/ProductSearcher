@@ -560,11 +560,87 @@ passo cabe com folga de mais de vinte vezes.
 **Um caso que D2 não resolve, e é honesto dizer:** "fone com bateria para o dia
 todo" devolve 15 resultados e nenhum com `battery_h >= 30`. Não é caso de uso, é
 faixa numérica — pede filtro de atributo no parser, não rótulo de LLM. Fica
-registrado como trabalho separado.
+registrado como trabalho separado — e foi construído logo em seguida, abaixo.
 
 **Pendência:** `ANTHROPIC_API_KEY`. Sem ela o lote não roda, os rótulos não
 existem e a metade de runtime não pode ser mesclada. `--dry-run` verificado
 contra o banco real: 235 fichas montadas, enum correto por categoria.
+
+A chave chegou em 19/08/2026 e **não autentica**: 401 `authentication_error`. O
+formato explica — 43 caracteres começando em `sk-ant-`, enquanto uma chave de API
+é `sk-ant-api03-…` com ~108. O que está no `.env` é outra coisa (o identificador
+da chave no Console, provavelmente), não o segredo. O lote continua pendente pelo
+mesmo motivo de antes.
+
+#### O trabalho separado: faixa numérica no parser (19/08/2026)
+
+Atacado antes de D3 porque é pequeno, é pré-requisito de medida e **não depende
+da chave** — deixá-lo para depois manteria o placar sujo enquanto D2 esperava.
+
+`attributes` não expressa faixa. O filtro de RF-12 é containment JSONB (`@>`),
+que é **igualdade**: um fone de 40h não *contém* 30h. Por isso a faixa é um campo
+próprio do `Intent` (`attribute_ranges`) e um operador próprio no SQL, em vez de
+um valor de formato especial dentro de `attributes` que o provider teria de
+adivinhar.
+
+**A comparação é jsonb contra jsonb, não `::numeric`.** O caminho óbvio
+(`(attributes->>'battery_h')::numeric >= 30`) é avaliado sobre as linhas que o
+planner escolher, e um único spec gravado como texto derruba a **consulta
+inteira** com erro de conversão — falha global causada por um dado ruim, o
+oposto da política "rejeita, loga e segue" do ADR-0005 D6. `jsonb_typeof(...) =
+'number'` mais `... >= to_jsonb(30::numeric)` nunca falha. Nenhum índice serve a
+condição (o GIN `jsonb_path_ops` só atende containment); com 235 produtos isso
+não custa nada, e se o catálogo crescer o caminho é um btree por expressão.
+
+**O bug que apareceu no meio, e que era pior que o caso original.** `_PRICE_PATTERN`
+casa `até` seguido de número, sem olhar o que vem depois. Então:
+
+| consulta | antes | depois |
+| --- | --- | --- |
+| `fone ate 20 horas de bateria` | `price_max = 20.0` → 0 resultados | `battery_h <= 20` |
+| `notebook ate 1,5kg` | `price_max = 15.0` → 0 resultados | `weight_kg <= 1.5` → 7 resultados |
+
+O segundo é o mais feio: a conversão de preço lê `.` como separador de milhar,
+então "1,5" virava quinze reais. As duas falhavam **em silêncio** — busca vazia
+sem nada indicando que o parser tinha lido a medida como dinheiro. A guarda é
+uma unidade colada ao número: se tem, não é preço.
+
+**"O dia todo" exige a categoria certa.** A expressão por extenso é a única
+regra aqui em que a *chave* é inferida, não digitada — e `battery_h` não existe
+no schema de notebooks. Aplicá-la a "notebook com bateria para o dia todo"
+zeraria a busca por um palpite do parser. Quando o usuário escreve o número, ele
+assume a consequência de não haver resultado; quando o parser adivinha, não pode
+impor essa consequência. Número dito vence a expressão sempre.
+
+O limiar de 30h é **decisão de produto, não medição**: uma jornada mais margem.
+A evidência que dá para trazer é de calibração — no catálogo de hoje o corte
+deixa 26 dos 117 fones (22%), dentro da faixa de acaso que a D1 estabeleceu.
+
+**O caso saiu do agregado, e é isso que importa para o placar.** Com o filtro no
+ar, o predicado do gabarito (`battery_h >= 30`) e a condição do SQL passaram a
+ser a **mesma regra**: a precisão dá 100% por construção, não por acerto. Contá-lo
+creditaria ao enriquecimento semântico um ganho que é do `RuleBasedIntentParser`
+— a conta errada que a D1 existe para impedir, a mesma que a D8 evitou ao vir
+antes de D2. Virou **controle**, junto do caso de ANC, e a regra fica escrita na
+suíte: *caso que o parser passa a resolver com filtro duro sai do agregado.*
+
+Isso **rebaixa o baseline publicado em D8**, e o número correto é este:
+
+| | D1 | depois de D8 | com a faixa | meta |
+| --- | --- | --- | --- | --- |
+| casos semânticos no agregado | 11 | 11 | **10** | — |
+| cobertura@5 | 27% | 55% | **60%** | 80% |
+| precisão média@5 | 16% | 34% | **37%** | 60% |
+| consultas com zero resultado | 7 de 11 | 2 de 11 | **2 de 10** | 0 |
+
+Os 60%/37% não são ganho de busca: são os mesmos 6 casos cobertos sobre um
+denominador menor. O que a faixa entregou de verdade foi um controle novo e dois
+bugs de preço a menos — e um placar que agora mede só o que D2 tem de resolver.
+
+**O que não foi feito, de propósito:** "notebook leve para viagem" continua em
+zero. "Leve" também é faixa (`weight_kg`), mas não há evidência para o corte além
+do próprio gabarito — escolher 1,6 kg porque o teste diz 1,6 kg é a circularidade
+que acabamos de tirar do agregado. Fica para quando houver um critério de fora.
 
 ### D8 (19/08/2026) — o fix de acento, medido
 
@@ -591,6 +667,11 @@ caminho (`edicao` → 0 documentos) e ao novo no fim (→ 10).
 `test_relevance.py` segue **13/13** — a metade "produto conhecido" não regrediu,
 que era o risco real de mexer no dicionário. Os agregados continuam `xfail`: o
 alvo é 80%/60% e ainda não chegamos. É D2 que tem de fechar o resto.
+
+> Estes 55%/34% são sobre 11 casos semânticos. O trabalho de faixa numérica
+> registrado em D2 tirou um caso do agregado (virou controle) e o denominador
+> passou a 10 — ver a tabela lá. Comparar com números posteriores exige olhar o
+> denominador junto.
 
 **O parser em Python já era tolerante a acento** (`_sem_acento` nos fillers,
 `ru[ií]do` no regex de ANC). O buraco era só do lado do Postgres — verificado

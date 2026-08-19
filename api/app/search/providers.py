@@ -18,7 +18,7 @@ from decimal import Decimal
 from typing import Annotated, Protocol
 
 from fastapi import Depends
-from sqlalchemy import and_, cast, func, literal, select
+from sqlalchemy import Numeric, and_, cast, func, literal, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session
 
@@ -109,6 +109,27 @@ class FtsSearchProvider:
         if attributes:
             conditions.append(product_specs.c.attributes.op("@>")(cast(attributes, JSONB)))
 
+        # Faixa numérica ("pelo menos 30 horas de bateria"). Não cabe no `@>`,
+        # que é igualdade: um fone de 40h não *contém* 30h. Por isso é comparação,
+        # e por isso vem num campo próprio do Intent.
+        #
+        # A comparação é jsonb contra jsonb, não `::numeric`. Não é preciosismo:
+        # o cast é avaliado sobre todas as linhas que o planner escolher, e um
+        # único spec gravado como texto ("30h") derruba a consulta inteira com
+        # erro de conversão. Comparar jsonb nunca falha — daí o `jsonb_typeof`
+        # ao lado, que é o que restringe a comparação a valores numéricos.
+        #
+        # Nenhum índice serve esta condição: o GIN jsonb_path_ops só atende
+        # containment. Com 235 produtos isso não custa nada; se o catálogo
+        # crescer, o caminho é um índice btree por expressão sobre a chave.
+        for chave, faixa in (intent.attribute_ranges or {}).items():
+            valor = product_specs.c.attributes[chave]
+            conditions.append(func.jsonb_typeof(valor) == "number")
+            if (minimo := faixa.get("min")) is not None:
+                conditions.append(valor.op(">=")(_como_jsonb(minimo)))
+            if (maximo := faixa.get("max")) is not None:
+                conditions.append(valor.op("<=")(_como_jsonb(maximo)))
+
         rank_expr = (
             func.ts_rank(
                 products.c.search_vector,
@@ -177,6 +198,15 @@ class FtsSearchProvider:
         rows = self._session.execute(stmt).all()
 
         return [_row_to_hit(row) for row in rows]
+
+
+def _como_jsonb(valor: float):
+    """`30.0` -> `to_jsonb(30.0::numeric)`, o lado direito da comparação.
+
+    O cast explícito para `numeric` é obrigatório: `to_jsonb` é polimórfica e um
+    parâmetro sem tipo chega ao Postgres como `unknown`, que ela rejeita.
+    """
+    return func.to_jsonb(cast(literal(float(valor)), Numeric))
 
 
 def _row_to_hit(row) -> dict:

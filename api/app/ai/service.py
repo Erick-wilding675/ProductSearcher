@@ -23,7 +23,11 @@ Chaves reconhecidas (todas opcionais menos `item`):
         "factors": {"relevance": {"score": 1.0, "applicable": True}, ...},
         "specs": {"ram_gb": 16, ...},
       },
-      "intent": {"price_max": 5000.0, "attributes": {"ram_gb": 16}},
+      "intent": {
+        "price_max": 5000.0,
+        "attributes": {"ram_gb": 16},
+        "attribute_ranges": {"battery_h": {"min": 30.0}},
+      },
     }
 
 O que faltar simplesmente não é dito. Nunca se afirma o que não veio no
@@ -36,7 +40,7 @@ dizer, porque tudo o que há para dizer está nos fatores.
 
 from typing import Protocol
 
-from app.search.ranking import WEIGHTS, attr_matches
+from app.search.ranking import WEIGHTS, attr_matches, range_matches
 
 # Acima disto o fator é dito sem ressalva. Não é 1.0 exato porque `relevance` é
 # uma divisão em ponto flutuante (`fts_rank / max_rank`) e o melhor item do
@@ -202,12 +206,16 @@ def _detalhe(nome: str, item: dict, intent: dict) -> str:
 
     elif nome == "attributes":
         pedidos = intent.get("attributes") or {}
+        faixas = intent.get("attribute_ranges") or {}
         specs = item.get("specs") or {}
-        # Mesma regra do ranking (`attr_matches`): chave presente com valor
-        # divergente **não** é atributo atendido, e não pode ser citada como se
-        # fosse. Só o que casa de fato entra na frase.
+        # Mesma regra do ranking (`attr_matches` / `range_matches`): chave
+        # presente com valor divergente **não** é atributo atendido, e não pode
+        # ser citada como se fosse. Só o que casa de fato entra na frase.
         casados = sorted(
             chave for chave, valor in pedidos.items() if attr_matches(specs.get(chave), valor)
+        )
+        casados += sorted(
+            chave for chave, faixa in faixas.items() if range_matches(specs.get(chave), faixa)
         )
         if casados:
             lista = ", ".join(f"{chave} = {specs[chave]}" for chave in casados)

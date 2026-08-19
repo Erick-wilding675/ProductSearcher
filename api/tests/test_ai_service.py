@@ -182,3 +182,39 @@ def test_llm_ainda_nao_existe_e_diz_por_que() -> None:
     """RF-61 é condicional (ADR-0010 D6): a mensagem aponta o caminho certo."""
     with pytest.raises(NotImplementedError, match="DeterministicAIService"):
         LLMAIService().explain({})
+
+
+def test_faixa_atendida_e_citada_com_o_valor_do_produto(
+    service: DeterministicAIService,
+) -> None:
+    """A faixa pesa no score, então tem de poder ser dita — senão a prosa
+    esconde o motivo da posição. E cita o valor do produto (40h), não o piso."""
+    texto = service.explain(
+        {
+            "item": {
+                "name": "Fone X",
+                "specs": {"battery_h": 40},
+                "factors": _fatores(attributes=1.0),
+            },
+            "intent": {"attribute_ranges": {"battery_h": {"min": 30.0}}},
+        }
+    )
+
+    assert "battery_h = 40" in texto
+
+
+def test_faixa_nao_atendida_nao_e_citada(service: DeterministicAIService) -> None:
+    """Mesma regra do atributo divergente (D6): 10h não atende a "30h ou mais",
+    e dizer que atende é exatamente a mentira que o contrato de `explain` proíbe."""
+    texto = service.explain(
+        {
+            "item": {
+                "name": "Fone X",
+                "specs": {"battery_h": 10},
+                "factors": _fatores(attributes=0.0),
+            },
+            "intent": {"attribute_ranges": {"battery_h": {"min": 30.0}}},
+        }
+    )
+
+    assert "battery_h" not in texto

@@ -152,15 +152,20 @@ def _factors(
         }
 
     # Atributos: cobertura dos pedidos no intent presentes/casados no item.
+    # Faixa numérica conta igual a atributo exato — os dois são coisas que o
+    # usuário pediu, e deixar a faixa de fora faria "fone com 30h ou mais"
+    # cair no ramo "não aplicável" e perder o fator inteiro.
     wanted = intent.attributes or {}
+    ranges = intent.attribute_ranges or {}
 
-    if wanted:
+    if wanted or ranges:
         have = hit.get("attributes") or {}
 
         matched = sum(1 for key, value in wanted.items() if attr_matches(have.get(key), value))
+        matched += sum(1 for key, faixa in ranges.items() if range_matches(have.get(key), faixa))
 
         factors["attributes"] = {
-            "score": matched / len(wanted),
+            "score": matched / (len(wanted) + len(ranges)),
             "applicable": True,
         }
     else:
@@ -224,7 +229,7 @@ def _criteria(
     active = {
         "relevance": bool(intent.raw),
         "price": intent.price_max is not None,
-        "attributes": bool(intent.attributes),
+        "attributes": bool(intent.attributes or intent.attribute_ranges),
         "preference": rank_by in {"brand", "spec"},
     }
 
@@ -273,6 +278,36 @@ def attr_matches(have, want) -> bool:
         return bool(have) == bool(want)
 
     return str(have).strip().lower() == str(want).strip().lower()
+
+
+def range_matches(have, faixa: dict) -> bool:
+    """Valor numérico dentro da faixa pedida (`{"min": 30.0}`, `{"max": 1.6}`).
+
+    Ausente, booleano ou não-numérico **não** casa: não há como afirmar que um
+    produto sem a spec atende ao piso pedido, e supor que atende é exatamente o
+    tipo de generosidade que faz a explicação mentir.
+
+    Pública pela mesma razão de `attr_matches`: a explicação em
+    `app/ai/service.py` precisa da **mesma** regra, ou a prosa diverge do score.
+    """
+    if have is None or isinstance(have, bool):
+        return False
+
+    try:
+        valor = float(have)
+    except (TypeError, ValueError):
+        return False
+
+    minimo = faixa.get("min")
+    maximo = faixa.get("max")
+
+    if minimo is not None and valor < float(minimo):
+        return False
+
+    if maximo is not None and valor > float(maximo):
+        return False
+
+    return True
 
 
 def _clamp(

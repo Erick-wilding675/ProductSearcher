@@ -44,6 +44,20 @@ atributo), o certo é o CI avisar, não quebrar.
 
 Ao trocar o seed, recalibre: um predicado que passou a valer para 80% do
 catálogo virou decorativo.
+
+## Quando um caso sai do agregado
+
+"fone com bateria para o dia todo" nasceu aqui como caso semântico e virou
+**controle** quando o parser passou a extrair `battery_h >= 30`. A razão é a
+mesma que proíbe gabarito textual: com o filtro no ar, o predicado do gabarito
+e a condição do SQL são a **mesma regra**, e a precisão dá 100% por construção,
+não por acerto. Deixá-lo no agregado creditaria ao enriquecimento semântico um
+ganho que é do `RuleBasedIntentParser` — a conta errada que a D1 existe para
+impedir. Como controle ele continua valendo, e é o que fica vermelho se a faixa
+numérica quebrar.
+
+Vale a regra geral: **um caso que o parser passa a resolver com filtro duro sai
+do agregado e vira controle.**
 """
 
 from collections.abc import Callable
@@ -190,14 +204,15 @@ CASOS: list[CasoDeUso] = [
         aceita=lambda i: _spec(i, "anc") is True and _spec(i, "type") == "over-ear",
         porque="ruído de cabine é grave e contínuo: over-ear com ANC é o que corta",
     ),
+    # ---- controles: o pipeline de hoje já deveria acertar -----------------
     CasoDeUso(
         query="fone com bateria para o dia todo",
-        rotulo="bateria",
+        rotulo="controle: faixa numérica",
         categoria="headphones",
         aceita=lambda i: _num(_spec(i, "battery_h"), 0) >= 30,
-        porque="'dia todo' é autonomia; 30h cobre a jornada sem recarga",
+        porque="'dia todo' é autonomia; o parser vira isso em battery_h >= 30",
+        controle=True,
     ),
-    # ---- controles: o pipeline de hoje já deveria acertar -----------------
     CasoDeUso(
         query="notebook gamer",
         rotulo="controle: termo no título",

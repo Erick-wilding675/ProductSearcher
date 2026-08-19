@@ -7,8 +7,10 @@ preferências explícitas por marca ou especificação.
 
 import random
 
+import pytest
+
 from app.search.intent import Intent
-from app.search.ranking import WEIGHTS, DeterministicRanking
+from app.search.ranking import WEIGHTS, DeterministicRanking, range_matches
 
 
 def _hit(
@@ -447,3 +449,74 @@ def test_peso_da_preferencia_domina_os_demais():
     outros = WEIGHTS["relevance"] + WEIGHTS["price"] + WEIGHTS["attributes"]
 
     assert WEIGHTS["preference"] > outros
+
+
+# --- faixas numéricas (ADR-0010, D2) ----------------------------------------
+
+
+def test_faixa_numerica_conta_no_fator_de_atributos():
+    """Pedido é pedido: uma faixa vale o mesmo que um atributo exato no fator.
+
+    Sem isso, "fone com 30h ou mais" cairia no ramo "não aplicável" e perderia o
+    fator inteiro — o ranking ignoraria justamente o que o usuário pediu.
+    """
+    hits = [
+        _hit("dentro", "Fone", 0.5, 200, {"battery_h": 40}),
+        _hit("fora", "Fone", 0.5, 200, {"battery_h": 10}),
+    ]
+
+    intent = Intent(raw="fone", attribute_ranges={"battery_h": {"min": 30.0}})
+
+    out = DeterministicRanking().rank(hits, intent)
+
+    assert [i["id"] for i in out["items"]] == ["dentro", "fora"]
+    assert out["items"][0]["factors"]["attributes"] == {"score": 1.0, "applicable": True}
+    assert out["items"][1]["factors"]["attributes"]["score"] == 0.0
+
+
+def test_faixa_e_atributo_exato_dividem_o_mesmo_fator():
+    """Dois pedidos, meio atendido: 0.5. O denominador soma os dois tipos."""
+    hit = _hit("meio", "Fone", 0.5, 200, {"anc": True, "battery_h": 10})
+
+    intent = Intent(
+        raw="fone",
+        attributes={"anc": True},
+        attribute_ranges={"battery_h": {"min": 30.0}},
+    )
+
+    out = DeterministicRanking().rank([hit], intent)
+
+    assert out["items"][0]["factors"]["attributes"]["score"] == 0.5
+
+
+def test_criterio_de_atributos_fica_ativo_so_com_faixa():
+    """A UI mostra o critério ativo; uma consulta só de faixa não pode aparecer
+    como se nenhuma especificação tivesse sido pedida."""
+    out = DeterministicRanking().rank(
+        [_hit("a", "Fone", 0.5, 200, {"battery_h": 40})],
+        Intent(raw="fone", attribute_ranges={"battery_h": {"min": 30.0}}),
+    )
+
+    atributos = next(c for c in out["criteria"] if c["factor"] == "attributes")
+    assert atributos["active"] is True
+
+
+@pytest.mark.parametrize(
+    ("valor", "faixa", "casa"),
+    [
+        (40, {"min": 30.0}, True),
+        (30, {"min": 30.0}, True),  # o piso é inclusivo
+        (29.9, {"min": 30.0}, False),
+        (1.4, {"max": 1.6}, True),
+        (1.7, {"max": 1.6}, False),
+        (1.4, {"min": 1.0, "max": 1.6}, True),
+        ("40", {"min": 30.0}, True),  # JSONB pode devolver número como texto
+        (None, {"min": 30.0}, False),  # spec ausente não atende ao piso
+        ("muitas horas", {"min": 30.0}, False),
+        (True, {"min": 0.5}, False),  # bool não é medida, mesmo valendo 1
+    ],
+)
+def test_range_matches(valor, faixa, casa):
+    """Ausente ou não-numérico **não** casa: supor que atende faria a explicação
+    afirmar um fato que o produto não tem."""
+    assert range_matches(valor, faixa) is casa

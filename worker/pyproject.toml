@@ -20,7 +20,11 @@ dev = ["pytest>=8", "ruff>=0.5"]
 # Só o rotulador de `use_case` (ADR-010 D2) precisa do SDK, e ele é um passo
 # offline avulso. Fora do conjunto obrigatório para a ingestão continuar
 # instalável sem nenhuma dependência de IA — princípio fundacional do projeto.
-ai = ["anthropic>=0.40"]
+# >=0.125: o rotulador manda `output_config.format` (structured outputs), que o
+# SDK precisa conhecer para montar a requisição. 0.125.0 é a versão em que isso
+# foi verificado; o >=0.40 anterior era o piso de quando o arquivo foi escrito e
+# aceitaria um SDK que descarta o parâmetro em silêncio.
+ai = ["anthropic>=0.125"]
 
 # Pacote de ingestão (seed/ é dado, não entra na distribuição).
 [tool.setuptools]

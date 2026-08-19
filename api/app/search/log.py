@@ -85,5 +85,9 @@ def _intent_para_json(intent: Intent) -> dict[str, Any]:
         "category": intent.category,
         "price_max": intent.price_max,
         "attributes": intent.attributes or {},
+        # Registrado à parte de `attributes` porque responde outra pergunta na
+        # análise: uma busca vazia com faixa pedida é o parser filtrando demais,
+        # não o FTS deixando de achar.
+        "attribute_ranges": intent.attribute_ranges or {},
         "text": intent.text,
     }

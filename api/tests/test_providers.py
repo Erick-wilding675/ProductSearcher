@@ -299,3 +299,83 @@ def test_sem_atributos_nao_filtra_por_specs():
     FtsSearchProvider(session).search(Intent(raw="notebook"))
 
     assert "@>" not in session.sql()
+
+
+# --- faixas numéricas (ADR-0010, D2) ----------------------------------------
+
+
+def test_faixa_numerica_vira_comparacao_e_nao_containment():
+    """`@>` é igualdade: um fone de 40h não *contém* 30h. Faixa tem de comparar."""
+
+    session = _FakeSession([])
+
+    FtsSearchProvider(session).search(
+        Intent(raw="fone", attribute_ranges={"battery_h": {"min": 30.0}}),
+    )
+
+    sql = session.sql()
+
+    assert "jsonb_typeof" in sql
+    assert ">=" in sql
+    assert "@>" not in sql
+
+
+def test_faixa_numerica_compara_jsonb_e_nao_faz_cast_de_texto():
+    """Sem o cast a consulta não pode falhar por causa de um spec mal gravado.
+
+    `(attributes->>'battery_h')::numeric` é avaliado sobre as linhas que o planner
+    escolher: um único valor gravado como "30h" derrubaria a busca inteira com
+    erro de conversão. Comparar jsonb contra jsonb nunca falha, e o `jsonb_typeof`
+    ao lado é o que restringe a comparação ao que é número.
+    """
+
+    session = _FakeSession([])
+
+    FtsSearchProvider(session).search(
+        Intent(raw="fone", attribute_ranges={"battery_h": {"min": 30.0}}),
+    )
+
+    sql = session.sql()
+
+    # `->>` extrai texto do JSONB e é o começo do caminho perigoso: quem extrai
+    # texto precisa converter de volta. O cast que aparece é o do **literal**
+    # (`to_jsonb(30.0::numeric)`), que não toca em nenhuma linha da tabela.
+    assert "->>" not in sql
+    assert "to_jsonb" in sql
+    assert "jsonb_typeof" in sql
+
+
+def test_faixa_com_as_duas_pontas_gera_os_dois_limites():
+    session = _FakeSession([])
+
+    FtsSearchProvider(session).search(
+        Intent(raw="notebook", attribute_ranges={"weight_kg": {"min": 1.0, "max": 1.6}}),
+    )
+
+    sql = session.sql()
+
+    assert ">=" in sql
+    assert "<=" in sql
+
+
+def test_faixa_do_parser_chega_ao_sql():
+    """Ponta a ponta dentro do retrieval: o que o parser extrai vira WHERE."""
+
+    session = _FakeSession([])
+
+    intent = RuleBasedIntentParser().parse("fone com bateria para o dia todo")
+
+    assert intent.attribute_ranges == {"battery_h": {"min": 30.0}}
+
+    FtsSearchProvider(session).search(intent)
+
+    assert "jsonb_typeof" in session.sql()
+    assert 30.0 in session.bound_values()
+
+
+def test_sem_faixa_nao_ha_comparacao_de_specs():
+    session = _FakeSession([])
+
+    FtsSearchProvider(session).search(Intent(raw="notebook"))
+
+    assert "jsonb_typeof" not in session.sql()

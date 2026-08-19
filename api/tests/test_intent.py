@@ -140,3 +140,121 @@ def test_e_deterministico(parser: RuleBasedIntentParser) -> None:
     query = "fone até R$800"
     primeiro, segundo = parser.parse(query), parser.parse(query)
     assert (primeiro.category, primeiro.price_max) == (segundo.category, segundo.price_max)
+
+
+# --- faixas numéricas (ADR-0010, D2) ----------------------------------------
+
+
+@pytest.mark.parametrize(
+    ("query", "esperado"),
+    [
+        # comparador antes do número
+        ("fone com pelo menos 30 horas de bateria", {"battery_h": {"min": 30.0}}),
+        ("fone com no minimo 20h", {"battery_h": {"min": 20.0}}),
+        ("fone a partir de 25 horas", {"battery_h": {"min": 25.0}}),
+        ("fone acima de 40 horas", {"battery_h": {"min": 40.0}}),
+        # comparador depois do número
+        ("fone 40h ou mais", {"battery_h": {"min": 40.0}}),
+        ("notebook 16gb de ram ou mais", {"ram_gb": {"min": 16.0}}),
+        # teto
+        ("fone ate 20 horas de bateria", {"battery_h": {"max": 20.0}}),
+        ("notebook ate 1,5kg", {"weight_kg": {"max": 1.5}}),
+        ("notebook menos de 2kg", {"weight_kg": {"max": 2.0}}),
+        # as duas pontas na mesma consulta
+        ("notebook acima de 14 polegadas e menos de 2kg",
+         {"screen_in": {"min": 14.0}, "weight_kg": {"max": 2.0}}),
+        # armazenamento precisa da palavra ao lado; "gb" sozinho é ambíguo
+        ("notebook a partir de 512gb de ssd", {"storage_gb": {"min": 512.0}}),
+        # sem comparador não é faixa
+        ("notebook com 16gb de ram", {}),
+        ("notebook gamer", {}),
+    ],
+)  # fmt: skip
+def test_extrai_faixa_numerica(parser: RuleBasedIntentParser, query: str, esperado: dict) -> None:
+    assert parser.parse(query).attribute_ranges == esperado
+
+
+def test_faixa_e_atributo_exato_nao_disputam_a_mesma_chave(
+    parser: RuleBasedIntentParser,
+) -> None:
+    """ "no mínimo 16GB" é piso, não igualdade — senão exclui as máquinas de 32GB.
+
+    Guarda de regressão: o `_RAM_PATTERN` casa a mesma frase e, se ainda gravasse
+    `ram_gb = 16`, o containment `@>` andaria junto do `>=` e o filtro voltaria
+    a ser exato sem ninguém perceber.
+    """
+    intent = parser.parse("notebook com no minimo 16gb de ram")
+
+    assert intent.attribute_ranges == {"ram_gb": {"min": 16.0}}
+    assert "ram_gb" not in intent.attributes
+
+
+@pytest.mark.parametrize(
+    ("query", "preco", "faixa"),
+    [
+        # o número tem unidade: é medida, não preço
+        ("fone ate 20 horas de bateria", None, {"battery_h": {"max": 20.0}}),
+        ("notebook ate 1,5kg", None, {"weight_kg": {"max": 1.5}}),
+        # sem unidade continua sendo teto de preço
+        ("notebook ate 5000", 5000.0, {}),
+        ("notebook ate R$ 5.000", 5000.0, {}),
+        # as duas coisas cabem na mesma consulta
+        ("fone ate R$300 com pelo menos 30 horas", 300.0, {"battery_h": {"min": 30.0}}),
+    ],
+)
+def test_unidade_impede_que_a_medida_vire_teto_de_preco(
+    parser: RuleBasedIntentParser, query: str, preco: float | None, faixa: dict
+) -> None:
+    """ "até 20 horas" não é R$ 20.
+
+    O defeito era silencioso e fatal: nenhum fone custa R$ 20, então a consulta
+    voltava vazia sem nada indicar que o parser tinha confundido as coisas. Em
+    "até 1,5kg" era pior — a conversão de preço lê "." como milhar e virava R$ 15.
+    """
+    intent = parser.parse(query)
+
+    assert intent.price_max == preco
+    assert intent.attribute_ranges == faixa
+
+
+def test_expressao_por_extenso_vira_faixa_na_categoria_certa(
+    parser: RuleBasedIntentParser,
+) -> None:
+    """ "o dia todo" é quantidade dita sem número — e é do parser, não do LLM.
+
+    A guarda de categoria não é detalhe: `battery_h` não existe no schema de
+    notebooks, então inferir a chave ali zeraria a busca por uma adivinhação do
+    parser. Com número digitado o usuário assume a consequência; adivinhando, não.
+    """
+    fone = parser.parse("fone com bateria para o dia todo")
+    assert fone.attribute_ranges == {"battery_h": {"min": 30.0}}
+
+    notebook = parser.parse("notebook com bateria para o dia todo")
+    assert notebook.attribute_ranges == {}
+
+
+def test_numero_dito_vence_a_expressao_por_extenso(parser: RuleBasedIntentParser) -> None:
+    """Quem escreveu "15 horas" pediu 15, mesmo dizendo "dia todo" na mesma frase."""
+    intent = parser.parse("fone para o dia todo com pelo menos 15 horas")
+    assert intent.attribute_ranges == {"battery_h": {"min": 15.0}}
+
+
+@pytest.mark.parametrize(
+    ("query", "fora_do_texto"),
+    [
+        ("fone com pelo menos 30 horas de bateria", ["30", "horas", "menos"]),
+        ("fone com bateria para o dia todo", ["dia", "todo"]),
+        ("notebook ate 1,5kg", ["1,5", "kg"]),
+    ],
+)
+def test_texto_para_fts_sai_sem_a_faixa(
+    parser: RuleBasedIntentParser, query: str, fora_do_texto: list[str]
+) -> None:
+    """O que virou filtro sai do texto — mesma razão do preço.
+
+    `plainto_tsquery` combina com AND: "dia" sobrando exigiria a palavra "dia" no
+    anúncio e zeraria justamente a busca que o filtro acabou de tornar possível.
+    """
+    texto = parser.parse(query).text
+    for termo in fora_do_texto:
+        assert termo not in texto, f"{termo!r} deveria ter saído de {texto!r}"
