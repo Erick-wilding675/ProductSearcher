@@ -504,6 +504,68 @@ evidência de consulta real, porém, **só existe depois do deploy** — até l�
 suíte continua medindo a busca contra a nossa imaginação, como o próprio
 cabeçalho da ferramenta admite.
 
+### D2, primeira parte (19/08/2026, branch `fase6`) — construída, **não executada**
+
+D2 foi relida à luz da medição, como o próprio ADR mandava. O que mudou:
+
+**O caso de D2 encolheu, mas não caiu.** Depois de D8, só 2 das 11 consultas
+ainda devolvem zero ("faculdade" e "notebook leve para viagem") — mas a
+precisão média é 34% contra 60% de alvo, e o parser extrai `attrs={}` em
+**todas** as consultas de uso. É exatamente o buraco que D2 preenche.
+
+**Achado que o plano não previu: rotular não basta — o parser tem de tirar os
+termos de uso do texto que vai ao FTS.** Mesma lógica do preço, e pelo mesmo
+motivo: o que virou filtro **duro** não pode continuar obrigatório no AND do
+`plainto_tsquery`. Deixar "faculdade" no texto exigiria a palavra no anúncio, e
+ela não está em nenhum dos 235 produtos — o filtro acertaria e o AND zeraria em
+seguida. O plano dizia que a consulta seria respondida "pelo caminho que já
+existe"; o caminho existe, mas precisava desta limpeza para funcionar.
+
+**As duas metades não podem viajar juntas, e isso foi medido.** Ligar o filtro
+antes dos rótulos existirem quebra a busca: `use_case` vira filtro duro sobre um
+atributo que nenhum produto tem. Pior que zerar as consultas de uso — derruba
+**produto conhecido**: "headset gamer havit" passa a filtrar por `gamer` e perde
+o match exato de marca. Cinco testes vermelhos, entre eles os dois controles e o
+`test_relevance.py`. **O instrumento de D1 pegou o erro**, que é literalmente o
+motivo de D1 existir.
+
+Por isso a entrega está partida em duas:
+
+| metade | onde | estado |
+| --- | --- | --- |
+| offline: schema `use_case`, `enum_multi`, guarda no `validate_specs` | `fase6` | commitada, **inerte** |
+| offline: rotulador pela Batch API | `fase6` | commitada, **não executada** (falta a chave) |
+| runtime: parser converte necessidade em filtro | `fase6-d2-runtime` | commitada, **não mesclável** até os rótulos existirem |
+
+**`use_case` é `enum_multi`, um tipo novo.** Lista e não escalar porque um
+notebook serve para jogos **e** edição de vídeo, e porque o filtro é containment
+JSONB (`@>`) — casa "contém este rótulo" sem precisar saber os outros. Sem
+migration: cabe no JSONB de `product_specs.attributes`, como o plano previa.
+
+**O enum é por categoria**, o que o plano não dizia. O mesmo termo não significa
+a mesma coisa nos dois catálogos: "viagem" em fone é ruído de cabine; em
+notebook é peso, ou seja `portabilidade`. O plano listava só
+`["jogos", "trabalho", "estudo", "edicao-video", "portabilidade"]` — escrito
+antes de D1 existir. A medição pediu `programacao` (notebooks) e um conjunto
+próprio para fones:
+
+- **notebooks:** `jogos`, `trabalho`, `estudo`, `edicao-video`, `programacao`,
+  `portabilidade`
+- **headphones:** `esporte`, `chamadas`, `viagem`, `trabalho`, `jogos`
+
+**Custo real do lote, não estimado por analogia:** 235 produtos, ~134k tokens de
+entrada, **US$ 0,45** com o desconto da Batch API. O teto da RNF-03 é US$ 10 — o
+passo cabe com folga de mais de vinte vezes.
+
+**Um caso que D2 não resolve, e é honesto dizer:** "fone com bateria para o dia
+todo" devolve 15 resultados e nenhum com `battery_h >= 30`. Não é caso de uso, é
+faixa numérica — pede filtro de atributo no parser, não rótulo de LLM. Fica
+registrado como trabalho separado.
+
+**Pendência:** `ANTHROPIC_API_KEY`. Sem ela o lote não roda, os rótulos não
+existem e a metade de runtime não pode ser mesclada. `--dry-run` verificado
+contra o banco real: 235 fichas montadas, enum correto por categoria.
+
 ### D8 (19/08/2026) — o fix de acento, medido
 
 Construído logo depois de D1 fechar, pela razão que a própria D8 dá: medir D2
