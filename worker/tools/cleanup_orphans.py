@@ -44,32 +44,43 @@ def orfaos(conn: sa.Connection, validos: set[str]) -> list[tuple[str, str]]:
     return [(str(r.id), r.slug) for r in linhas if r.slug not in validos]
 
 
+def _delete_por_ids(conn: sa.Connection, sql: str, ids: list[str]) -> int:
+    """Executa um `delete ... in :ids` com bind expansível.
+
+    Sem `expanding=True` o SQLAlchemy entrega a coleção ao psycopg como **um**
+    parâmetro, o SQL vira `in $1` e o Postgres responde
+    `syntax error at or near "$1"`. Foi assim que a primeira execução real deste
+    script morreu (19/08/2026) — o `--dry-run` nunca passa por aqui, então o
+    defeito ficou latente desde que o arquivo nasceu.
+    """
+    stmt = sa.text(sql).bindparams(sa.bindparam("ids", expanding=True))
+    return conn.execute(stmt, {"ids": list(ids)}).rowcount
+
+
 def remove(conn: sa.Connection, ids: list[str]) -> dict[str, int]:
     """Apaga os produtos e tudo que pende deles, na ordem das FKs."""
     if not ids:
         return {}
 
-    p = {"ids": tuple(ids)}
     contagens = {}
-    contagens["price_history"] = conn.execute(
-        sa.text(
-            "delete from price_history where offer_id in "
-            "(select id from offers where product_id::text in :ids)"
-        ),
-        p,
-    ).rowcount
-    contagens["offers"] = conn.execute(
-        sa.text("delete from offers where product_id::text in :ids"), p
-    ).rowcount
-    contagens["reviews"] = conn.execute(
-        sa.text("delete from reviews where product_id::text in :ids"), p
-    ).rowcount
-    contagens["product_specs"] = conn.execute(
-        sa.text("delete from product_specs where product_id::text in :ids"), p
-    ).rowcount
-    contagens["products"] = conn.execute(
-        sa.text("delete from products where id::text in :ids"), p
-    ).rowcount
+    contagens["price_history"] = _delete_por_ids(
+        conn,
+        "delete from price_history where offer_id in "
+        "(select id from offers where product_id::text in :ids)",
+        ids,
+    )
+    contagens["offers"] = _delete_por_ids(
+        conn, "delete from offers where product_id::text in :ids", ids
+    )
+    contagens["reviews"] = _delete_por_ids(
+        conn, "delete from reviews where product_id::text in :ids", ids
+    )
+    contagens["product_specs"] = _delete_por_ids(
+        conn, "delete from product_specs where product_id::text in :ids", ids
+    )
+    contagens["products"] = _delete_por_ids(
+        conn, "delete from products where id::text in :ids", ids
+    )
 
     # Lojas e marcas órfãs: sem produto/oferta apontando, viram lixo no catálogo.
     contagens["stores"] = conn.execute(
@@ -98,10 +109,9 @@ def remove_atributos_orfaos(conn: sa.Connection, categorias) -> int:
     sobrando = [str(r.id) for r in linhas if (r.slug, r.attribute_key) not in declarados]
     if not sobrando:
         return 0
-    return conn.execute(
-        sa.text("delete from category_attribute_schema where id::text in :ids"),
-        {"ids": tuple(sobrando)},
-    ).rowcount
+    return _delete_por_ids(
+        conn, "delete from category_attribute_schema where id::text in :ids", sobrando
+    )
 
 
 def main() -> None:
