@@ -17,6 +17,10 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.5"]
+# Só o rotulador de `use_case` (ADR-010 D2) precisa do SDK, e ele é um passo
+# offline avulso. Fora do conjunto obrigatório para a ingestão continuar
+# instalável sem nenhuma dependência de IA — princípio fundacional do projeto.
+ai = ["anthropic>=0.40"]
 
 # Pacote de ingestão (seed/ é dado, não entra na distribuição).
 [tool.setuptools]
