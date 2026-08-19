@@ -22,7 +22,14 @@ from sqlalchemy import and_, cast, func, literal, select
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.orm import Session
 
-from app.catalog.tables import brands, categories, offers, product_specs, products
+from app.catalog.tables import (
+    FTS_CONFIG,
+    brands,
+    categories,
+    offers,
+    product_specs,
+    products,
+)
 from app.core.config import settings
 from app.core.db import get_session
 from app.search.intent import Intent
@@ -78,8 +85,11 @@ class FtsSearchProvider:
         # `intent.text` (e não `raw`): o texto já sem as partes que viraram filtro.
         # `plainto_tsquery` combina os termos com AND — "até R$5000" no texto exigiria
         # "ate"/"r"/"5000" no produto e zeraria o resultado.
+        # `FTS_CONFIG` e não "portuguese": tem de ser a **mesma** configuração da
+        # coluna gerada. Consulta e documento processados por configurações
+        # diferentes casam menos e não dão erro — falha silenciosa.
         texto = intent.text or intent.raw
-        tsquery = func.plainto_tsquery("portuguese", texto) if texto else None
+        tsquery = func.plainto_tsquery(FTS_CONFIG, texto) if texto else None
 
         min_price = func.min(offers.c.price)
 

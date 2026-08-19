@@ -189,6 +189,61 @@ não devolve avaliação para token de aplicação (ADR-0009 D7). Não é "falta
 implementar" — é schema sem origem de dado. Qualquer plano de RAG sobre review
 morre aqui até a rota do Apify ser executada.
 
+### D8 — Dobrar acento no FTS vem **antes** de qualquer IA
+
+*(decidido em 19/08/2026, a partir da medição de D1)*
+
+D1 encontrou uma causa dos zeros que não é semântica: `to_tsvector('portuguese',
+…)` **não dobra acento** e a extensão `unaccent` não estava instalada. O corpus é
+copy de marketplace, escrita com acento; a consulta em pt-BR vem sem. Como o
+`plainto_tsquery` combina com AND, **um** termo sem acento zera a consulta
+inteira — "notebook para trabalho no escritorio" vira `'notebook' & 'trabalh' &
+'escritori'`, e `escritori` casa nada, embora "escritório" apareça em 15
+produtos.
+
+Decisão: configuração de busca própria, `public.portuguese_unaccent` (`portuguese`
+com `unaccent` na frente do `portuguese_stem`), usada **na coluna gerada e na
+consulta**. Migration `d2e4f6a8b0c1`.
+
+Por que antes de D2, e não depois: sozinho, o fix leva a **cobertura@5 de 27%
+para 55%** e a **precisão média@5 de 16% para 34%** — mais da metade do caminho
+até a meta, sem IA. Medir D2 antes disso creditaria ao LLM um ganho que era do
+`unaccent`, e é exatamente o tipo de conta errada que D1 existe para impedir.
+
+Duas notas de construção que valem como decisão:
+
+- **A configuração é sempre qualificada** (`public.portuguese_unaccent`). Um nome
+  nu resolveria pelo `search_path` de quem consulta, e o do Supabase (`"$user",
+  public, extensions`) não é o do Postgres do docker. Coluna e consulta têm de
+  usar a **mesma** configuração: divergir não dá erro, só devolve menos — falha
+  silenciosa, do mesmo tipo que o ADR-010 D3 alerta para embeddings.
+- **`unaccent` entra como dicionário, não como função.** `unaccent(text)` é
+  STABLE e por isso proibida em coluna gerada; `to_tsvector(regconfig, text)` é
+  IMMUTABLE mesmo com a dobra dentro da configuração.
+
+**Custo aceito: o stemmer português enfraquece.** As regras de sufixo do snowball
+dependem do acento. Com a dobra na frente, "programação" deixa de virar `program`
+e vira `programaca`:
+
+| termo | `portuguese` | `portuguese_unaccent` |
+| --- | --- | --- |
+| programação | `program` | `programaca` |
+| programacao | `programaca` | `programaca` |
+| edição / edicao | `ediçã` / `edica` | `edica` / `edica` |
+
+O radical largo (`program`) casava 13 notebooks, mas casando "programa"/"programas"
+— software incluso na copy, não relevância. O estreito casa 2, e o ganho real é a
+**coerência**: acentuado e não acentuado passam a produzir o mesmo radical, que é
+o defeito que estamos consertando. Se em algum momento a recall curta doer, a
+saída é indexar a **união** das duas configurações
+(`to_tsvector('portuguese', …) || to_tsvector('public.portuguese_unaccent', …)`)
+em vez de reabrir a ordem do dicionário — mas isso dobra o índice e não se paga
+com o número de hoje.
+
+**O que o fix não alcança:** "faculdade" e "notebook leve para viagem" continuam
+em zero. Ali não é acento — a palavra **não existe** no corpus em forma nenhuma.
+São exatamente os casos que sobram para D2.
+
 ## Benefícios
 
 - A IA passa a ser julgada por **evidência**: D1 constrói o placar antes de
@@ -251,8 +306,10 @@ morre aqui até a rota do Apify ser executada.
 - `api/app/ai/service.py`: `DeterministicAIService.explain` deixa de ser
   `NotImplementedError`.
 - `api/app/core/config.py`: flags novas.
-- **Sem migration**: a coluna `embedding` e o índice HNSW já existem; `use_case`
-  cabe no JSONB.
+- **Sem migration em D2/D3**: a coluna `embedding` e o índice HNSW já existem;
+  `use_case` cabe no JSONB. D8, decidido depois, **tem** migration
+  (`d2e4f6a8b0c1`): recria a coluna gerada `search_vector` sob a configuração
+  nova.
 
 ---
 
@@ -446,6 +503,36 @@ exercitadas direto contra o Postgres: as quatro rodam sem erro de SQL. A
 evidência de consulta real, porém, **só existe depois do deploy** — até lá a
 suíte continua medindo a busca contra a nossa imaginação, como o próprio
 cabeçalho da ferramenta admite.
+
+### D8 (19/08/2026) — o fix de acento, medido
+
+Construído logo depois de D1 fechar, pela razão que a própria D8 dá: medir D2
+antes disso creditaria ao LLM o ganho do `unaccent`.
+
+**A coluna gerada é recriada, não alterada.** `ALTER COLUMN … SET EXPRESSION` só
+existe do PG17 em diante e o dev local roda PG16 (`pgvector/pgvector:pg16`),
+enquanto o Supabase está em 17.6. Drop + add funciona nos dois, e como a coluna é
+GERADA os 235 produtos se reindexam sozinhos — não há passo de backfill.
+
+**Round-trip verificado no banco real**: `upgrade` → `downgrade` → `upgrade`, com
+os 235 produtos intactos e a busca voltando ao comportamento antigo no meio do
+caminho (`edicao` → 0 documentos) e ao novo no fim (→ 10).
+
+**Placar depois do fix** (mesmo catálogo de 235, nenhuma IA):
+
+| | D1 (baseline) | depois de D8 | meta |
+| --- | --- | --- | --- |
+| cobertura@5 | 27% | **55%** | 80% |
+| precisão média@5 | 16% | **34%** | 60% |
+| consultas com zero resultado | 7 de 11 | **2 de 11** | 0 |
+
+`test_relevance.py` segue **13/13** — a metade "produto conhecido" não regrediu,
+que era o risco real de mexer no dicionário. Os agregados continuam `xfail`: o
+alvo é 80%/60% e ainda não chegamos. É D2 que tem de fechar o resto.
+
+**O parser em Python já era tolerante a acento** (`_sem_acento` nos fillers,
+`ru[ií]do` no regex de ANC). O buraco era só do lado do Postgres — verificado
+antes de mexer, para não "consertar" duas vezes o mesmo lugar.
 
 ### D6, primeira metade (19/08/2026, commit `8c562d7`)
 

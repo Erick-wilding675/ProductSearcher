@@ -19,9 +19,15 @@ from sqlalchemy.dialects.postgresql import JSONB, TSVECTOR, UUID
 
 metadata = MetaData()
 
-# Expressão da coluna gerada `search_vector` (espelha a migration c1a2b3d4e5f6).
+# Configuração de busca textual do projeto: `portuguese` + dobra de acento.
+# Sempre **qualificada** — o `search_path` do Supabase não é o do Postgres do
+# docker, e um nome nu resolveria diferente em cada um. Ver migration
+# d2e4f6a8b0c1 para o porquê da dobra.
+FTS_CONFIG = "public.portuguese_unaccent"
+
+# Expressão da coluna gerada `search_vector` (espelha a migration d2e4f6a8b0c1).
 _SEARCH_VECTOR = Computed(
-    "to_tsvector('portuguese', "
+    f"to_tsvector('{FTS_CONFIG}', "
     "coalesce(name, '') || ' ' || coalesce(model, '') || ' ' || coalesce(description, ''))",
     persisted=True,
 )
