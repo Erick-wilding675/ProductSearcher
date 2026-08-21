@@ -20,11 +20,11 @@ dev = ["pytest>=8", "ruff>=0.5"]
 # Só o rotulador de `use_case` (ADR-010 D2) precisa do SDK, e ele é um passo
 # offline avulso. Fora do conjunto obrigatório para a ingestão continuar
 # instalável sem nenhuma dependência de IA — princípio fundacional do projeto.
-# >=0.125: o rotulador manda `output_config.format` (structured outputs), que o
-# SDK precisa conhecer para montar a requisição. 0.125.0 é a versão em que isso
-# foi verificado; o >=0.40 anterior era o piso de quando o arquivo foi escrito e
-# aceitaria um SDK que descarta o parâmetro em silêncio.
-ai = ["anthropic>=0.125"]
+# O SDK é o da OpenAI porque a API da Groq é compatível com ele (`base_url`); o
+# rotulador não usa nada específico de OpenAI além do formato do endpoint.
+# >=1.40: o piso de `with_raw_response`, que é como o rotulador lê os cabeçalhos
+# `x-ratelimit-*` para se pautar pelo limite por minuto. Verificado com 3.3.1.
+ai = ["openai>=1.40"]
 
 # Pacote de ingestão (seed/ é dado, não entra na distribuição).
 [tool.setuptools]
