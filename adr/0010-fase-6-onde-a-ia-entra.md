@@ -860,15 +860,125 @@ merge.
 #### Duas armadilhas para quem executar isto de novo
 
 **A ordem é carga do seed → rotulagem, sempre.** Os rótulos vivem só no banco (o
-YAML do seed não tem `use_case`), e o upsert de `product_specs` substitui
+YAML do seed não tem `use_case`), e o upsert de `product_specs` substituía
 `attributes` inteiro — sem o cuidado que o `keep_if_null` tem com
-`model`/`description`. Qualquer ingestão apaga a rotulagem em silêncio, e o filtro
-de D2 volta a não casar com nada. Reexecutar é grátis e leva ~30 min, mas é
-preciso lembrar. (Fazer o upsert **mesclar** o JSONB resolveria de vez; é decisão
-de ingestão, não de D2, e fica registrada aqui como candidata.)
+`model`/`description`. Qualquer ingestão apagava a rotulagem em silêncio, e o
+filtro de D2 voltava a não casar com nada.
+
+> **Resolvido no mesmo dia**, com o upsert mesclando o JSONB — ver *"A carga do
+> seed parou de apagar a rotulagem"*, no fim deste arquivo, com o trade-off que
+> isso traz. A ordem continua sendo a recomendada; deixou é de ser obrigatória.
 
 **`use_case` ainda não está em `category_attribute_schema` no banco.** O
-`categories.json` tem, mas quem leva schema para o Postgres é a carga do seed —
-que, pela armadilha acima, apagaria os rótulos recém-gravados. Hoje isso não
-quebra nada: o atributo é lista, e o seletor de specs só oferece valores simples,
-então ele já seria ignorado como faceta. Entra na próxima carga.
+`categories.json` tem, mas quem leva schema para o Postgres é a carga do seed.
+Hoje isso não quebra nada: o atributo é lista, e o seletor de specs só oferece
+valores simples, então ele já seria ignorado como faceta. Entra na próxima carga
+— que, depois do merge de JSONB, deixou de ser perigosa para os rótulos.
+
+### D2, metade de runtime — mesclada e medida (21/08/2026, merge `b293b7a`)
+
+Com os rótulos no ar, a `fase6-d2-runtime` deixou de ser perigosa e entrou. O
+merge **não foi mecânico**: as duas metades resolviam o mesmo problema — tirar do
+texto do FTS o que virou filtro duro — por caminhos diferentes.
+
+**Ficou o caminho da faixa numérica, e o outro morreu.** A faixa devolve, de cada
+extração, os **trechos** que consumiu, e `_remove_trechos` apaga por posição; a
+metade de runtime refazia a varredura com `re.sub` depois de já ter reconhecido os
+termos. Apagar por posição não depende da ordem em que os padrões casaram — e eles
+se sobrepõem (preço e faixa disputam o "até"). `_parse_use_cases` passou a devolver
+`(rótulos, trechos)` e `_sem_termos_de_uso` deixou de existir. Um mecanismo para os
+três filtros, não três.
+
+Detalhe que o merge obrigou a pensar: a varredura de uso roda sobre a cópia **sem
+acento**, e os índices são usados na original. Vale porque `_sem_acento` decompõe
+em NFD e descarta só a combinante — cada letra acentuada continua ocupando uma
+posição. Está escrito no docstring, porque é o tipo de coisa que a próxima pessoa
+desfaz sem perceber.
+
+**Três testes de parser mudaram de expectativa, e a mudança é o contrato.**
+"notebook gamer" agora consulta o FTS por `notebook` e filtra `use_case=jogos`;
+antes mandava "notebook gamer" ao `plainto_tsquery`. Não é regressão: é a mesma
+regra do preço chegando ao vocabulário de uso.
+
+#### O placar, medido depois do merge
+
+| | D1 | +D8 (acento) | +faixa | **+D2** | meta |
+| --- | --- | --- | --- | --- | --- |
+| cobertura@5 | 27% | 55% | 60% | **100%** | 80% |
+| precisão média@5 | 16% | 34% | 37% | **68%** | 60% |
+| consultas com zero | 7/11 | 2/11 | 2/10 | **0/10** | 0 |
+
+    caso                   consulta                                 top5   prec  acaso  total
+    jogos                  notebook para jogos                    5/5     100%   24%     37
+    edição de vídeo        notebook para edicao de video          2/5      40%   18%     24
+    trabalho               notebook para trabalho no escritorio   4/5      80%   50%     50
+    faculdade              notebook para faculdade                5/5     100%   24%     45
+    portabilidade          notebook leve para viagem              1/5      20%   15%     15
+    programação            notebook para programacao              5/5     100%   43%     42
+    academia               fone para academia                     4/5      80%   25%     31
+    corrida                fone para correr                       4/5      80%   25%     31
+    reunião                fone para reuniao online               2/5      40%   37%      6
+    viagem                 fone para viagem de aviao              2/5      40%   14%     23
+
+`test_relevance.py` segue **13/13**: "headset gamer havit" não perdeu o match
+exato de marca, que era o risco medido quando o filtro subiu sem rótulo.
+
+**Os dois agregados saíram do `xfail`.** Nasceram vermelhos de propósito, como
+previsão de fracasso a ser virada; viraram. Daqui para a frente são guarda de
+regressão — quem baixar o placar tem de justificar.
+
+#### As quatro consultas que sobraram não têm todas o mesmo problema
+
+Vale separar, porque a tentação é creditar tudo ao rótulo:
+
+- **`reunião` (40%, só 6 resultados)** e **`portabilidade` (20%, 15
+  resultados)**: o gargalo é **texto residual**, não rótulo. "fone para reuniao
+  online" vira `reuniao` → filtro e sobra `online` no AND do FTS; "notebook leve
+  para viagem" sobra `leve`. Palavras que descrevem necessidade mas não estão no
+  vocabulário de `use_case` continuam obrigatórias no `plainto_tsquery` e cortam
+  o conjunto antes do ranking. É o mesmo defeito de fundo do ADR-0007 D2.1, agora
+  no resto.
+- **`edição de vídeo` (40%)** e **`viagem` (40%)**: aqui é o rótulo mesmo — 62% e
+  32% de concordância com o predicado, os dois números mais baixos da tabela de
+  rotulagem. O filtro traz o conjunto certo por definição do rótulo; quem discorda
+  é o gabarito.
+
+A diferença importa para o passo seguinte: D3 (vetorial) ataca o primeiro grupo —
+"online" e "leve" deixariam de ser termo obrigatório — e não faz nada pelo
+segundo, que é qualidade de rótulo.
+
+### A carga do seed parou de apagar a rotulagem (21/08/2026, commit `ef3468f`)
+
+A armadilha registrada acima — *"a ordem é carga do seed → rotulagem, sempre"* —
+virou correção em vez de aviso, a pedido do Erick.
+
+`product_specs.attributes` tem **dois donos**: o seed traz a ficha técnica e o
+rotulador grava `use_case` e `_labeling`. O upsert substituía a coluna inteira,
+então qualquer carga apagava a rotulagem em silêncio. Agora o `ON CONFLICT DO
+UPDATE` faz `attributes || excluded.attributes`: o seed vence chave a chave, e o
+que ele não conhece sobrevive. É o `keep_if_null` de `model`/`description` um
+nível abaixo — chave, não coluna.
+
+**O trade-off, dito por inteiro:** mesclar preserva o que a carga não conhece e,
+pela mesma regra, o que ela **deixou** de conhecer. Um `gpu` errado que foi
+removido do seed continua no banco para sempre; antes, a carga seguinte o
+apagava. Trocar apagamento silencioso por permanência silenciosa seria trocar um
+defeito por outro — então a permanência **é anunciada**: `_avisa_specs_orfas` loga
+toda chave que ficou sem correspondente no seed, ignorando `use_case` e os
+carimbos `_*`, que são do outro dono. Remover de vez continua sendo decisão
+humana, com `update` à mão; o que não pode é a remoção acontecer sozinha, sem
+ninguém saber.
+
+Duas alternativas descartadas: **preservar só um conjunto fixo de chaves**
+(`use_case`, `_labeling`) mantém a propagação de remoção, mas amarra a ingestão à
+lista de passos de enriquecimento — cada passo novo obrigaria a mexer no `load`;
+e **escrever os rótulos de volta no YAML do seed**, que resolveria de vez, mas
+põe saída de LLM dentro do dado curado, que é justamente o que o ADR-0001 quis
+evitar.
+
+**Achado que só apareceu porque o teste é de integração:** montar o lado direito
+do `||` com `cast(str, JSONB)` liga um `str` com tipo JSONB, o driver serializa
+para o escalar `'"{...}"'` — e no Postgres `objeto || escalar` devolve **array**,
+não objeto. `{"ram_gb": 16}` virou `[{"ram_gb": 16}, "{...}"]` sem erro nenhum.
+Os dois lados agora são expressões jsonb; o teste que pegou isso é o mesmo que
+guarda a preservação do rótulo.
