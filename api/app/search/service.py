@@ -17,6 +17,7 @@ from typing import Annotated, Any
 from fastapi import Depends
 
 from app.catalog.repository import CatalogRepository, get_catalog_repository
+from app.catalog.specs import publicas
 from app.search.intent import Intent, IntentParser, RuleBasedIntentParser
 from app.search.log import NullSearchLog, SearchLog, get_search_log
 from app.search.providers import SearchProvider, get_fts_search_provider
@@ -281,7 +282,7 @@ def _para_item(hit: dict) -> SearchResultItem:
         category=hit["category"],
         brand=hit["brand"],
         min_price=(Decimal(str(preco)) if preco is not None else None),
-        specs=hit.get("attributes") or {},
+        specs=publicas(hit.get("attributes")),
         score=hit.get("score", 0.0),
         factors={key: RankingFactor(**value) for key, value in (hit.get("factors") or {}).items()},
     )

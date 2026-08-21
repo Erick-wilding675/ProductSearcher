@@ -457,3 +457,29 @@ def test_sem_rank_by_a_ordem_segue_o_ranking():
     resposta = _servico_precos().search(q="notebook")
 
     assert [item.name for item in resposta.results] == ["Caro", "Medio", "Barato"]
+
+
+def test_carimbo_da_ingestao_nao_vira_spec_do_produto():
+    """`_labeling` é metadado do rotulador (ADR-010 D2), não característica.
+
+    Vaza direto para a UI se não for filtrado: a página de produto renderiza toda
+    chave de `specs`, e a comparação monta uma linha por chave presente. O rótulo
+    `use_case`, que **é** spec, continua exposto.
+    """
+    service, _ = _service(
+        [
+            _hit(
+                "Nitro V15",
+                attributes={
+                    "ram_gb": 16,
+                    "use_case": ["jogos"],
+                    "_labeling": {"data": "2026-08-21", "modelo": "openai/gpt-oss-120b"},
+                },
+            )
+        ]
+    )
+
+    item = service.search(q="notebook", page=1).results[0]
+
+    assert "_labeling" not in item.specs
+    assert item.specs == {"ram_gb": 16, "use_case": ["jogos"]}

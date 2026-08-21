@@ -19,6 +19,7 @@ from app.catalog.schemas import (
     OfferOut,
     ProductDetailOut,
 )
+from app.catalog.specs import publicas
 from app.catalog.tables import (
     brands,
     categories,
@@ -158,11 +159,10 @@ class SqlCatalogRepository:
         if base is None:
             return None
 
-        specs = (
+        specs = publicas(
             self._session.execute(
                 select(product_specs.c.attributes).where(product_specs.c.product_id == pid)
             ).scalar_one_or_none()
-            or {}
         )
 
         offer_rows = self._session.execute(
@@ -218,7 +218,7 @@ class SqlCatalogRepository:
                 product_specs.c.product_id.in_(pids)
             )
         ).all()
-        specs_by_pid = {row.product_id: row.attributes for row in specs_rows}
+        specs_by_pid = {row.product_id: publicas(row.attributes) for row in specs_rows}
 
         return [
             CompareProduct(
