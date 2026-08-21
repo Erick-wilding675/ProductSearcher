@@ -195,11 +195,15 @@ def test_fts_usa_texto_sem_preco_e_nao_a_query_crua():
 
     valores = session.bound_values()
 
-    # Texto limpo vai para o tsquery.
-    assert "notebook gamer" in valores
+    # Texto limpo vai para o tsquery. "gamer" também não está aqui: virou o
+    # filtro use_case=jogos (ADR-010 D2), pela mesma regra do preço.
+    assert "notebook" in valores
 
     # O preço vira filtro.
     assert 5000.0 in valores
+
+    # E a necessidade também.
+    assert {"use_case": ["jogos"]} in valores
 
     assert not any(isinstance(value, str) and "5000" in value for value in valores)
 

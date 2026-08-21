@@ -32,15 +32,18 @@ bem servido. Spec é fato do produto, independente de como o anúncio foi escrit
   devolver qualquer coisa acerta. Por isso os predicados foram calibrados contra
   o seed para ficar entre ~15% e ~45% (ver ADR-010, D1).
 
-## Por que os agregados estão em xfail
+## Os agregados saíram do xfail em 21/08/2026
 
-O alvo (`META`) é o do PRD para relevância: 80%. Antes do passo 2 o documento
-FTS não tem vocabulário de uso confiável — parte dos títulos traz "gamer" ou
-"para trabalho" porque a copy do marketplace resolveu escrever, não porque o
-produto seja isso. Espera-se que os agregados falhem **agora**: é o teste
-vermelho que o enriquecimento semântico tem que virar verde. `strict=False`
-porque, se virar verde antes (ex.: uma consulta em que o parser já extrai o
-atributo), o certo é o CI avisar, não quebrar.
+O alvo (`META`) é o do PRD para relevância: 80%. Os dois agregados nasceram em
+`xfail`: antes do passo 2 o documento FTS não tinha vocabulário de uso confiável
+— parte dos títulos traz "gamer" ou "para trabalho" porque a copy do marketplace
+resolveu escrever, não porque o produto seja isso.
+
+O passo 2 fechou (ADR-010 D2, rótulos offline + filtro no parser) e o vermelho
+virou verde: cobertura@5 27% → 55% (acento, D8) → 60% (faixa numérica) → **100%**,
+precisão média@5 16% → 34% → 37% → **68%**, com zero consulta devolvendo vazio.
+Os `xfail` saíram junto: daqui para a frente estes dois testes são **guarda de
+regressão**, não previsão de fracasso. Quem baixar o placar tem de justificar.
 
 Ao trocar o seed, recalibre: um predicado que passou a valer para 80% do
 catálogo virou decorativo.
@@ -304,10 +307,6 @@ def test_caso_de_uso_mede(search_service: SearchService, caso: CasoDeUso) -> Non
         )
 
 
-@pytest.mark.xfail(
-    reason="baseline pré-enriquecimento semântico (Fase 6, passo 2 do ADR-010)",
-    strict=False,
-)
 def test_cobertura_casos_de_uso(search_service: SearchService, acaso) -> None:
     """KPI: ≥80% dos casos com ao menos um resultado útil no top-5."""
     medicoes = [_medir(search_service, caso) for caso in CASOS if not caso.controle]
@@ -319,10 +318,6 @@ def test_cobertura_casos_de_uso(search_service: SearchService, acaso) -> None:
     )
 
 
-@pytest.mark.xfail(
-    reason="baseline pré-enriquecimento semântico (Fase 6, passo 2 do ADR-010)",
-    strict=False,
-)
 def test_precisao_casos_de_uso(search_service: SearchService, acaso) -> None:
     """Precisão média@5 acima do acaso com folga — o topo tem que ser do caso de uso.
 

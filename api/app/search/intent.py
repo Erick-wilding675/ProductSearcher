@@ -198,6 +198,36 @@ class RuleBasedIntentParser:
     _STORAGE_TYPES = {"ssd": "SSD", "hdd": "HDD", "emmc": "eMMC"}
     _ANC_PATTERN = re.compile(r"\banc\b|cancelamento\s+de\s+ru[ií]do", re.IGNORECASE)
 
+    # Consulta de **necessidade** ("fone para academia") → rótulo do conjunto
+    # fechado `use_case` (ADR-010 D2). O rótulo tem de existir em
+    # `worker/seed/categories.json`: o filtro é containment JSONB contra o que a
+    # ingestão gravou, então um rótulo inventado aqui vira silenciosamente zero
+    # resultado — a mesma armadilha dos slugs de categoria acima.
+    #
+    # Separado por categoria porque o mesmo termo não significa a mesma coisa nos
+    # dois catálogos: "viagem" em fone é ruído de cabine; em notebook é peso, ou
+    # seja `portabilidade`.
+    #
+    # Termos comparados **sem acento** (ver `_sem_acento`), então basta a forma
+    # simples aqui.
+    _USE_CASES: dict[str, dict[str, tuple[str, ...]]] = {
+        "notebooks": {
+            "jogos": ("jogos", "jogar", "gamer", "games", "game"),
+            "edicao-video": ("edicao de video", "editar video", "edicao de videos"),
+            "trabalho": ("trabalho", "trabalhar", "escritorio", "home office"),
+            "estudo": ("faculdade", "estudar", "estudos", "estudante", "escola", "aula"),
+            "programacao": ("programacao", "programar", "desenvolvimento", "codigo"),
+            "portabilidade": ("viagem", "viajar", "carregar", "levar", "mochila"),
+        },
+        "headphones": {
+            "esporte": ("academia", "correr", "corrida", "treino", "treinar", "esporte"),
+            "chamadas": ("reuniao", "reunioes", "chamada", "chamadas", "call", "ligacao"),
+            "viagem": ("viagem", "viajar", "aviao", "voo"),
+            "trabalho": ("trabalho", "trabalhar", "escritorio", "home office"),
+            "jogos": ("jogos", "jogar", "gamer", "games", "game"),
+        },
+    }
+
     # Palavras que expressam **intenção de compra**, não característica de produto.
     # O dicionário `portuguese` do Postgres só descarta stopword gramatical ("para",
     # "com", "qual"); "melhor"/"barato"/"quero" sobrevivem e viram termo obrigatório
@@ -228,11 +258,18 @@ class RuleBasedIntentParser:
 
         # Cada extração devolve também o trecho que consumiu: o que virou filtro
         # sai do texto do FTS, ou volta como termo obrigatório no AND e zera a
-        # busca. Vale para "até R$5000" e igualmente para "pelo menos 30 horas".
+        # busca. Vale para "até R$5000", para "pelo menos 30 horas" e para
+        # "para faculdade" — a necessidade que virou `use_case` é filtro duro
+        # como qualquer outro.
         intent.price_max, trecho_preco = self._parse_price_max(normalized)
         intent.attribute_ranges, trechos_faixa = self._parse_ranges(normalized, intent.category)
+        usos, trechos_uso = self._parse_use_cases(normalized, intent.category)
         intent.attributes = self._parse_attributes(normalized, intent.attribute_ranges)
-        intent.text = self._texto_para_fts(normalized, trecho_preco + trechos_faixa) or query
+        if usos:
+            intent.attributes["use_case"] = usos
+        intent.text = (
+            self._texto_para_fts(normalized, trecho_preco + trechos_faixa + trechos_uso) or query
+        )
         return intent
 
     def _texto_para_fts(self, normalized: str, consumidos: list[tuple[int, int]]) -> str:
@@ -321,6 +358,7 @@ class RuleBasedIntentParser:
         return {chave: faixa for chave, faixa in faixas.items() if faixa}, consumidos
 
     def _parse_attributes(self, normalized: str, faixas: dict | None = None) -> dict:
+
         """Atributos estruturados citados na consulta (chaves do schema da categoria).
 
         Cobre os sinais que o usuário costuma digitar; o que não for reconhecido
@@ -345,3 +383,41 @@ class RuleBasedIntentParser:
             attributes["anc"] = True
 
         return attributes
+
+    def _parse_use_cases(
+        self, normalized: str, category: str | None
+    ) -> tuple[list[str], list[tuple[int, int]]]:
+        """Rótulos de `use_case` reconhecidos na consulta, e os trechos consumidos.
+
+        Sem categoria não rotula: "para viagem" sozinho é ambíguo entre
+        `portabilidade` (notebook) e `viagem` (fone), e chutar traria filtro duro
+        errado — pior que filtro nenhum.
+
+        Devolve **lista** porque o filtro é containment JSONB: uma lista com dois
+        rótulos exige que o produto tenha os dois, que é a leitura certa de
+        "notebook para jogos e edição de vídeo".
+
+        Os trechos saem do texto do FTS pelo mesmo caminho do preço e da faixa
+        (`_remove_trechos`). A busca é feita sobre a cópia **sem acento**, que tem
+        o mesmo comprimento da original — cada letra acentuada decompõe em base +
+        combinante, e só a combinante cai —, então a posição vale nas duas.
+        """
+        vocabulario = self._USE_CASES.get(category or "")
+        if not vocabulario:
+            return [], []
+
+        texto = self._sem_acento(normalized)
+        encontrados: list[str] = []
+        consumidos: list[tuple[int, int]] = []
+        for rotulo, termos in vocabulario.items():
+            spans = [
+                match.span()
+                for termo in termos
+                for match in re.finditer(rf"\b{re.escape(termo)}\b", texto)
+            ]
+            if spans:
+                encontrados.append(rotulo)
+                consumidos.extend(spans)
+        # Ordem estável (a do vocabulário) para o filtro e o log não variarem
+        # entre execuções — `searches` guarda o `parsed_intent`.
+        return encontrados, consumidos

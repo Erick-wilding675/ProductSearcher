@@ -98,9 +98,12 @@ def test_preserva_query_original(parser: RuleBasedIntentParser) -> None:
 @pytest.mark.parametrize(
     ("query", "esperado"),
     [
-        ("notebook gamer ate R$ 8.000", "notebook gamer"),
+        ("notebook gamer ate R$ 8.000", "notebook"),
         ("fone com anc até 300", "fone com anc"),
-        ("notebook gamer", "notebook gamer"),  # sem preço, texto intacto
+        # "gamer" também sai, mas por outro motivo: virou o filtro use_case=jogos
+        # (ADR-010 D2). A regra é a mesma do preço — o que virou filtro duro não
+        # pode continuar obrigatório no AND.
+        ("notebook gamer", "notebook"),
     ],
 )
 def test_texto_para_fts_sai_sem_o_preco(
@@ -115,7 +118,7 @@ def test_texto_para_fts_sai_sem_o_preco(
     ("query", "esperado"),
     [
         ("melhor notebook", "notebook"),
-        ("melhores notebooks para trabalho", "notebooks para trabalho"),
+        ("melhores notebooks para trabalho", "notebooks para"),  # "trabalho" virou use_case
         ("notebook bom e barato", "notebook e"),
         ("quero um fone ótimo", "um fone"),
         ("melhor notebook até R$5000", "notebook"),  # preço + filler juntos
@@ -258,3 +261,61 @@ def test_texto_para_fts_sai_sem_a_faixa(
     texto = parser.parse(query).text
     for termo in fora_do_texto:
         assert termo not in texto, f"{termo!r} deveria ter saído de {texto!r}"
+
+
+# ---- use_case: necessidade vira filtro duro (ADR-010 D2, metade de runtime) ----
+
+
+@pytest.mark.parametrize(
+    ("query", "categoria", "esperado"),
+    [
+        ("notebook para jogos", "notebooks", ["jogos"]),
+        ("notebook para faculdade", "notebooks", ["estudo"]),
+        ("notebook leve para viagem", "notebooks", ["portabilidade"]),
+        ("fone para academia", "headphones", ["esporte"]),
+        ("fone para correr", "headphones", ["esporte"]),
+        ("fone para viagem de aviao", "headphones", ["viagem"]),
+        # Mesma palavra, catálogos diferentes: "viagem" em notebook é peso; em
+        # fone é ruído de cabine. É o motivo de o vocabulário ser por categoria.
+        ("fone para reuniao online", "headphones", ["chamadas"]),
+    ],
+)
+def test_necessidade_vira_use_case(
+    parser: RuleBasedIntentParser, query: str, categoria: str, esperado: list[str]
+) -> None:
+    intent = parser.parse(query)
+    assert intent.category == categoria
+    assert intent.attributes["use_case"] == esperado
+
+
+def test_sem_categoria_nao_rotula(parser: RuleBasedIntentParser) -> None:
+    """"para viagem" sozinho é ambíguo entre `portabilidade` e `viagem`.
+
+    Chutar traria filtro duro errado — pior que filtro nenhum, porque o
+    containment JSONB não perdoa: o produto certo simplesmente não volta.
+    """
+    intent = parser.parse("algo para viagem")
+    assert "use_case" not in intent.attributes
+
+
+def test_termo_de_uso_sai_do_texto_do_fts(parser: RuleBasedIntentParser) -> None:
+    """O rótulo cobre a necessidade; a palavra não pode continuar no AND.
+
+    "faculdade" não aparece em nenhum dos 235 anúncios do catálogo: mantê-la no
+    texto faria o filtro acertar e o `plainto_tsquery` zerar em seguida.
+    """
+    intent = parser.parse("notebook para faculdade")
+
+    assert intent.attributes["use_case"] == ["estudo"]
+    assert "faculdade" not in intent.text
+
+
+def test_uso_convive_com_preco_e_faixa(parser: RuleBasedIntentParser) -> None:
+    """Os três filtros saem do texto pelo mesmo mecanismo de trechos consumidos."""
+    intent = parser.parse("fone para academia ate R$300 com pelo menos 20 horas de bateria")
+
+    assert intent.attributes["use_case"] == ["esporte"]
+    assert intent.price_max == 300.0
+    assert intent.attribute_ranges == {"battery_h": {"min": 20.0}}
+    assert "academia" not in intent.text
+    assert "300" not in intent.text
