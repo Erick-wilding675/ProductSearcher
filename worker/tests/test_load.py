@@ -11,6 +11,7 @@ from decimal import Decimal
 
 import pytest
 import sqlalchemy as sa
+from sqlalchemy.dialects.postgresql import JSONB
 
 from ingestion import schema
 from ingestion.load import load
@@ -133,6 +134,65 @@ def test_load_idempotente_e_price_history():
                 sa.select(sa.func.count()).select_from(schema.price_history)
             ).scalar_one()
             assert n_hist_depois == hist_antes + 1
+    finally:
+        with engine.begin() as conn:
+            _cleanup(conn)
+        engine.dispose()
+
+
+def test_carga_preserva_rotulo_gravado_fora_do_seed():
+    """A carga não pode apagar o que o rotulador de `use_case` gravou (ADR-010 D2).
+
+    `attributes` tem dois donos: o seed traz a ficha técnica, e um passo offline
+    posterior grava o rótulo semântico que YAML nenhum tem. Enquanto o upsert
+    substituía a coluna inteira, toda carga zerava a rotulagem em silêncio — e o
+    filtro de caso de uso voltava a não casar com nada.
+    """
+    engine = _engine_or_skip()
+    try:
+        with engine.begin() as conn:
+            _cleanup(conn)
+            load(conn, [_product("3999.00")], [_category()])
+
+        # O que o rotulador faria, depois da carga.
+        with engine.begin() as conn:
+            conn.execute(
+                sa.update(schema.product_specs)
+                .where(
+                    schema.product_specs.c.product_id
+                    == sa.select(schema.products.c.id)
+                    .where(schema.products.c.slug == f"{PREFIX}prod")
+                    .scalar_subquery()
+                )
+                .values(
+                    # `sa.literal(dict, JSONB)` e não `cast(str, JSONB)`: o segundo
+                    # vira o escalar `'"{...}"'`, e `objeto || escalar` devolve
+                    # array. Foi assim que o defeito apareceu.
+                    attributes=schema.product_specs.c.attributes.concat(
+                        sa.literal({"use_case": ["jogos"], "_labeling": {"modelo": "x"}}, JSONB)
+                    )
+                )
+            )
+
+        # Carga nova, com a ficha do seed mudada: o rótulo sobrevive, a spec atualiza.
+        produto = _product("3999.00")
+        produto.specs = {"ram_gb": 32}
+        with engine.begin() as conn:
+            load(conn, [produto], [_category()])
+
+        with engine.connect() as conn:
+            attributes = conn.execute(
+                sa.select(schema.product_specs.c.attributes).where(
+                    schema.product_specs.c.product_id
+                    == sa.select(schema.products.c.id)
+                    .where(schema.products.c.slug == f"{PREFIX}prod")
+                    .scalar_subquery()
+                )
+            ).scalar_one()
+
+        assert attributes["use_case"] == ["jogos"]
+        assert attributes["_labeling"] == {"modelo": "x"}
+        assert attributes["ram_gb"] == 32  # o seed continua vencendo na chave dele
     finally:
         with engine.begin() as conn:
             _cleanup(conn)

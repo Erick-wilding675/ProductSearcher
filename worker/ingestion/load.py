@@ -99,29 +99,87 @@ def _upsert_lote(
     update_cols: Sequence[str],
     returning_cols: Sequence[str],
     keep_if_null: Sequence[str] = (),
+    merge_jsonb: Sequence[str] = (),
 ) -> list:
     """Upsert de várias linhas numa instrução só; devolve as colunas pedidas.
 
     As linhas precisam vir **sem repetir a chave de conflito**: o Postgres recusa
     um `ON CONFLICT DO UPDATE` que afetaria a mesma linha duas vezes no mesmo
     comando. Quem chama deduplica antes.
+
+    `merge_jsonb` troca a substituição por `antigo || novo`: o que a carga traz
+    vence chave a chave, e o que ela não conhece sobrevive. É o que impede a
+    ingestão de apagar o enriquecimento de outro passo — mesmo papel do
+    `keep_if_null` para `model`/`description`, um nível abaixo (chave, não coluna).
     """
     if not linhas:
         return []
 
     stmt = pg_insert(table).values([{"id": uuid4(), **linha} for linha in linhas])
-    atualizacoes = {
-        col: (
-            sa.func.coalesce(stmt.excluded[col], table.c[col])
-            if col in keep_if_null
-            else stmt.excluded[col]
-        )
-        for col in update_cols
-    }
+    atualizacoes = {}
+    for col in update_cols:
+        if col in merge_jsonb:
+            # `||` de jsonb é raso: chave repetida fica com o valor da direita, e
+            # objeto aninhado é trocado inteiro. `attributes` é plano, então raso
+            # é exatamente o que se quer.
+            #
+            # Os dois lados são expressões jsonb, sem literal no meio, e isso é de
+            # propósito: `cast("{}", JSONB)` liga um **str** com tipo JSONB, que o
+            # driver serializa para o escalar `'"{}"'` — e `objeto || escalar` no
+            # Postgres devolve **array**, não objeto. Erro silencioso, achado em
+            # teste. A coluna é `NOT NULL`, então não falta coalesce nenhum aqui.
+            atualizacoes[col] = table.c[col].concat(stmt.excluded[col])
+        elif col in keep_if_null:
+            atualizacoes[col] = sa.func.coalesce(stmt.excluded[col], table.c[col])
+        else:
+            atualizacoes[col] = stmt.excluded[col]
     stmt = stmt.on_conflict_do_update(
         index_elements=list(conflict_cols), set_=atualizacoes
     ).returning(*[table.c[col] for col in returning_cols])
     return conn.execute(stmt).all()
+
+
+# Chaves de `attributes` que a carga do seed **não** produz e não deve cobrar:
+# são de passos offline posteriores (ADR-010 D2). Tudo que começa com `_` é
+# carimbo de pipeline pela mesma convenção que a API usa para escondê-los.
+_CHAVES_DE_ENRIQUECIMENTO = frozenset({"use_case"})
+
+
+def _avisa_specs_orfas(conn: Connection, linhas: list[dict]) -> int:
+    """Loga a spec que ficou no banco e o seed não traz mais. Devolve quantas.
+
+    É o preço do `merge_jsonb`: mesclar preserva o que a carga não conhece, e por
+    isso também preserva o que a carga **deixou** de conhecer — um `gpu` corrigido
+    para ausente sobrevive. Trocar apagamento silencioso por permanência silenciosa
+    seria trocar um defeito por outro, então a permanência é anunciada. Corrigir de
+    verdade é decisão de quem lê: a remoção continua sendo um `update` à mão.
+    """
+    if not linhas:
+        return 0
+
+    novas = {linha["product_id"]: set(linha["attributes"] or {}) for linha in linhas}
+    existentes = conn.execute(
+        sa.select(schema.product_specs.c.product_id, schema.product_specs.c.attributes).where(
+            schema.product_specs.c.product_id.in_(list(novas))
+        )
+    ).all()
+
+    orfas = 0
+    for linha in existentes:
+        chaves = set(linha.attributes or {}) - novas[linha.product_id]
+        sobrando = {
+            chave
+            for chave in chaves
+            if not chave.startswith("_") and chave not in _CHAVES_DE_ENRIQUECIMENTO
+        }
+        if sobrando:
+            orfas += 1
+            logger.warning(
+                "Spec preservada por merge, mas ausente no seed (produto %s): %s",
+                linha.product_id,
+                ", ".join(sorted(sobrando)),
+            )
+    return orfas
 
 
 def _load_offers(
@@ -260,17 +318,24 @@ def load(
         )
     }
 
+    specs_do_lote = [
+        {"product_id": product_ids[p.slug], "attributes": p.specs}
+        for p in conhecidos
+        if p.slug in product_ids
+    ]
+    _avisa_specs_orfas(conn, specs_do_lote)
     _upsert_lote(
         conn,
         schema.product_specs,
-        [
-            {"product_id": product_ids[p.slug], "attributes": p.specs}
-            for p in conhecidos
-            if p.slug in product_ids
-        ],
+        specs_do_lote,
         ["product_id"],
         ["attributes"],
         ["id"],
+        # O seed não é dono exclusivo de `attributes`: o rotulador de `use_case`
+        # (ADR-010 D2) grava ali, offline, o que nenhum YAML tem. Substituir a
+        # coluna inteira apagava a rotulagem a cada carga — em silêncio, e o
+        # filtro de caso de uso voltava a não casar com nada.
+        merge_jsonb=["attributes"],
     )
 
     offers_count, price_points = _load_offers(conn, product_ids, conhecidos)
