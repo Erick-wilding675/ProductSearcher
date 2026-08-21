@@ -534,7 +534,7 @@ Por isso a entrega está partida em duas:
 | metade | onde | estado |
 | --- | --- | --- |
 | offline: schema `use_case`, `enum_multi`, guarda no `validate_specs` | `fase6` | commitada, **inerte** |
-| offline: rotulador pela Batch API | `fase6` | commitada, **não executada** (falta a chave) |
+| offline: rotulador pela Batch API | `fase6` | reescrito para a Groq e **executado em 21/08** (ver abaixo) |
 | runtime: parser converte necessidade em filtro | `fase6-d2-runtime` | commitada, **não mesclável** até os rótulos existirem |
 
 **`use_case` é `enum_multi`, um tipo novo.** Lista e não escalar porque um
@@ -569,8 +569,12 @@ contra o banco real: 235 fichas montadas, enum correto por categoria.
 A chave chegou em 19/08/2026 e **não autentica**: 401 `authentication_error`. O
 formato explica — 43 caracteres começando em `sk-ant-`, enquanto uma chave de API
 é `sk-ant-api03-…` com ~108. O que está no `.env` é outra coisa (o identificador
-da chave no Console, provavelmente), não o segredo. O lote continua pendente pelo
-mesmo motivo de antes.
+da chave no Console, provavelmente), não o segredo.
+
+**Resolvida em 21/08/2026 por outro caminho:** a chave que veio é da **Groq**. O
+rotulador foi migrado, executado e medido — e a Batch API caiu junto com o
+fornecedor. O registro está em *"D2, primeira parte — executada"*, no fim deste
+arquivo; o custo de US$ 0,45 acima virou US$ 0.
 
 #### O trabalho separado: faixa numérica no parser (19/08/2026)
 
@@ -712,3 +716,159 @@ Quatro regras de fidelidade, cada uma com teste em `api/tests/test_ai_service.py
 
 `LLMAIService.explain` segue `NotImplementedError` — RF-61 continua condicional
 a D2/D4 —, agora com mensagem que aponta o substituto e o contrato a herdar.
+### D2, primeira parte — **executada** (21/08/2026)
+
+A chave chegou, e não é da Anthropic: é da **Groq**. O rotulador foi escrito para
+a Batch API da Anthropic, então a execução começou por uma migração de transporte
+— e o que ela revelou está registrado abaixo, porque nada disso estava no plano.
+
+**A Batch API saiu, e o motivo dela também.** O plano gratuito da Groq não expõe
+o endpoint de lotes (`not_available_for_plan`, verificado). A decisão original
+tinha uma razão de custo — metade do preço, latência irrelevante num passo
+offline; sem custo por token essa razão evapora, e no lugar dela entra o limite
+de **8.000 tokens por minuto**. Com isso `--submit`/`--collect` (desenhados para
+um lote de até 24h) deixaram de fazer sentido: virou uma passada síncrona que lê
+`x-ratelimit-remaining-tokens` e `x-ratelimit-reset-tokens` da própria resposta e
+dorme quando falta folga — quem dita o ritmo é o servidor, não um `sleep` chutado.
+Modelo: `openai/gpt-oss-120b`, `temperature=0`, `reasoning_effort=low`.
+
+O que **não** mudou é a decisão D2: o LLM continua offline, na ingestão, atrás do
+conjunto fechado do `categories.json`, e o runtime segue sem IA. Trocar Anthropic
+por Groq é trocar transporte — a guarda é o schema da resposta mais o
+`validate_specs`, não a marca do modelo. Foi por isso que a substituição custou
+uma tarde e não uma reescrita.
+
+**A gravação passou a ser por produto**, e não um `--collect` transacional no fim:
+a passada leva ~25 minutos contra o limite por minuto, e perder tudo por uma queda
+de rede aos 20 seria o contrário da idempotência que o passo promete. Interromper
+e reexecutar continua de onde parou pelo mesmo mecanismo que já existia (pula quem
+tem `use_case`).
+
+#### Três defeitos que só a execução mostrava
+
+**1. A guarda rejeitava todo fone.** `validate_specs` cobra também os atributos
+`required` da categoria, e a ficha aqui é **parcial** — um atributo só. Fone tem
+`type` e `anc` obrigatórios: os 117 seriam rejeitados por "atributo obrigatório
+ausente", com log, sem gravar nada. O piloto de 8 produtos pegou (7 gravados, 1
+rejeitado — o único fone da amostra). A chamada passou a validar só o spec de
+`use_case`; o conjunto fechado, que é a guarda que importa, continua valendo.
+
+Vale a mesma lição do `cleanup_orphans`: **caminho que nenhuma execução percorre
+não está testado**. O `--dry-run` monta a requisição e mostra a ficha — não chega
+perto do `validate_specs`.
+
+**2. `DuplicatePreparedStatement` no pooler.** A primeira execução morreu no
+sétimo produto. O motivo já estava documentado em `api/app/core/db.py`: o Supabase
+é acessado pelo pooler em modo transação (6543), que multiplexa sessões, e
+prepared statement é por sessão. As outras ferramentas do worker escapam por
+abrirem **uma** transação; esta abre uma por produto e reencontra o `_pg3_0` de
+outra sessão na segunda escrita. `connect_args={"prepare_threshold": None}`,
+como na API.
+
+**3. O carimbo vazava para a UI.** `_labeling` (data e modelo) é metadado de
+pipeline, mas mora no mesmo JSONB das specs — e o contrato público devolve
+`attributes` inteiro. A página de produto renderiza `Object.entries(specs)` e a
+comparação monta uma linha por chave presente em qualquer produto: o carimbo
+viraria linha de tabela na cara do usuário. `app/catalog/specs.py` passou a
+recortar o que começa com `_`, nos três pontos em que specs saem da API (busca,
+detalhe, comparação), com teste. O rótulo `use_case`, que **é** spec, continua
+exposto.
+
+#### O prompt precisou de calibração — e ela tem um limite de propósito
+
+A primeira passada rotulou um Alienware de 2,49 kg com os **seis** rótulos de
+notebook, portabilidade inclusive. Rótulo que vale para todo mundo não filtra
+nada: seria um `@>` que devolve o catálogo inteiro, e a precisão de D1 não subiria
+um ponto. Duas mudanças:
+
+- **Teto de 3 rótulos** e a regra escrita de que rótulo é *recomendação*, não
+  inventário do que o aparelho aguenta — vale para quem se destaca naquilo entre
+  os concorrentes da mesma categoria.
+- **Glossário por categoria** (mesma razão do enum ser por categoria: `jogos` em
+  notebook é GPU, em fone é latência e microfone).
+
+O glossário define a **necessidade**, nunca o limiar. É deliberado: o gabarito de
+D1 diz `weight_kg <= 1.6`, e escrever isso no prompt faria o rotulador repetir o
+teste que deveria medi-lo — a precisão daria 100% por construção. É a mesma
+circularidade que tirou o caso da bateria do agregado. O rotulador julga; a suíte
+julga o rotulador; os dois não podem ler a mesma régua.
+
+
+#### O que ficou no catálogo
+
+    235 produtos · 213 com rótulo · 22 sem
+    rótulos por produto: média 1,88   (0 → 22 produtos, 1 → 47, 2 → 103, 3 → 63)
+
+Os 22 sem rótulo não são falha: lista vazia é resposta válida do prompt, e são
+fichas magras demais para sustentar qualquer recomendação (fone com `type` e
+nada mais). Eles são o **piso de recall** do filtro de D2 — nenhuma consulta de
+uso vai alcançá-los.
+
+Custo: **US$ 0** (plano gratuito), contra os US$ 0,45 estimados para a Batch API
+da Anthropic. Tempo de relógio: ~30 minutos, todos ditados pelo limite por
+minuto — o modelo responde em ~1s.
+
+#### O rótulo medido contra o gabarito de D1
+
+O rotulador não pode ser julgado por amostra lida a olho. A régua independente já
+existe: os predicados sobre specs da suíte de D1. Para cada rótulo, sobre o
+catálogo inteiro — **concordância** é quanto do que ele marcou satisfaz o
+predicado; **cobertura**, quanto de quem satisfaz o predicado ele marcou:
+
+| rótulo | caso de D1 | marcados | acaso | concordância | cobertura |
+| --- | --- | ---: | ---: | ---: | ---: |
+| `jogos` | notebook para jogos | 37/118 | 24% | **76%** | 100% |
+| `edicao-video` | edição de vídeo | 26/118 | 18% | **62%** | 76% |
+| `trabalho` | trabalho no escritório | 53/118 | 50% | **77%** | 69% |
+| `estudo` | faculdade | 47/118 | 24% | 40% | 68% |
+| `portabilidade` | notebook leve para viagem | 39/118 | 15% | 46% | 100% |
+| `programacao` | programação | 46/118 | 43% | **74%** | 67% |
+| `esporte` | academia / corrida | 31/117 | 25% | **77%** | 83% |
+| `chamadas` | reunião online | 73/117 | 37% | 42% | 72% |
+| `viagem` | viagem de avião | 25/117 | 14% | 32% | 50% |
+
+Lidas contra o acaso, oito das nove batem a régua com folga. As duas fracas têm
+explicação, e nenhuma delas é "o modelo errou":
+
+- **`estudo` (40% contra 24%)**: o gabarito de "faculdade" inclui **preço ≤ R$
+  4.500**, e a ficha enviada ao rotulador não tem preço — de propósito, porque
+  preço muda e rótulo carimbado não. O teto é filtro do parser, não do rótulo;
+  na consulta real os dois se somam.
+- **`chamadas` (42% contra 37%)**: é o rótulo mais largo do catálogo (62% dos
+  fones). Quase todo fone tem microfone, e o gabarito de "reunião" exige
+  microfone **e** ANC. É o rótulo com menos valor de filtro dos nove — se a
+  consulta de reunião continuar fraca depois de D2, é aqui que se mexe.
+- **`portabilidade` (46% contra 15%)**: o modelo chama de portátil o notebook de
+  1,8 kg; o gabarito corta em 1,6. Aqui a divergência é de régua, não de fato — e
+  é exatamente a divergência que o glossário se recusou a eliminar por decreto.
+
+#### O placar não mudou — e não devia
+
+`227 passed, 2 xfailed`; cobertura@5 **60%**, precisão média@5 **37%**, iguais ao
+que a faixa numérica deixou. `search_vector` é `name || model || description`:
+rótulo em `attributes` não entra no documento FTS e nada em runtime lê `use_case`
+ainda. Etapa 1 produziu o **dado**; quem o transforma em resultado é a metade de
+runtime, que está pronta na `fase6-d2-runtime`.
+
+Projetando a tabela acima sobre os 10 casos do agregado (a concordância do rótulo
+é o teto da precisão@5 quando o filtro domina o top-5), a média dá **~60%** —
+exatamente o alvo, com a cobertura indo a 100% porque todo caso passou a ter pelo
+menos 25 produtos marcados. É projeção, não medida: o filtro ainda concorre com o
+texto do FTS e com o ranking, e é a suíte de D1 que dá a palavra final depois do
+merge.
+
+#### Duas armadilhas para quem executar isto de novo
+
+**A ordem é carga do seed → rotulagem, sempre.** Os rótulos vivem só no banco (o
+YAML do seed não tem `use_case`), e o upsert de `product_specs` substitui
+`attributes` inteiro — sem o cuidado que o `keep_if_null` tem com
+`model`/`description`. Qualquer ingestão apaga a rotulagem em silêncio, e o filtro
+de D2 volta a não casar com nada. Reexecutar é grátis e leva ~30 min, mas é
+preciso lembrar. (Fazer o upsert **mesclar** o JSONB resolveria de vez; é decisão
+de ingestão, não de D2, e fica registrada aqui como candidata.)
+
+**`use_case` ainda não está em `category_attribute_schema` no banco.** O
+`categories.json` tem, mas quem leva schema para o Postgres é a carga do seed —
+que, pela armadilha acima, apagaria os rótulos recém-gravados. Hoje isso não
+quebra nada: o atributo é lista, e o seletor de specs só oferece valores simples,
+então ele já seria ignorado como faceta. Entra na próxima carga.
