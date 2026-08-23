@@ -20,7 +20,7 @@ from app.catalog.repository import CatalogRepository, get_catalog_repository
 from app.catalog.specs import publicas
 from app.search.intent import Intent, IntentParser, RuleBasedIntentParser
 from app.search.log import NullSearchLog, SearchLog, get_search_log
-from app.search.providers import SearchProvider, get_fts_search_provider
+from app.search.providers import SearchProvider, get_search_provider
 from app.search.ranking import DeterministicRanking, RankingService
 from app.search.schemas import (
     RankingCriterion,
@@ -291,7 +291,10 @@ def _para_item(hit: dict) -> SearchResultItem:
 def get_search_service(
     provider: Annotated[
         SearchProvider,
-        Depends(get_fts_search_provider),
+        # `get_search_provider` e não `get_fts_search_provider`: a escolha entre
+        # textual e híbrido é da flag (ADR-010 D4), e fica lá para que este
+        # ponto não precise saber qual braço está no ar.
+        Depends(get_search_provider),
     ],
     catalog: Annotated[
         CatalogRepository,

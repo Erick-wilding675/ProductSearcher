@@ -193,6 +193,77 @@ Efeito colateral a revisar: união aumenta o pool, e `total` hoje significa
 "tamanho do pool" (ADR-0007 D5.1) — `search_candidate_pool = 200` precisa ser
 reavaliado.
 
+### D4.1 — A união é construída, e entregue **desligada**
+
+*(medido e decidido em 22/08/2026, sobre o catálogo de 235 produtos)*
+
+O gatilho de D4 pedia a revisão do pool/`total` e as rotas de fusão antes de
+implementar. A medição respondeu as duas coisas — e contradisse a premissa de
+D4.
+
+**O braço vetorial não ganha do textual em nenhum caso da suíte de D1:**
+
+| | precisão@5 | cobertura@5 |
+| --- | --- | --- |
+| FTS + D2 (hoje) | **68%** | 100% |
+| Braço vetorial sozinho | 34% | 90% |
+
+Ele empata em "trabalho" (80%) e perde em todos os outros. E acerta a
+**categoria** em 5/5 sempre: sabe o assunto e erra a spec. A razão é estrutural —
+os predicados da suíte são sobre GPU, RAM, peso e preço, e nada disso está no
+texto vetorizado. Testada a correção óbvia, incluir as specs no texto: **piora**
+(42% → 36%). Não é texto mal escolhido; vetor não substitui filtro sobre spec.
+
+**As quatro rotas de fusão, simuladas e medidas:**
+
+| rota | precisão@5 | cobertura@5 |
+| --- | --- | --- |
+| só FTS (hoje) | **68%** | 100% |
+| RRF puro (o que D4 especifica) | 64% | 100% |
+| fallback quando o pool é pequeno | 68% | 100% |
+| rerank do pool pelo vetor | 64% | 100% |
+| RRF + corte por distância | 58% | 90% |
+
+Uma varredura do limiar de disparo achou 70% em "pool < 20" — e **não vale**: os
+pools se concentram exatamente em 20, então o limiar está encaixado na
+distribuição desta suíte. Overfit de 10 casos, num movimento de 2 pontos que
+equivale a um único item mudando de lugar.
+
+**Por que a premissa caiu:** D4 foi escrito para consertar consulta faminta por
+excesso de AND no FTS. Depois de D2, nenhuma consulta da suíte volta vazia e o
+menor pool é 6. O problema que D4 atacaria já tinha sido resolvido por outro
+caminho.
+
+**A decisão do Erick, com isso na mesa:** construir a união completa como D4
+especifica e entregá-la **desligada** (`hybrid_enabled=false`). Não é meio-termo
+por indecisão — é a leitura de que a evidência contra é estreita demais para
+enterrar o caminho: a suíte tem 10 casos curados, todos de "necessidade", em duas
+categorias, e `searches` está **vazia** porque não há deploy. As consultas em que
+o vetorial plausivelmente ajudaria — erro de digitação, sinônimo, formulação que
+ninguém previu — são exatamente as que ainda não existem. Ligar hoje trocaria 4
+pontos de precisão medidos por um ganho hipotético; jogar fora custaria
+reconstruir quando o dado real aparecer.
+
+**Verificado com o código de verdade, não só na simulação:** com a flag ligada
+contra o banco real, o pipeline dá precisão@5 de 64% e cobertura de 90%, contra
+68% e 100% com ela desligada. A implementação reproduz o que foi medido.
+
+#### A revisão do pool/`total`, que era a outra metade do gatilho
+
+O efeito colateral existe, mas menor do que o ADR temia: `total` médio vai de
+**30,4 para 38,5** com a união ligada — 27% a mais, não uma triplicação. A razão
+é que o braço vetorial aplica **os mesmos filtros duros** do textual.
+
+Isso é ponto de correção, não de desempenho: se o braço vetorial ignorasse
+`price_max`, a união devolveria produto acima do teto que o usuário pediu, sem
+erro nenhum. Por isso as condições duras foram extraídas para
+`_condicoes_duras()` e os dois braços as compartilham — a divergência deixa de
+ser possível em vez de ser proibida por convenção.
+
+Com isso, **`search_candidate_pool = 200` não precisa mudar**: nunca chega perto
+de ser atingido (o pool real é da ordem de 30), e a semântica de `total` do
+ADR-0007 D5.1 continua valendo — é o tamanho do pool, agora do pool da união.
+
 ### D5 — LLM no `IntentParser` (RF-16): **condicional**
 
 `LLMIntentParser` atrás da Protocol que já existe, acionado **só** quando o
@@ -325,8 +396,11 @@ São exatamente os casos que sobram para D2.
   exige. A alavanca (1) do D3.2 já foi gasta em D3.3; se o envelope ainda não
   couber em host viável, o que resta é a alavanca (2) — reabrir dimensão ou
   provider externo.
-- **Gatilho de D4:** apresentar a revisão do pool/`total` e as rotas de fusão
-  para decisão antes de implementar.
+- **Gatilho de D4:** ~~apresentar a revisão do pool/`total` e as rotas de fusão
+  para decisão antes de implementar~~ **cumprido em 22/08/2026 (D4.1)**. A
+  medição derrubou a premissa: a união custa 4 pontos de precisão e não ganha em
+  nenhum caso da suíte. Construída e **desligada**. Reabrir quando `searches`
+  tiver consulta real — e só com medição nova por cima, não por convicção.
 - **Gatilho de D5:** só constrói se a suíte de D1 continuar vermelha depois de
   D2.
 - **Gatilho de D6:** reavaliar necessidade ao fim de D4.

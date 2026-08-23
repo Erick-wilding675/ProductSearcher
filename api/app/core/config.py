@@ -18,6 +18,19 @@ class Settings(BaseSettings):
     cors_origins: list[str] = ["http://localhost:3000"]
     cors_origin_regex: str = r"^(chrome-extension|moz-extension)://[a-z0-9]+$"
 
+    # Busca híbrida: união textual + vetorial fundida por RRF (ADR-010 D4).
+    #
+    # **Desligada por decisão, não por cautela genérica.** Medido em 22/08/2026
+    # sobre a suíte de D1: só FTS dá precisão@5 de 68%; com a união, 64%. O braço
+    # vetorial acerta a categoria e erra a spec, e D2 já resolveu a fome de
+    # resultado que D4 foi escrito para atacar — nenhuma consulta volta vazia.
+    #
+    # Fica construída e desligada para o dia em que `searches` tiver consulta
+    # real: a suíte tem 10 casos curados, e as consultas onde o vetorial
+    # ajudaria (erro de digitação, sinônimo, formulação imprevista) são as que
+    # ainda não existem. Ligar só com medição nova por cima.
+    hybrid_enabled: bool = False
+
     # --- Busca vetorial (ADR-010 D3) -------------------------------------
     # Desligada por padrão, como toda IA aqui: com `false` a API não importa o
     # runtime de inferência nem carrega o modelo, e o FTS serve sozinho.
