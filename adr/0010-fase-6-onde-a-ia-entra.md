@@ -141,6 +141,41 @@ de mandar requisito ao Pedro: medir o RSS do processo com o modelo carregado, o
 tempo de carga e a latência de uma inferência de consulta — e comunicar **número
 medido, não estimado**. Mesma disciplina do ADR-0009.
 
+### D3.3 — `multilingual-e5-base` sobre ONNX Runtime int8
+
+*(decidido em 22/08/2026, sobre a medição registrada no log de construção)*
+
+Decisão: o modelo é **`intfloat/multilingual-e5-base`**, servido por **ONNX
+Runtime com quantização int8 dinâmica**, em imagem multi-stage onde o torch fica
+só no estágio de export e **não entra na imagem final**. Dimensão **768**, como
+D3 já fixou — a alavanca (2) do D3.2 continua fechada.
+
+**A medição não escolheu o modelo, e isso é o resultado.** e5 e
+`paraphrase-multilingual-mpnet-base-v2` empatam no envelope porque são a mesma
+arquitetura (XLM-R base, 278M de parâmetros); a diferença entre eles é ruído da
+máquina de medição. O desempate veio do **objetivo de treino**, não dos números:
+o mpnet é `paraphrase-*`, treinado para similaridade **simétrica** entre frases
+de mesma natureza. Nosso caso é **assimétrico** — consulta curta ("notebook para
+faculdade") contra copy longo de produto — que é exatamente o que o e5 treina,
+com os prefixos `query:` e `passage:`.
+
+O que a medição decidiu foi o **runtime**: a alavanca (1) do D3.2 leva a imagem
+de 2546 para 739 MB e o RSS de pico de 1220 para 872 MB, sem mudar modelo nem
+dimensão. Adotada agora, e não guardada para o caso de não caber — porque com
+ela o requisito ao Pedro cabe em muito mais host, o que é o ponto do comunicado.
+
+**Preço da escolha, e como ele é pago:** o e5 degrada **em silêncio** se o
+prefixo faltar — um vetor de produto gerado sem `passage:` não dá erro, só piora
+o resultado. É a mesma classe de falha da invariante de modelo único do D3, e
+recebe o mesmo tratamento: os prefixos ficam **encapsulados dentro do provider**,
+sem caminho de chamada público que aceite texto cru. Quem chama pede "vetor de
+consulta" ou "vetor de produto"; o prefixo não é decisão de quem chama.
+
+Consequência para D3.2: os requisitos ao Pedro passam a ser os da coluna
+quantizada — **RAM de 1 GB com folga** (pico medido de 872 MB), imagem de **~750
+MB**, e `OMP_NUM_THREADS=1` como item obrigatório de configuração, não como
+ajuste fino.
+
 ### D4 — Busca híbrida por **união**, não por chave
 
 O enunciado original da task ("flag liga a vetorial; desligada, FTS opera
@@ -284,9 +319,12 @@ São exatamente os casos que sobram para D2.
 ## Caminho de evolução / gatilho de revisão
 
 - **Gatilho de D3:** ~~fechar o provider do embedding antes de escrever código~~
-  **fechado em D3.1**. Resta medir o envelope de recursos e emitir o comunicado
-  ao Pedro antes de ele escolher o host da Fase 7. Se a medição não couber em
-  host viável, reabrir por D3.2 na ordem ali definida.
+  **fechado em D3.1**; ~~medir o envelope de recursos~~ **medido em 22/08/2026**,
+  e o modelo/runtime **fechado em D3.3**. Resta emitir o comunicado ao Pedro
+  antes de ele escolher o host da Fase 7 — agora com número medido, como o D3.2
+  exige. A alavanca (1) do D3.2 já foi gasta em D3.3; se o envelope ainda não
+  couber em host viável, o que resta é a alavanca (2) — reabrir dimensão ou
+  provider externo.
 - **Gatilho de D4:** apresentar a revisão do pool/`total` e as rotas de fusão
   para decisão antes de implementar.
 - **Gatilho de D5:** só constrói se a suíte de D1 continuar vermelha depois de
@@ -982,3 +1020,62 @@ para o escalar `'"{...}"'` — e no Postgres `objeto || escalar` devolve **array
 não objeto. `{"ram_gb": 16}` virou `[{"ram_gb": 16}, "{...}"]` sem erro nenhum.
 Os dois lados agora são expressões jsonb; o teste que pegou isso é o mesmo que
 guarda a preservação do rótulo.
+
+### Medição do envelope de D3 (22/08/2026) — números, não estimativa
+
+O D3.2 exige **número medido** antes do comunicado ao Pedro. Medido dentro de
+container `python:3.11-slim` — a mesma base do deploy — porque RSS, tempo de
+carga e tamanho de imagem não transferem do Windows local (venv 3.14) para lá.
+Imagens de medição descartáveis: não tocam `api/pyproject.toml` nem a imagem de
+produção.
+
+**A medição foi feita com `--cpus=1`**, e não no host de 16 vCPU. Esse detalhe
+não é cosmético — ver o achado das threads abaixo.
+
+Candidatos comparados, ambos de 768 dimensões e multilíngues (modelo só-inglês
+está fora: o catálogo é copy de marketplace brasileiro):
+`intfloat/multilingual-e5-base` e
+`sentence-transformers/paraphrase-multilingual-mpnet-base-v2`.
+
+| Medida (1 vCPU, `OMP_NUM_THREADS=1`) | e5 (torch fp32) | mpnet (torch fp32) | e5 (ONNX int8) |
+| --- | --- | --- | --- |
+| Imagem em disco | 2546 MB | 2538 MB | **739 MB** |
+| RSS de pico | 1220 MB | 1205 MB | **872 MB** |
+| Carga (import + init) | ~10,5 s | ~14 s | **~2,5 s** |
+| Consulta p50 | 44–52 ms | 40–47 ms | **10,3 ms** |
+| Consulta p95 | 52–111 ms | 60–166 ms | **12,8 ms** |
+| Catálogo de 250 offline | 39 s | 36 s | **14,3 s** |
+
+**Os dois candidatos empatam no envelope, e o empate era previsível:** ambos são
+XLM-R base, 278M de parâmetros, 768 dimensões. A dispersão entre eles (p95 de 52
+a 166 ms) é ruído da máquina de medição, não diferença de modelo — rodadas
+repetidas trocam quem "ganha". **Então a medição não escolhe o modelo.** Ela
+decide outra coisa, que era a pergunta mais importante.
+
+**Achado que vale mais que a escolha do modelo:** em 1 vCPU com a configuração
+de threads *default*, o p50 vai a **602 ms** e o p95 a **804 ms** (mpnet: 651 e
+806). Sozinho, sem a query SQL, isso já estoura a RNF-01 (p95 < 500 ms). O torch
+dimensiona o pool de threads pelo número de CPUs que *enxerga* — 16, no host —
+enquanto o cgroup lhe dá 1, e o processo passa o tempo em troca de contexto.
+`OMP_NUM_THREADS=1` derruba o p95 de 804 para 63 ms: **13x, de uma variável de
+ambiente.** Vale como requisito de deploy tanto quanto a RAM.
+
+**A alavanca (1) do D3.2 foi medida, não assumida** — e paga muito bem: ONNX
+Runtime com quantização int8 dinâmica, em build multi-stage onde o torch fica só
+no estágio de export e **não entra na imagem final**. Imagem de 2546 para 739 MB
+(3,4x), RSS de pico de 1220 para 872 MB, p95 de 63 para 13 ms, carga de 10,5 para
+2,5 s. Mesmo modelo, mesma dimensão, mesmo espaço vetorial — exatamente o que a
+alavanca (1) prometia, sem tocar em (2).
+
+**Quantizar não quebrou o ranking** — verificado, porque recomendar int8 sem
+checar seria trocar um problema de infra por uma falha silenciosa do tipo que
+este ADR já alerta. Sobre um mini-corpus pt-BR de 8 produtos e 8 consultas, fp32
+e int8 dão **o mesmo top-1 nas 8**, e o cosseno entre os vetores fp32 e int8 do
+mesmo texto fica em 0,979 de média (mínimo 0,972). **Ressalva honesta:** 8 casos
+descartam quebra grosseira, não provam paridade de qualidade sobre os ~250
+produtos. A prova real é a suíte de casos de uso de D1.
+
+Efeito colateral registrado: a margem de separação entre 1º e 2º colocado é bem
+menor no e5 (0,04) que no mpnet (0,24). Não é defeito — o e5 comprime a faixa de
+cosseno. E **não afeta D4**, que funde por RRF, que é baseado em posição, não em
+score absoluto. Se a fusão fosse por limiar de score, afetaria.
