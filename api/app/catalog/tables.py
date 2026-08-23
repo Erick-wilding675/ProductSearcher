@@ -4,6 +4,7 @@ Só as colunas usadas na leitura — a migration inicial (`7d5fdc583693`) é a f
 verdade do schema. Novos endpoints estendem este módulo com as tabelas que precisarem.
 """
 
+from pgvector.sqlalchemy import Vector
 from sqlalchemy import (
     Boolean,
     Column,
@@ -81,6 +82,11 @@ products = Table(
     Column("model", Text),
     Column("description", Text),
     Column("search_vector", TSVECTOR, _SEARCH_VECTOR),
+    # Vetor semântico de 768 dimensões (ADR-0005 D2, mantido pelo ADR-010 D3).
+    # A coluna e o índice HNSW existem desde a migration inicial — D3 preenche
+    # o valor, e por isso **não** tem migration. Nula até a carga offline rodar
+    # (`python -m app.search.vector_load`); o retrieval vetorial ignora nulos.
+    Column("embedding", Vector(768)),
 )
 
 product_specs = Table(

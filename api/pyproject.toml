@@ -22,6 +22,16 @@ dependencies = [
 [project.optional-dependencies]
 dev = ["pytest>=8", "ruff>=0.5", "httpx>=0.27"]
 
+# Busca vetorial (ADR-010 D3). Extra, e não dependência obrigatória, pelo mesmo
+# motivo do extra `ai` do worker: a IA é complementar neste projeto, e a API tem
+# de continuar instalável e funcional sem nada de inferência — com
+# `vector_enabled=false` o FTS serve sozinho e estes pacotes nem são importados.
+#
+# `onnxruntime` e não `torch`: é a alavanca (1) do ADR-010 D3.2, medida em
+# D3.3 — mesma dimensão e mesmo modelo, com 739 MB de imagem em vez de 2546 MB.
+# O torch aparece só no estágio de export do Dockerfile e não vai para produção.
+vector = ["onnxruntime>=1.17", "transformers>=4.40", "numpy>=1.26"]
+
 # Pacote da aplicação (exclui tests/ da distribuição).
 [tool.setuptools]
 packages = ["app"]

@@ -1079,3 +1079,80 @@ Efeito colateral registrado: a margem de separação entre 1º e 2º colocado é
 menor no e5 (0,04) que no mpnet (0,24). Não é defeito — o e5 comprime a faixa de
 cosseno. E **não afeta D4**, que funde por RRF, que é baseado em posição, não em
 score absoluto. Se a fusão fosse por limiar de score, afetaria.
+
+### D3 construído (22/08/2026) — o provider, a carga e dois achados de execução
+
+Entregue: `app/search/embedding.py` (o modelo), `PgVectorProvider` em
+`providers.py` (o retrieval), `app/search/vector_load.py` (a carga offline) e
+`api/Dockerfile.vector` (a imagem de deploy). **Sem migration**, como D3 previa —
+a coluna e o índice HNSW já existiam.
+
+**A busca vetorial ainda não está ligada no `/search`.** Isso é D4, e o gatilho
+de D4 pede a revisão apresentada antes de implementar. O que existe hoje é o
+caminho vetorial inteiro, testado, esperando a decisão de fusão.
+
+**As invariantes viraram construção, não recomendação.** O `VectorProvider`
+deixou de ter `embed(text)` e passou a ter `embed_query(text)`: um `embed`
+genérico convidava a vetorizar produto pelo caminho da consulta, o que não dá
+erro — só piora o resultado. Os prefixos `query:`/`passage:` do e5 vivem dentro
+do módulo, sem caminho público que aceite texto cru. E o pool de threads é
+fixado **no código** (`intra_op_num_threads`), não só na variável de ambiente do
+deploy: o requisito que o Pedro recebeu continua valendo para numpy/tokenizers,
+mas o caso que fura a RNF-01 sozinho não depende mais de alguém lembrar.
+
+**Carimbo em vez de fé.** `products.embedding` não diz qual modelo gerou o
+vetor, e trocar de modelo deixaria vetores de espaços diferentes convivendo sem
+erro. A carga carimba `product_specs.attributes._embedding` com id do modelo,
+dimensão e data; quem está carimbado com outro modelo volta a contar como
+pendente. O id vem de um arquivo gravado **junto aos pesos** no export, e não de
+variável de ambiente — assim o carimbo não tem como divergir do que foi de fato
+carregado. Vai no JSONB porque D3 não tem migration e o `_` do prefixo já é
+respeitado pelo `||` da carga do seed (`ef3468f`) e ignorado pelo
+`_avisa_specs_orfas`. Verificado: `use_case` plantado sobrevive a um
+`--force`, e a segunda execução sem `--force` não refaz nada.
+
+#### Achado 1: a quantização int8 faz o vetor depender do lote
+
+`embed_products` usa **lote de 1 por default**, e não é desatenção com
+desempenho. A quantização int8 é *dinâmica*: a escala das ativações sai do
+tensor inteiro, isto é, do lote. Medido: o mesmo texto sozinho e num lote de
+dois dá cosseno **0,991** contra si mesmo — e com textos de mesmo comprimento,
+**sem padding nenhum**, ainda dá 0,993. Não é a máscara de pooling; é a escala.
+
+O efeito isolado é pequeno. O que ele significa não é: o vetor gravado
+dependeria da ordem do catálogo e do `batch_size`, então recarregar mudaria
+vetores sem nada ter mudado no produto. Com lote de 1 o resultado é idêntico
+entre execuções, e para ~250 produtos custa segundos. O teste
+`test_lote_maior_que_um_muda_o_vetor` **afirma o defeito**: se o runtime um dia
+ficar invariante ao lote, ele fica vermelho e avisa que o default pode mudar.
+
+#### Achado 2: busca vetorial não sabe dizer "não achei" — e isso é assunto de D4
+
+O k-NN devolve sempre os `k` mais próximos, mesmo quando nada serve. Com o
+catálogo atual (só `notebooks` e `headphones`), "algo para gelar bebidas"
+devolve headsets com naturalidade. O FTS, no mesmo caso, devolve zero.
+
+Isso é entrada direta para D4: uma união que simplesmente soma o top-k vetorial
+injeta lixo nas consultas em que o catálogo não tem resposta. A distância dá um
+sinal aproveitável — categorias presentes ficaram entre **0,139 e 0,156** de
+distância de cosseno, e ausentes entre **0,187 e 0,194**, o que sugere um corte
+por volta de 0,17. **Quatro consultas sobre 167 produtos e duas categorias não
+fecham um limiar**; é ponto de partida para D4 medir, não número para adotar.
+
+#### Onde o modelo mora, e por que a imagem padrão não o carrega
+
+A imagem padrão (`api/Dockerfile`) segue sem modelo: `vector_enabled` é falso
+por default, e embutir 750 MB de pesos mais ~10 min de export num build que a
+maioria das vezes não usa o caminho vetorial cobraria de todo o time por algo
+desligado. `api/Dockerfile.vector` parte da **própria imagem padrão** e só
+acrescenta runtime e pesos — uma fonte de verdade para o código da aplicação.
+As dependências entram como extra `vector` no `pyproject.toml`, pelo mesmo
+motivo do extra `ai` do worker: a API tem de continuar instalável e funcional
+sem nada de inferência.
+
+**Correção de número comunicado:** o comunicado ao Pedro citou imagem de ~750 MB,
+que era a medição do runtime + pesos isolados. A imagem de deploy real
+(`productsearcher-api:vector`) dá **906 MB**, porque carrega também a aplicação.
+Continua abaixo de 1 GB e não muda a escolha de host, mas o número corrigido é o
+que vale — a disciplina do D3.2 é número medido, e o medido agora é o da imagem
+inteira. O comunicado foi atualizado.

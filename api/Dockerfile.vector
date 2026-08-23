@@ -1,0 +1,76 @@
+# Imagem de deploy COM busca vetorial (ADR-010 D3 / D3.3).
+#
+# Por que é um arquivo separado do `Dockerfile`:
+# a busca vetorial é desligada por padrão (`vector_enabled=false`) e a imagem
+# padrão é a que o time e a CI constroem todo dia. Embutir 750 MB de pesos e
+# ~10 min de export num build que a maioria das vezes não usa o modelo seria
+# cobrar de todo mundo por um caminho que está desligado.
+#
+# Por que não duplica o build da aplicação:
+# o estágio final parte da **própria imagem padrão**, então o código, as
+# dependências e o CMD têm uma fonte de verdade só. Aqui só entram o runtime de
+# inferência e os pesos.
+#
+#   docker build -t productsearcher-api ./api
+#   docker build -f api/Dockerfile.vector -t productsearcher-api:vector ./api
+#
+# O deploy da Fase 7 usa a tag `:vector`. Requisitos de host medidos e
+# comunicados: RAM de 1 GB (pico de 872 MB), sem sleep/idle shutdown, imagem de
+# ~750 MB, 1 vCPU.
+
+ARG MODEL_ID=intfloat/multilingual-e5-base
+ARG BASE=productsearcher-api:latest
+
+# ---------------------------------------------------------------- exporter
+# O torch vive SÓ aqui. Ele é o motivo de a imagem cheia dar 2546 MB, e não
+# entra no estágio final — é isso que a alavanca (1) do D3.2 compra.
+FROM python:3.11-slim AS exporter
+ARG MODEL_ID
+ENV HF_HOME=/hf
+ENV MODEL_ID=${MODEL_ID}
+
+RUN pip install --no-cache-dir --upgrade pip \
+ && pip install --no-cache-dir --index-url https://download.pytorch.org/whl/cpu torch \
+ && pip install --no-cache-dir "optimum[onnxruntime]" transformers
+
+# Exporta para ONNX e quantiza em int8 dinâmica (avx512_vnni).
+# `per_channel=False`: medido em D3.3 como suficiente — o ranking do
+# mini-corpus não muda em relação ao fp32 (8/8, cosseno 0,979).
+RUN python -c "\
+from optimum.onnxruntime import ORTModelForFeatureExtraction, ORTQuantizer;\
+from optimum.onnxruntime.configuration import AutoQuantizationConfig;\
+from transformers import AutoTokenizer;\
+import os;\
+mid=os.environ['MODEL_ID'];\
+ORTModelForFeatureExtraction.from_pretrained(mid, export=True).save_pretrained('/export');\
+AutoTokenizer.from_pretrained(mid).save_pretrained('/export');\
+q=ORTQuantizer.from_pretrained('/export');\
+q.quantize(save_dir='/model', quantization_config=AutoQuantizationConfig.avx512_vnni(is_static=False, per_channel=False));\
+AutoTokenizer.from_pretrained(mid).save_pretrained('/model')"
+
+# Identidade do modelo gravada JUNTO aos pesos: é o que carimba os vetores dos
+# produtos. Vindo daqui, o carimbo não tem como divergir do que foi realmente
+# exportado — se viesse de variável de ambiente, daria para trocar os pesos sem
+# trocar o carimbo e quebrar a invariante de D3 sem deixar rastro.
+RUN echo -n "${MODEL_ID}" > /model/MODEL_ID
+
+# ------------------------------------------------------------------- final
+FROM ${BASE}
+
+WORKDIR /app
+
+# Só o runtime de inferência. Sem torch, sem sentence-transformers.
+RUN pip install --no-cache-dir ".[vector]"
+
+COPY --from=exporter /model /model
+
+ENV VECTOR_ENABLED=true
+ENV EMBEDDING_MODEL_DIR=/model
+
+# Cinto e suspensório para o achado do D3.3: `embedding_threads` já fixa o pool
+# do ONNX Runtime no código, e isto cobre o que passa por numpy/tokenizers.
+# Em 1 vCPU, sem isso, o p95 vai a 804 ms e fura a RNF-01 sozinho.
+ENV OMP_NUM_THREADS=1
+
+EXPOSE 8000
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]

@@ -45,7 +45,18 @@ class SearchProvider(Protocol):
 
 
 class VectorProvider(Protocol):
-    def embed(self, text: str) -> list[float]: ...
+    """Retrieval semântico por vizinhança de vetores (ADR-010 D3).
+
+    `embed_query` e não `embed`: o modelo escolhido em D3.3 é **assimétrico** —
+    consulta e produto entram no espaço por caminhos diferentes. Um `embed`
+    genérico convidaria a vetorizar produto pelo caminho da consulta, o que não
+    dá erro, só piora o resultado. Ver `app/search/embedding.py`.
+
+    `search` recebe **vetor**, não texto, para que dê para exercitar a busca com
+    um vetor fixo, sem carregar o modelo.
+    """
+
+    def embed_query(self, text: str) -> list[float]: ...
 
     def search(
         self,
@@ -241,3 +252,58 @@ def get_fts_search_provider(
     """Dependency do FastAPI: injeta o provider FTS (uma sessão por request)."""
 
     return FtsSearchProvider(session)
+
+
+class PgVectorProvider:
+    """Retrieval semântico via pgvector, servido pelo índice HNSW (ADR-010 D3).
+
+    Devolve **ids**, não hits completos: o vetorial responde "quais produtos se
+    parecem com esta necessidade", e quem monta a linha do resultado continua
+    sendo o caminho que já sabe fazer isso. Manter os dois papéis separados é o
+    que permite a união do D4 sem duplicar a montagem do hit.
+    """
+
+    def __init__(self, session: Session, embedder: object | None = None) -> None:
+        self._session = session
+        # Injetável para teste; em produção resolve para a instância única.
+        self._embedder = embedder
+
+    def embed_query(self, text: str) -> list[float]:
+        if self._embedder is None:
+            from app.search.embedding import get_embedder
+
+            self._embedder = get_embedder()
+        return self._embedder.embed_query(text)
+
+    def search(self, vector: list[float], k: int = 10) -> list[str]:
+        # `<=>` é distância de cosseno, e é o operador que o índice HNSW foi
+        # criado para servir (`vector_cosine_ops`, migration 71ab0046068d).
+        # Usar outro operador aqui não daria erro — só deixaria de usar o
+        # índice e passaria a varrer a tabela.
+        distancia = products.c.embedding.cosine_distance(vector)
+
+        # `IS NOT NULL` explícito: produto ainda não vetorizado não é "muito
+        # distante", é *desconhecido*. Sem este filtro o Postgres ordena nulos
+        # e eles entram no topo ou no fim conforme a versão — melhor excluir.
+        stmt = (
+            select(products.c.id)
+            .where(products.c.embedding.isnot(None))
+            .order_by(distancia)
+            .limit(k)
+        )
+        return [str(linha.id) for linha in self._session.execute(stmt).all()]
+
+
+def get_vector_provider(
+    session: Annotated[
+        Session,
+        Depends(get_session),
+    ],
+) -> VectorProvider:
+    """Dependency do FastAPI: injeta o provider vetorial (uma sessão por request).
+
+    Não checa `vector_enabled` — quem decide se o caminho vetorial entra na
+    busca é o serviço, não a construção do provider.
+    """
+
+    return PgVectorProvider(session)
