@@ -275,6 +275,29 @@ normalizada; a chave já está em `searches`.
 parte do RF-16 fica sem função. Por isso vem depois, e só com evidência da suíte
 de D1.
 
+### D5.1 — O gatilho de D5 **não passou**: não se constrói
+
+*(avaliado em 28/08/2026, ao fim de D4)*
+
+O gatilho estava escrito como condição verificável, não como intenção: *"só
+constrói se a suíte de D1 continuar vermelha depois de D2"*. Ela não continuou.
+
+Depois de D2, a suíte de casos de uso dá **precisão@5 de 68% e cobertura@5 de
+100%**, com **zero consultas vazias** — e os dois agregados saíram do `xfail`
+para virar guarda de regressão. O acionamento que D5 especifica é "parser de
+regra não extraiu nada **e** o FTS voltou vazio". Essa conjunção **não ocorre em
+nenhum caso da suíte**: não há consulta vazia para o fallback atender.
+
+Construir agora seria escrever um caminho que a evidência disponível nunca
+executa — e pagar por ele em dependência de rede, custo e um modo de falha novo
+no caminho de busca, em troca de nada mensurável. **RF-16 permanece atendido
+deterministicamente.**
+
+O que reabre isto não é opinião: `searches` está **vazia** porque não há deploy.
+Quando houver consulta real e ela mostrar retorno vazio com frequência
+material, o gatilho volta a valer com o mesmo critério — suíte vermelha,
+medida, não suposta.
+
 ### D6 — Explicação por LLM (RF-61): mantida, **rebaixada e condicional**
 
 Hoje o LLM aqui só converte número em prosa, e traz um risco novo: prosa que
@@ -287,6 +310,43 @@ Pré-requisito que ninguém tinha notado: **`DeterministicAIService.explain` ain
 instrução de narrar sem introduzir fato novo.
 
 Reavaliar se vale a pena depois de D2 e D4 — pode não valer.
+
+### D6.1 — Reavaliado ao fim de D4: **não vale**, e o `LLMAIService` fica fora
+
+*(avaliado em 28/08/2026)*
+
+D6 mandava reavaliar a necessidade ao fim de D4. Reavaliado: **não vale**.
+
+A primeira metade entregou o que faltava de verdade — `DeterministicAIService.
+explain` deixou de ser `NotImplementedError` e passou a narrar **exatamente** os
+`factors` que o ranking calculou, com quatro regras de fidelidade escritas como
+teste. O que sobra para o LLM é reescrever essa mesma frase com outras palavras.
+
+O saldo é negativo dos dois lados. Do lado do ganho: a prosa determinística já
+diz tudo o que o `context` contém, porque o `context` é deliberadamente pequeno
+(`score`, `factors`, `intent` — nada do produto). Do lado do custo: o risco que
+o próprio D6 nomeia — *"prosa que contradiz os `factors` é pior que prosa
+nenhuma"* — só existe se o LLM entrar, e nenhuma das quatro regras de fidelidade
+sobrevive como garantia quando quem escreve a frase é um modelo. Elas viram
+instrução de prompt, isto é, deixam de ser verificáveis.
+
+**RF-61 fica com a implementação determinística.** `LLMAIService.explain`
+permanece `NotImplementedError` — não por esquecimento, mas como decisão: a
+classe fica no lugar, com o contrato de `context` a herdar documentado na
+mensagem, para quem reabrir não precisar redescobrir a restrição que a torna
+segura.
+
+#### Achado do fechamento: `explain` não tem chamador
+
+Levantado ao fechar D6: **nada em `api/app/` chama `explain`**. Não há rota, e o
+`AIService` não é injetado em `search/router.py` nem em `catalog/router.py`. A
+implementação de D6 é exercida só pelos testes.
+
+Ou seja: RF-61 está **implementado e não entregue**. Isso não muda a decisão
+acima — trocar o motor da explicação por um LLM não resolveria a falta de rota,
+e um LLM alimentando endpoint que ninguém chama seria pior ainda. Mas registra
+que **expor a explicação é trabalho pendente, e não é trabalho de IA**: é
+endpoint mais consumo na UI, portanto assunto das Fases 4/7, não desta.
 
 ### D7 — RAG sobre reviews continua fora
 
@@ -401,9 +461,14 @@ São exatamente os casos que sobram para D2.
   medição derrubou a premissa: a união custa 4 pontos de precisão e não ganha em
   nenhum caso da suíte. Construída e **desligada**. Reabrir quando `searches`
   tiver consulta real — e só com medição nova por cima, não por convicção.
-- **Gatilho de D5:** só constrói se a suíte de D1 continuar vermelha depois de
-  D2.
-- **Gatilho de D6:** reavaliar necessidade ao fim de D4.
+- **Gatilho de D5:** ~~só constrói se a suíte de D1 continuar vermelha depois de
+  D2~~ **avaliado em 28/08/2026 (D5.1): não passou.** A suíte ficou verde (68% de
+  precisão@5, 100% de cobertura, zero consultas vazias), e o acionamento que D5
+  especifica exige justamente consulta vazia. Não se constrói. Reabre quando
+  `searches` tiver consulta real mostrando retorno vazio material.
+- **Gatilho de D6:** ~~reavaliar necessidade ao fim de D4~~ **reavaliado em
+  28/08/2026 (D6.1): não vale.** RF-61 fica determinístico; `LLMAIService`
+  permanece fora. Pendente que sobrou, e que não é de IA: `explain` não tem rota.
 - **Gatilho de D7:** quando RF-05 sair de `Could` ou a rota do Apify for
   executada.
 
@@ -1230,3 +1295,47 @@ que era a medição do runtime + pesos isolados. A imagem de deploy real
 Continua abaixo de 1 GB e não muda a escolha de host, mas o número corrigido é o
 que vale — a disciplina do D3.2 é número medido, e o medido agora é o da imagem
 inteira. O comunicado foi atualizado.
+
+### Fecho da Fase 6 (28/08/2026) — o que a fase entregou, e o que ela recusou
+
+D4 foi o último passo com código. D5 e D6 foram avaliados contra os próprios
+gatilhos (D5.1 e D6.1) e **nenhum dos dois passou**. Com isso a Fase 6 fecha.
+
+O placar da suíte de D1, do começo ao fim da fase, sobre o mesmo catálogo:
+
+| | cobertura@5 | precisão@5 | consultas vazias |
+| --- | --- | --- | --- |
+| baseline (19/08, catálogo limpo) | 27% | 16% | 7 de 11 |
+| depois de D8 (acento, sem IA) | 55% | 34% | 2 de 11 |
+| depois de D2 (rótulos + runtime) | **100%** | **68%** | **0 de 10** |
+
+O detalhe que dá o sentido da fase: **os dois saltos vieram de trabalho sem
+LLM em runtime.** D8 é configuração de FTS. D2 usa LLM, mas *offline, na
+ingestão* — em runtime o rótulo é um filtro comum sobre JSONB. As duas peças de
+IA em runtime que a fase construiu ou previu terminaram desligadas ou recusadas:
+D4 mede **pior** que o textual (64% contra 68%) e saiu com `hybrid_enabled=false`;
+D5 não tem caso que o acione; D6 não acrescenta nada ao que a versão
+determinística já diz.
+
+Isso confirma o princípio 1 do projeto na prática, e não por declaração: o
+sistema melhorou 4x em precisão **sem que o caminho de resposta passe por um
+modelo**. A IA que sobrou está onde ela é barata e verificável — na ingestão,
+uma vez, com o resultado gravado e medido contra gabarito.
+
+**O que fica construído e desligado, com o porquê de não ter sido jogado fora:**
+
+- `vector_enabled=false` — o caminho vetorial inteiro (embedder, provider,
+  carga, imagem de deploy) existe e é testado.
+- `hybrid_enabled=false` — a união com RRF existe e reproduz o que foi medido.
+
+Os dois esperam a mesma coisa: `searches` com consulta real, que só existe
+depois do deploy da Fase 7. As consultas em que o vetorial plausivelmente ajuda
+— erro de digitação, sinônimo, formulação imprevista — são exatamente as que
+uma suíte de 10 casos curados não contém.
+
+**Pendências que a fase deixa, e que não são de IA:**
+
+1. `explain` não tem rota (D6.1) — RF-61 está implementado e não entregue.
+   É endpoint mais consumo na UI: Fase 4/7.
+2. O comunicado de requisitos de host ao Pedro (D3.2/D3.3) está publicado e
+   ainda **não confirmado** por ele — a escolha do host da Fase 7 depende disso.

@@ -28,3 +28,6 @@ Thumbs.db
 
 # Arquivos pesados / exportações que não devem ser versionados
 *.zip
+
+# Config local do Obsidian (vault sobre o repo) - nao versionar
+.obsidian/
