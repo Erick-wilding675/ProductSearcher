@@ -289,7 +289,7 @@ def test_necessidade_vira_use_case(
 
 
 def test_sem_categoria_nao_rotula(parser: RuleBasedIntentParser) -> None:
-    """"para viagem" sozinho é ambíguo entre `portabilidade` e `viagem`.
+    """ "para viagem" sozinho é ambíguo entre `portabilidade` e `viagem`.
 
     Chutar traria filtro duro errado — pior que filtro nenhum, porque o
     containment JSONB não perdoa: o produto certo simplesmente não volta.

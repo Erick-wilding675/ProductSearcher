@@ -358,7 +358,6 @@ class RuleBasedIntentParser:
         return {chave: faixa for chave, faixa in faixas.items() if faixa}, consumidos
 
     def _parse_attributes(self, normalized: str, faixas: dict | None = None) -> dict:
-
         """Atributos estruturados citados na consulta (chaves do schema da categoria).
 
         Cobre os sinais que o usuário costuma digitar; o que não for reconhecido
