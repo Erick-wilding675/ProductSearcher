@@ -1333,9 +1333,27 @@ depois do deploy da Fase 7. As consultas em que o vetorial plausivelmente ajuda
 — erro de digitação, sinônimo, formulação imprevista — são exatamente as que
 uma suíte de 10 casos curados não contém.
 
+**Carga dos vetores em produção (28/08/2026):** o Supabase estava com **0**
+embeddings — o banco local tinha sido carregado, produção não. Carregados
+**235/235**, 768 dimensões, carimbados com o id do modelo; os 213 rótulos de
+`use_case` sobreviveram à carga, o que confirma na prática a mesclagem de JSONB
+de `ef3468f`. Levou 3 minutos, com lote de 1, rodando dentro da imagem
+`:vector` e falando com o Supabase pelo **pooler em modo sessão** — a conexão
+direta é IPv6-only e o Docker não a alcança.
+
 **Pendências que a fase deixa, e que não são de IA:**
 
 1. `explain` não tem rota (D6.1) — RF-61 está implementado e não entregue.
    É endpoint mais consumo na UI: Fase 4/7.
 2. O comunicado de requisitos de host ao Pedro (D3.2/D3.3) está publicado e
    ainda **não confirmado** por ele — a escolha do host da Fase 7 depende disso.
+3. O tamanho da imagem `:vector` precisa ser **remedido**. Este ADR registra
+   906 MB, e as três leituras do Docker sobre a **mesma** imagem (build de
+   22/08, não reconstruída) divergem entre si: `docker images` dá **1,37 GB**,
+   a soma das camadas do `docker history` dá **991 MB**, e
+   `docker image inspect --format {{.Size}}` dá **404 MB**. Nenhuma reproduz os
+   906 MB. Isso importa porque o número foi **comunicado ao Pedro** como
+   critério de escolha de host, com a afirmação de que fica abaixo de 1 GB — e
+   a leitura mais usual (`docker images`) contradiz essa afirmação. A
+   disciplina do D3.2 é número medido: escolher **um** método, medir, e
+   corrigir o comunicado.
