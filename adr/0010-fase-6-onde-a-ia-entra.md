@@ -1296,6 +1296,48 @@ Continua abaixo de 1 GB e não muda a escolha de host, mas o número corrigido �
 que vale — a disciplina do D3.2 é número medido, e o medido agora é o da imagem
 inteira. O comunicado foi atualizado.
 
+> **Superado pelo D3.4 (28/08/2026).** O 906 MB estava perto do certo para
+> disco, mas a frase "é o que o serviço vai puxar" estava errada.
+
+### D3.4 — O tamanho da imagem são **dois** números (28/08/2026)
+
+Ao fechar a fase, o 906 MB do D3.3 não reproduziu — e as ferramentas do Docker
+discordavam entre si sobre a **mesma** imagem, sem rebuild: `docker images` dava
+1,37 GB, a soma do `docker history` dava 991 MB, `docker image inspect` dava
+404 MB.
+
+**Nenhuma das três estava errada; elas respondem perguntas diferentes.** O Docker
+desta máquina usa o image store do **containerd**
+(`io.containerd.snapshotter.v1`), e com ele `inspect` e `save` reportam o
+conteúdo **comprimido**, enquanto `history` soma o diff **descompactado por
+camada** e `docker images` soma os **snapshots desempacotados** — as duas últimas
+supercontam, porque arquivo reescrito numa camada posterior conta nas duas.
+
+A leitura que não depende de contabilidade de camada é medir **por dentro do
+container**, com `du` sobre o rootfs. Medido assim:
+
+| | publicada (puxa) | rootfs (ocupa) |
+| --- | --- | --- |
+| `productsearcher-api` (base) | 102 MB | 294 MB |
+| `productsearcher-api:vector` | **404 MB** | **886 MB** |
+| custo do caminho vetorial | +302 MB | +592 MB |
+
+Composição do rootfs de `:vector`: pesos ONNX 295 MB, dependências Python
+399 MB, aplicação 75 MB.
+
+**O que isso corrige de fato.** A conclusão de fundo se manteve — cabe em 1 GB de
+disco, e o requisito apertado continua sendo RAM. Mas a frase do comunicado
+anterior, "906 MB é o que o serviço vai puxar", era falsa: o que se puxa é a
+imagem comprimida, 404 MB. A diferença não é acadêmica — um host com teto de
+500 MB sobre a imagem publicada **cabe**, e teria sido descartado pelo número
+antigo. O comunicado ao Pedro foi corrigido com os dois números e com a
+instrução de conferir **qual** deles o plano mede.
+
+**A lição generalizável, que é o motivo de isto virar seção e não nota de
+rodapé:** "tamanho da imagem" não é uma grandeza única, e a ferramenta mais óbvia
+(`docker images`) é justamente a que mais superconta. Citar tamanho de imagem sem
+dizer o método é citar número sem unidade.
+
 ### Fecho da Fase 6 (28/08/2026) — o que a fase entregou, e o que ela recusou
 
 D4 foi o último passo com código. D5 e D6 foram avaliados contra os próprios
@@ -1347,13 +1389,6 @@ direta é IPv6-only e o Docker não a alcança.
    É endpoint mais consumo na UI: Fase 4/7.
 2. O comunicado de requisitos de host ao Pedro (D3.2/D3.3) está publicado e
    ainda **não confirmado** por ele — a escolha do host da Fase 7 depende disso.
-3. O tamanho da imagem `:vector` precisa ser **remedido**. Este ADR registra
-   906 MB, e as três leituras do Docker sobre a **mesma** imagem (build de
-   22/08, não reconstruída) divergem entre si: `docker images` dá **1,37 GB**,
-   a soma das camadas do `docker history` dá **991 MB**, e
-   `docker image inspect --format {{.Size}}` dá **404 MB**. Nenhuma reproduz os
-   906 MB. Isso importa porque o número foi **comunicado ao Pedro** como
-   critério de escolha de host, com a afirmação de que fica abaixo de 1 GB — e
-   a leitura mais usual (`docker images`) contradiz essa afirmação. A
-   disciplina do D3.2 é número medido: escolher **um** método, medir, e
-   corrigir o comunicado.
+3. ~~O tamanho da imagem `:vector` precisa ser remedido~~ **remedido em
+   28/08/2026 — ver D3.4.** São dois números, não um: **404 MB** para puxar e
+   **886 MB** em disco. O comunicado ao Pedro foi corrigido.
