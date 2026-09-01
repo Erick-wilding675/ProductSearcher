@@ -115,4 +115,6 @@ offers = Table(
     Column("price", Numeric, nullable=False),
     Column("currency", Text, nullable=False),
     Column("url", Text, nullable=False),
+    Column("quality_status", Text, nullable=False),
+    Column("quality_reason", Text),
 )
