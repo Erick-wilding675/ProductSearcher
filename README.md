@@ -4,6 +4,18 @@ Plataforma inteligente de **descoberta, comparação e análise de produtos**. P
 
 > IA é complementar: o sistema funciona sem qualquer LLM. Ver [`.ai/ai.md`](.ai/ai.md).
 
+## No ar
+
+| | |
+| --- | --- |
+| **Web app** | <https://product-searcher-tawny.vercel.app> |
+| **API** | <https://productsearcher-api.fly.dev> · [`/health`](https://productsearcher-api.fly.dev/health) |
+| **Extensão** | carregada sem compactação a partir de `extension/` (ver [`extension/README.md`](extension/README.md)) |
+
+Topologia e o porquê de cada escolha: [ADR-0011](adr/0011-deploy-producao-fly-io.md) —
+backend no Fly (`gru`, sem sleep), banco Supabase em `sa-east-1` junto dele, frontend na
+Vercel. Runbooks em [`infra/deploy/`](infra/deploy/README.md).
+
 ## Monorepo
 
 ```

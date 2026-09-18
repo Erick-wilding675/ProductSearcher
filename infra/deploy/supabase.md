@@ -54,6 +54,11 @@
 - [ ] Connection string (pooler) adaptada para `postgresql+psycopg://` e gravada no `.env` local.
 - [ ] Segredo fora do Git (`.env` ignorado).
 
+> ⚠️ **Obsoleto desde 18/09/2026.** O projeto abaixo (`us-east-1`) foi substituído por
+> um em **`sa-east-1`**, junto do backend no Fly ([ADR-0011](../../adr/0011-deploy-producao-fly-io.md) D3).
+> A reconstrução está em [`supabase-sa-east-1.md`](supabase-sa-east-1.md). O que segue vale como
+> histórico e como referência do procedimento de provisionamento — **a connection string não vale mais**.
+
 ## Valores deste projeto (provisionado em 24/06/2026)
 
 Projeto Supabase reaproveitado (org `Erick-wilding675's Org`, Free Plan), região **us-east-1**. `pgvector` confirmado: `vector` v0.8.0.
@@ -77,9 +82,13 @@ postgresql+psycopg://postgres.fzbaamyeyffnprinrkva:[SUA_SENHA]@aws-1-us-east-1.p
 
 > **Nota para Fase 2/3 (pgbouncer):** o Transaction pooler roda o pgbouncer em modo *transaction*, que não suporta prepared statements persistentes. Ao conectar via SQLAlchemy/psycopg em `api/app/core/db.py`, desabilite o cache de prepared statements (psycopg v3: `connect_args={"prepare_threshold": None}`). Para migrations (Alembic), prefira a **Direct connection** (porta 5432).
 
-## Keep-alive (free-tier)
+## Keep-alive (free-tier) — decidido na Fase 7
 
-O Supabase Free **pausa o projeto após 7 dias de inatividade**. Para a demo manter-se sempre no ar, agende um ping periódico (tarefa de Fase 7 — deploy). Opções: GitHub Actions agendado, cron do provedor de backend, ou o keep-alive do próprio host. Registrar a escolha quando o backend estiver no ar.
+O Supabase Free **pausa o projeto após 7 dias de inatividade**. A escolha está no
+[ADR-0011](../../adr/0011-deploy-producao-fly-io.md) D4: **não há cron**. Quem mantém o
+banco ativo é o health check do Fly batendo em `/health` a cada 30 s — endpoint que já
+executa um `SELECT 1`, então a mesma sondagem serve de prova de vida do serviço e de
+atividade no banco, sem serviço extra nem segredo.
 
 ## Notas de evolução
 

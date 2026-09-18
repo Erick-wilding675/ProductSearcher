@@ -185,6 +185,64 @@ em cinco pontos, todos achados ao confrontar o texto com o código:
   Medir com o serviço no ar (a task de cold start da Fase 7 já tem o script) e registrar
   aqui o número real.
 
+## ✅ Execução — 18/09/2026
+
+O MVP está no ar. Endereços:
+
+- **Web app:** <https://product-searcher-tawny.vercel.app>
+- **API:** <https://productsearcher-api.fly.dev> (`/health` devolve `{"status":"ok","ai_enabled":false,"db":"ok"}`)
+- **Banco:** projeto Supabase em `sa-east-1`, com migrations, seed e rótulos de `use_case` recarregados.
+
+### A medição que faltava (pendência de D3, parcialmente fechada)
+
+Medido de fora, com 10 amostras de `/search?q=notebook gamer` e 5 de `/health`:
+
+| Endpoint | mediana | mínimo | máximo |
+| --- | --- | --- | --- |
+| `/search` | 349 ms | 324 ms | 573 ms |
+| `/health` | 296 ms | 289 ms | 401 ms |
+
+**O que isso prova e o que não prova.** O número inclui a travessia da internet desde a
+máquina que mediu até `gru`, então é **teto**, não piso: da rede do usuário brasileiro o
+tempo é menor. Serve para a RNF-02 (primeira resposta abaixo de 2 s) com folga larga, e é
+coerente com a RNF-01 — mas **não substitui** o p95 medido dentro do servidor, que
+continua pendente, nem mede o RTT API↔banco que motivou D3. O script de cold start da
+Fase 7 fecha isso quando rodar contra produção.
+
+Sobre cold start: com `auto_stop_machines = false` e o health check a cada 30 s, a
+máquina nunca fica ociosa a ponto de dormir. Não é um resultado medido, é uma propriedade
+da configuração.
+
+### Quatro coisas que a proposta não previa, e custaram tempo
+
+Ficam registradas porque nenhuma delas aparece em documentação de fornecedor:
+
+1. **`CORS_ORIGINS` em JSON não sobrevive ao PowerShell.** As aspas duplas somem, o
+   container recebe `[https://...]`, o pydantic-settings não consegue ler a lista e a API
+   **morre no import**, em loop de restart. O sintoma visível era "health check não passa",
+   que aponta para o lugar errado. Corrigido no código: a variável aceita lista separada
+   por vírgula, e o erro de JSON quebrado agora diz que o problema são as aspas.
+2. **Faltava `.dockerignore` na `api/`.** O `COPY . .` levava para dentro da imagem o
+   `.env` (com a senha do banco) e o `.venv` da máquina de quem builda — 77 MB de contexto
+   inútil e um segredo numa imagem publicada.
+3. **Recarregar o seed apaga os rótulos de `use_case`.** Eles vivem só no banco, e o
+   upsert de `product_specs` substitui `attributes` inteiro. A falha é silenciosa e cruel:
+   "notebook" responde, "notebook gamer" volta zero — justamente a consulta do pitch. O
+   passo de re-rotulagem entrou no runbook da migração.
+4. **`%` na senha do banco quebra duas vezes.** No Alembic, porque o `alembic.ini` é lido
+   com interpolação do configparser; e na URL, porque `%B6` é escape percentual e o driver
+   recebe uma senha diferente da digitada. O `env.py` passou a escapar o `%`, e o
+   `.env.example` recomenda senha alfanumérica.
+
+### O que ficou de fora
+
+- **Pipeline de deploy automático não validado ponta a ponta**: o workflow existe, mas
+  falta gravar `FLY_API_TOKEN` no GitHub e fazer o merge na `main` para ver um ciclo
+  completo (CI verde → release no Fly).
+- **Rotação da senha do banco**: ela chegou a entrar numa imagem publicada (item 2). O
+  registro do Fly é privado e o risco é baixo, mas a higiene pede trocar a senha e
+  atualizar só o secret do Fly — que não vai para a imagem.
+
 ## Impacto futuro
 
 - **Código/infra:** `api/fly.toml` (deploy + health check do keep-alive);
