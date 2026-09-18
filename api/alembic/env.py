@@ -35,7 +35,14 @@ if config.config_file_name is not None:
 # alembic.ini fica apenas como fallback local. Evita credencial versionada.
 _db_url = os.environ.get("DATABASE_URL")
 if _db_url:
-    config.set_main_option("sqlalchemy.url", _db_url)
+    # `%` escapado: o alembic.ini é lido por configparser COM interpolação, então
+    # uma URL contendo `%` (senha gerada com esse caractere, por exemplo) estoura
+    # em "invalid interpolation syntax" antes de qualquer conexão. Escapar aqui
+    # resolve do lado do Alembic — mas note que `%` na senha continua ruim por
+    # outro motivo: na URL ele é o prefixo de escape percentual (`%B6` vira o byte
+    # 0xB6), então o driver recebe uma senha diferente da que você colou. Senha
+    # com `%`, `@`, `/` ou `#`: gere outra, ou percent-encode antes de montar a URL.
+    config.set_main_option("sqlalchemy.url", _db_url.replace("%", "%%"))
 
 # add your model's MetaData object here
 # for 'autogenerate' support
