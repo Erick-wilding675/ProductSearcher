@@ -53,11 +53,33 @@ Não é migração de dados: **é reconstrução**. O catálogo é reproduzível
    banco atual, pare aqui: deploy sobre catálogo incompleto derruba o KPI de relevância
    sem deixar rastro óbvio.
 
-6. **Trocar os consumidores para a 6543** (pooler de transação, runtime):
+6. **Re-rotular `use_case`** — passo obrigatório, não opcional:
+
+   ```bash
+   # ainda em worker/, ainda na 5432
+   python -m tools.seedbuilder.label_use_cases --executar
+   ```
+
+   Os rótulos de `use_case` (ADR-010 D2) vivem **só no banco**: o YAML do seed não
+   os tem, e o upsert de `product_specs` substitui `attributes` inteiro. Sem este
+   passo, o filtro de `use_case` não casa com nada — e a falha é **silenciosa**:
+   consultas de uma palavra ("notebook") respondem, mas "notebook gamer" e
+   "melhor notebook para programação" voltam com **zero resultados**, porque o
+   parser transforma "gamer" em filtro duro. É exatamente a consulta do pitch do
+   produto. Leva ~25 min e é grátis no plano da Groq (exige `GROQ_API_KEY` no
+   `worker/.env`).
+
+   Conferir depois:
+
+   ```sql
+   select count(*) from product_specs where attributes ? 'use_case';
+   ```
+
+7. **Trocar os consumidores para a 6543** (pooler de transação, runtime):
    - Fly: `flyctl secrets set DATABASE_URL='postgresql+psycopg://postgres.<ref>:<senha>@aws-1-sa-east-1.pooler.supabase.com:6543/postgres'`
    - `.env` local: volte para a 6543 no uso normal da API.
 
-7. **Aposentar o projeto antigo (`us-east-1`)** — só depois de o `/health` de produção
+8. **Aposentar o projeto antigo (`us-east-1`)** — só depois de o `/health` de produção
    responder `"db":"ok"` e uma busca real voltar com resultado. Pausar antes de apagar dá
    caminho de volta.
 
@@ -74,5 +96,6 @@ Não é migração de dados: **é reconstrução**. O catálogo é reproduzível
 - [ ] Projeto `sa-east-1` ativo, com `vector` habilitado.
 - [ ] `alembic upgrade head` aplicado pela 5432.
 - [ ] Seed recarregado, com as contagens conferidas.
+- [ ] `use_case` re-rotulado (`select count(*) from product_specs where attributes ? 'use_case';` > 0) e uma busca de duas palavras conferida.
 - [ ] `DATABASE_URL` (6543) trocada no Fly e no `.env` local.
 - [ ] Projeto `us-east-1` pausado (e apagado depois da demo estabilizar).
