@@ -13,7 +13,7 @@
 export const API_BASE_URL = "https://productsearcher-api.fly.dev";
 
 /** Web app, para o link "ver todos" (RF-54). */
-export const WEB_APP_URL = "https://productsearcher.vercel.app";
+export const WEB_APP_URL = "https://product-searcher-tawny.vercel.app";
 
 /** Quantos produtos o popup e o painel da SERP mostram. */
 export const TOP_N = 3;

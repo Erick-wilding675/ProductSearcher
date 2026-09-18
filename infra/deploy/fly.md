@@ -29,13 +29,16 @@
    ```bash
    flyctl secrets set \
      DATABASE_URL='postgresql+psycopg://postgres.<ref>:<senha>@aws-1-sa-east-1.pooler.supabase.com:6543/postgres' \
-     CORS_ORIGINS='["https://productsearcher.vercel.app"]'
+     CORS_ORIGINS=https://product-searcher-tawny.vercel.app
    ```
 
    - **Porta 6543** (pooler de *transação*) para o runtime. O 5432 é para migration
      (ADR-0011 D7).
-   - `CORS_ORIGINS` é uma lista JSON e recebe **a origem exata** do web app, sem curinga
-     (ADR-0011 D5). Confirme o domínio que a Vercel atribuiu antes de gravar.
+   - `CORS_ORIGINS` recebe **a origem exata** do web app, sem curinga (ADR-0011 D5).
+     Confirme o domínio que a Vercel atribuiu antes de gravar. Várias origens: separe
+     por vírgula (`a,b`). **Evite a forma JSON aqui**: no PowerShell as aspas duplas
+     somem, o container recebe `[https://...]` e a API entra em loop de restart — foi
+     o que aconteceu no primeiro deploy.
    - `CORS_ORIGIN_REGEX` não precisa ser definido: o default do código já cobre
      `chrome-extension://` e `moz-extension://`.
 
