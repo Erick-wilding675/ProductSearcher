@@ -339,7 +339,21 @@ def main() -> None:
     # ferramentas do worker escapam por abrirem **uma** transação; esta grava
     # produto a produto e reencontra o `_pg3_0` de outra sessão na segunda escrita
     # — foi exatamente onde a primeira execução morreu, depois de 7 produtos.
-    engine = sa.create_engine(url, future=True, connect_args={"prepare_threshold": None})
+    #
+    # `pool_pre_ping` + `pool_recycle`: este laço passa a maior parte do tempo
+    # **dormindo** — até 50 s por vez, esperando a janela de tokens da Groq virar.
+    # Nesse intervalo o pooler do Supabase fecha a conexão ociosa, e a iteração
+    # seguinte pega do pool um socket morto: "server closed the connection
+    # unexpectedly", já no meio da execução (aconteceu no produto 182 de 235). O
+    # ping descarta a conexão morta e abre outra; o recycle evita chegar nesse
+    # ponto na maioria das vezes.
+    engine = sa.create_engine(
+        url,
+        future=True,
+        connect_args={"prepare_threshold": None},
+        pool_pre_ping=True,
+        pool_recycle=300,
+    )
 
     categorias = read_categories(SEED_DIR)
     schemas = {c.slug: c.attributes for c in categorias}
