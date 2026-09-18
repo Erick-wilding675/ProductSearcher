@@ -1,6 +1,10 @@
 """Configuração via variáveis de ambiente (sem segredos no repositório)."""
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+import json
+from typing import Annotated
+
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, NoDecode, SettingsConfigDict
 
 
 class Settings(BaseSettings):
@@ -15,8 +19,36 @@ class Settings(BaseSettings):
     # - `cors_origin_regex`: casa as origens de extensão, cujo id não é fixo em dev.
     #   Extensões expõem origem `chrome-extension://<id>` (ou `moz-extension://<id>`),
     #   que não dá para listar item a item — por isso um regex.
-    cors_origins: list[str] = ["http://localhost:3000"]
+    #
+    # `NoDecode` + validador: sem isso, o pydantic-settings exige **JSON** para uma
+    # lista vinda do ambiente, e um `CORS_ORIGINS=["https://x"]` perde as aspas em
+    # qualquer shell que as interprete (PowerShell, entre outros). O resultado é
+    # `[https://x]`, que não é JSON — e a API morre no import, em loop de restart,
+    # exibindo um erro de parsing que não diz nada sobre aspas. Aceitar também a
+    # forma separada por vírgula tira essa armadilha do caminho de quem opera o
+    # deploy, sem perder a compatibilidade com o formato JSON.
+    cors_origins: Annotated[list[str], NoDecode] = ["http://localhost:3000"]
     cors_origin_regex: str = r"^(chrome-extension|moz-extension)://[a-z0-9]+$"
+
+    @field_validator("cors_origins", mode="before")
+    @classmethod
+    def _parse_cors_origins(cls, valor: object) -> object:
+        """Aceita `["a","b"]` (JSON), `a,b` (vírgula) ou uma lista já pronta."""
+        if not isinstance(valor, str):
+            return valor
+        texto = valor.strip()
+        if texto.startswith("["):
+            try:
+                return json.loads(texto)
+            except json.JSONDecodeError as erro:
+                # Mensagem no lugar de um "Expecting value: line 1 column 2", que não
+                # diz a ninguém que o problema são as aspas comidas pelo shell.
+                raise ValueError(
+                    "CORS_ORIGINS começa com '[' mas não é JSON válido — provavelmente o "
+                    "shell removeu as aspas duplas. Use a forma separada por vírgula: "
+                    "CORS_ORIGINS=https://a.exemplo,https://b.exemplo"
+                ) from erro
+        return [item.strip() for item in texto.split(",") if item.strip()]
 
     # Busca híbrida: união textual + vetorial fundida por RRF (ADR-010 D4).
     #
