@@ -1,0 +1,32 @@
+# O Dockerfile faz `COPY . .` (o pacote precisa existir antes do `pip install .`),
+# então sem esta lista TUDO que está em api/ entra na imagem — inclusive o `.env`
+# com a senha do banco e o `.venv` da máquina de quem builda. Duas coisas ruins de
+# uma vez: segredo dentro de uma imagem publicada, e um contexto de build gigante
+# que atrasa o deploy a ponto de estourar o tempo dos health checks.
+
+# Segredos. Em produção a configuração vem de variável de ambiente (flyctl secrets).
+.env
+*.env
+!.env.example
+
+# Ambientes virtuais da máquina local (e são de outro sistema operacional).
+.venv/
+venv/
+
+# Caches e artefatos de build.
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+build/
+dist/
+*.egg-info/
+
+# Testes não vão para a imagem de produção (o pacote distribuído é só `app`).
+tests/
+
+# Documentação e afins: não afetam o runtime.
+README.md
+README-vector.md
+fly.toml
