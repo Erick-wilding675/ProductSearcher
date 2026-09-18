@@ -1,0 +1,60 @@
+# Deploy de produção da API (ADR-0011).
+#
+# A imagem é a LEVE (`api/Dockerfile`, sem modelo de embedding): em produção
+# `vector_enabled=false` (ADR-0010), então o runtime de inferência não entra.
+# A imagem pesada (`Dockerfile.vector`) é só de teste e NÃO é referenciada aqui.
+#
+#   cd api && flyctl deploy --remote-only
+#
+# Segredos (nunca neste arquivo — `flyctl secrets set`):
+#   DATABASE_URL   pooler de TRANSAÇÃO (6543) do projeto sa-east-1
+#   CORS_ORIGINS   origem exata do web app em produção (ADR-0011 D5)
+
+app = "productsearcher-api"
+
+# São Paulo. O banco também vive em sa-east-1 (ADR-0011 D3): uma busca faz de 3 a
+# 5 idas ao banco, e separar as duas pontas colocaria a rede transcontinental
+# dentro do orçamento de 500 ms da RNF-01.
+primary_region = "gru"
+
+# Rede de segurança para o plano de 256 MB: um pico de alocação vira paginação em
+# vez de OOM kill. Se o swap começar a ser usado de verdade, é sintoma — o
+# caminho certo é subir a memória, não conviver com disco no caminho da request.
+swap_size_mb = 256
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8000
+  force_https = true
+
+  # RNF-02 (sem cold start) de forma determinística: a máquina não dorme, ponto.
+  # É por isso que o ADR-0004 vetou Render free e Cloud Run — e o que faz esta
+  # linha valer os ~US$2/mês.
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+  processes = ["app"]
+
+  # Keep-alive do Supabase (ADR-0011 D4). `/health` executa um `SELECT 1`, então
+  # esta sondagem serve de duas coisas ao mesmo tempo: prova de vida do serviço e
+  # atividade no banco, que é o que evita a pausa do plano free.
+  #
+  # Seguro por construção: `/health` SEMPRE responde 200 e reporta o banco no
+  # campo `db` ("ok"/"down"). Um soluço do Supabase não vira 5xx e, portanto, não
+  # faz o proxy do Fly tirar a máquina de rota.
+  [[http_service.checks]]
+    interval = "30s"
+    timeout = "5s"
+    grace_period = "10s"
+    method = "GET"
+    path = "/health"
+
+[[vm]]
+  # Medido em 15/09/2026: a API leve estabiliza em ~87 MB de RSS. 256 MB dá folga
+  # de ~2,5x. Gatilho de revisão do ADR-0011 D2: OOM kill ou p95 inexplicado →
+  # `memory = "512mb"` (US$3,19/mês em vez de US$1,94).
+  size = "shared-cpu-1x"
+  memory = "256mb"
+  cpus = 1

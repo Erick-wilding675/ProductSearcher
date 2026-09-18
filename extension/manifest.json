@@ -35,7 +35,10 @@
     }
   ],
   "permissions": ["storage", "activeTab"],
-  "host_permissions": ["http://localhost:8000/*"],
+  "host_permissions": [
+    "https://productsearcher-api.fly.dev/*",
+    "http://localhost:8000/*"
+  ],
   "web_accessible_resources": [
     {
       "resources": ["src/shared/coverage.js", "src/shared/config.js"],

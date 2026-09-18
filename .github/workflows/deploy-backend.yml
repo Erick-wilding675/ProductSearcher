@@ -1,0 +1,63 @@
+name: Deploy backend (Fly.io)
+
+# Entrega contínua do backend (ADR-0011 D8).
+#
+# Por que `workflow_run` e não `push`: o deploy só faz sentido sobre um commit que
+# JÁ passou pela CI (lint, testes da api com Postgres real, worker, frontend,
+# extensão). Com `push`, o deploy correria em paralelo com os testes e poderia
+# publicar um commit que a suíte reprova minutos depois.
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+# Um deploy por vez, sem cancelar o que está no ar: cancelar no meio de um
+# `flyctl deploy` deixa a release pela metade.
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Só main, só push, só CI verde.
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'main' &&
+      github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      # `workflow_run` roda no contexto do repositório, não do commit testado —
+      # sem este `ref`, o checkout traria o topo da main, que pode já ser outro
+      # commit. Publicamos exatamente o que a CI aprovou.
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - uses: superfly/flyctl-actions/setup-flyctl@master
+
+      # `--remote-only`: o build roda no builder do Fly. O runner do GitHub não
+      # precisa de Docker nem de cache, e a imagem já nasce no destino.
+      - name: flyctl deploy
+        working-directory: api
+        env:
+          FLY_API_TOKEN: ${{ secrets.FLY_API_TOKEN }}
+        run: flyctl deploy --remote-only
+
+      # Deploy "verde" no Fly significa que a máquina subiu e passou no health
+      # check — não que o banco respondeu. Este passo separa as duas coisas: o
+      # `/health` sempre devolve 200 (ADR-0011 D4), então quem diz a verdade
+      # sobre o Supabase é o campo `db`.
+      - name: Smoke do /health (app + banco)
+        run: |
+          set -euo pipefail
+          url="https://productsearcher-api.fly.dev/health"
+          for tentativa in 1 2 3 4 5; do
+            corpo="$(curl -fsS --max-time 10 "$url" || true)"
+            echo "tentativa $tentativa: ${corpo:-<sem resposta>}"
+            case "$corpo" in
+              *'"db":"ok"'*) echo "Backend no ar e falando com o banco."; exit 0 ;;
+            esac
+            sleep 5
+          done
+          echo "::error::/health não confirmou o banco ('\"db\":\"ok\"') após 5 tentativas."
+          exit 1

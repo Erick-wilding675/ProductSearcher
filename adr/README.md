@@ -7,12 +7,13 @@ Registro das decisões arquiteturais do ProductSearcher. Cada ADR documenta **co
 | [0001](0001-aquisicao-de-dados.md) | Aquisição de dados do catálogo (seed curado) | Aceito |
 | [0002](0002-datastore-postgres-only.md) | Datastore: Postgres-only (FTS + pgvector) | Aceito |
 | [0003](0003-monolito-modular.md) | Arquitetura de backend: monólito modular | Aceito |
-| [0004](0004-deploy-free-tier.md) | Deploy e infraestrutura (free-tier) | Aceito (com ponto em aberto) |
+| [0004](0004-deploy-free-tier.md) | Deploy e infraestrutura (free-tier) | Aceito (ponto em aberto fechado pelo 0011) |
 | [0005](0005-decisoes-fase-2.md) | Decisões técnicas da Fase 2 (schema + ingestão) | Aceito |
 | [0006](0006-licenciamento-busl.md) | Licenciamento: Business Source License 1.1 | Aceito |
 | [0007](0007-pipeline-busca-retrieval-ranking.md) | Pipeline de busca: retrieval (SearchProvider) + ranking (RankingService) | Aceito |
 | [0008](0008-cobertura-do-seed-parser-e-specs-opcionais.md) | Cobertura do seed: parser de título e specs opcionais | Aceito (parcialmente revisto pelo 0009) |
 | [0009](0009-enriquecimento-pela-api-e-identidade-do-produto.md) | Enriquecimento pela API do ML e identidade do produto | Aceito |
 | [0010](0010-fase-6-onde-a-ia-entra.md) | Fase 6: onde a IA entra (e onde não entra) | Aceito (em construção) |
+| [0011](0011-deploy-producao-fly-io.md) | Deploy de produção: Fly.io em `gru`, banco em `sa-east-1`, keep-alive por health check | Aceito |
 
 > Novos ADRs seguem o `template.md`. Numeração sequencial. A fonte de verdade também vive no Notion (Document Hub).

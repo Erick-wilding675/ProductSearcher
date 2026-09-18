@@ -1,7 +1,7 @@
 # ADR-0004 — Deploy e infraestrutura (free-tier)
 
-- **Status:** Aceito (MVP, com ponto em aberto)
-- **Data:** 2026-06-21
+- **Status:** Aceito (MVP) — **ponto em aberto fechado pelo [ADR-0011](0011-deploy-producao-fly-io.md)**
+- **Data:** 2026-06-21 (atualizado em 2026-09-18)
 - **Decisor:** Erick
 
 ## Contexto
@@ -41,9 +41,13 @@ O MVP precisa hospedar **frontend**, **backend** e **banco** com orçamento ~US$
 | Render free (backend) | Cold start de 30–60s arruína demo e popup da extensão. **Descartado.** |
 | PaaS pago único | Fora do orçamento do MVP. **Adiado.** |
 
-## Ponto em aberto
+## Ponto em aberto — fechado em 18/09/2026
 
-Host definitivo do backend (**Fly.io vs Hugging Face Spaces**) a confirmar após teste prático de cold start/limites.
+O host definitivo do backend era **Fly.io vs Hugging Face Spaces**. O [ADR-0011](0011-deploy-producao-fly-io.md) fecha em **Fly.io** (`shared-cpu-1x`, 256 MB, região `gru`, sem sleep) e revisa três premissas desta ADR:
+
+- **Custo não é ~US$0**: o free tier do Fly acabou; o serviço custa ~US$2/mês.
+- **Região do banco**: o Supabase sai de `us-east-1` para `sa-east-1`, junto do backend (ADR-0011 D3).
+- **Keep-alive**: deixa de ser cron e passa a ser o health check do próprio host sobre `/health` (ADR-0011 D4).
 
 ## Caminho de evolução / gatilho de revisão
 
