@@ -123,6 +123,12 @@ do PRD: o PRD descreve requisitos, não o estado corrente do trabalho.
 
 ## Armadilhas conhecidas
 
+- **`make migrate`, `make seed` e `pytest` apontam para PRODUÇÃO por padrão.** Eles leem
+  `api/.env` e `worker/.env`, que nesta máquina têm a URL do Supabase. Rodar qualquer um
+  deles "para preparar o ambiente local" aplica DDL, recarrega o catálogo ou mede a suíte
+  **no banco de produção**, sem confirmação. Sempre exporte a `DATABASE_URL` local antes:
+  a variável de ambiente vence o `.env` nos dois caminhos (verificado). Recarregar o seed
+  em produção apaga os rótulos de `use_case` e faz "notebook gamer" voltar vazio.
 - **`docker compose up` sobe o banco vazio.** Nada no compose roda migrations. Sem
   `make migrate` e `make seed`, a API responde `[]` e tudo parece quebrado.
 - **O job `lint` da CI commita no branch.** Ele aplica `ruff --fix`, `ruff format` e

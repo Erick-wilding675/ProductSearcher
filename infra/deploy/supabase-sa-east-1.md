@@ -29,7 +29,7 @@ Não é migração de dados: **é reconstrução**. O catálogo é reproduzível
    ```bash
    cd api
    # .env local, temporariamente na 5432:
-   # DATABASE_URL=postgresql+psycopg://postgres.<ref>:<senha>@aws-1-sa-east-1.pooler.supabase.com:5432/postgres
+   # DATABASE_URL=postgresql+psycopg://postgres.<ref>:<senha>@aws-<n>-sa-east-1.pooler.supabase.com:5432/postgres
    alembic upgrade head
    ```
 
@@ -75,11 +75,31 @@ Não é migração de dados: **é reconstrução**. O catálogo é reproduzível
    select count(*) from product_specs where attributes ? 'use_case';
    ```
 
-7. **Trocar os consumidores para a 6543** (pooler de transação, runtime):
-   - Fly: `flyctl secrets set DATABASE_URL='postgresql+psycopg://postgres.<ref>:<senha>@aws-1-sa-east-1.pooler.supabase.com:6543/postgres'`
+7. **Recarregar os vetores**, se e somente se a busca vetorial estiver ligada.
+
+   ```bash
+   # só com vector_enabled=true; exige a imagem :vector (api/README-vector.md)
+   docker run --rm -e DATABASE_URL='...:5432/postgres'      productsearcher-api:vector python -m app.search.vector_load
+   ```
+
+   `products.embedding` também vive **só no banco**, como os rótulos do passo 6, e um
+   projeto novo nasce com ela vazia. Este passo foi **esquecido na migração de 18/09/2026**
+   e só apareceu num inventário de 19/09: o banco de produção tem 0 de 235 embeddings.
+
+   Não houve dano porque `vector_enabled=false` e nada lê a coluna. O perigo é ligar a
+   flag sem rodar isto: o retrieval vetorial devolve **vazio, sem erro**.
+
+   Conferir depois:
+
+   ```sql
+   select count(*) from products where embedding is not null;
+   ```
+
+8. **Trocar os consumidores para a 6543** (pooler de transação, runtime):
+   - Fly: `flyctl secrets set DATABASE_URL='postgresql+psycopg://postgres.<ref>:<senha>@aws-<n>-sa-east-1.pooler.supabase.com:6543/postgres'`
    - `.env` local: volte para a 6543 no uso normal da API.
 
-8. **Aposentar o projeto antigo (`us-east-1`)**, só depois de o `/health` de produção
+9. **Aposentar o projeto antigo (`us-east-1`)**, só depois de o `/health` de produção
    responder `"db":"ok"` e uma busca real voltar com resultado. Pausar antes de apagar dá
    caminho de volta.
 

@@ -40,8 +40,10 @@ Ver [ADR-0012](../adr/0012-qualidade-de-ofertas-na-ingestao.md).
 
 ## Estado
 
-`products.embedding` está preenchida (235 de 235 em produção), mas o retrieval que a
-consome está desligado por flag. `searches` recebe escrita a cada busca com texto, sem
+`products.embedding` está **vazia** no banco atual (0 de 235, medido em 19/09/2026): a
+carga de vetores da Fase 6 ficou no projeto Supabase antigo, que foi substituído em 18/09.
+Sem impacto enquanto `vector_enabled=false`, mas ligar a busca vetorial exige rodar
+`python -m app.search.vector_load` antes. `searches` recebe escrita a cada busca com texto, sem
 identificação de usuário. `reviews` está vazia por decisão: a API do Mercado Livre não
 expõe avaliação para token de aplicação.
 

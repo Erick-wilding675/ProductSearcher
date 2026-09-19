@@ -60,14 +60,34 @@ Pré-requisito: Docker.
 ```bash
 cp .env.example .env
 docker compose up -d db          # sobe só o Postgres (pgvector)
+
+# DATABASE_URL explícita: veja o aviso logo abaixo antes de rodar
+export DATABASE_URL='postgresql+psycopg://postgres:postgres@localhost:5432/productsearcher'
 make migrate                     # cria o schema (alembic upgrade head)
 make seed                        # carrega o catálogo seed
+
 docker compose up -d api         # sobe a API já com dados
 cd frontend && npm install && npm run dev
 ```
 
+No PowerShell, a terceira linha é `$env:DATABASE_URL = 'postgresql+psycopg://postgres:postgres@localhost:5432/productsearcher'`.
+
 - API: <http://localhost:8000> (`/health`)
 - Web: <http://localhost:3000>
+
+> ### Rode `make migrate` e `make seed` com a `DATABASE_URL` explícita
+>
+> Os dois alvos **não** falam com o Postgres do compose por padrão. `make migrate` lê
+> `api/.env` e `make seed` lê `worker/.env`, e numa máquina que já operou produção esses
+> arquivos apontam para o **Supabase**. Sem a variável exportada, o comando que você
+> acha que está preparando o banco local aplica DDL e recarrega o catálogo **em
+> produção**, sem pedir confirmação.
+>
+> Recarregar o seed em produção não é reversível por desfazer: ele reescreve
+> `product_specs.attributes` e apaga os rótulos de `use_case`, o que faz "notebook gamer"
+> voltar vazio até alguém re-rotular.
+>
+> A variável exportada vence o `.env`, porque os dois lados usam `override=False`.
 
 > **Não pule `make migrate` e `make seed`.** O `docker compose up` sobe o banco **vazio**,
 > porque nada no compose roda migrations. Com o banco vazio a API responde `[]` em

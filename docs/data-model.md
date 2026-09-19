@@ -156,7 +156,7 @@ esquecimento:
 
 | Tabela ou coluna | Estado | Observação |
 | --- | --- | --- |
-| `products.embedding` | **Preenchida** | 235 de 235 produtos em produção, 768 dimensões, carimbados com o id do modelo (28/08/2026). O retrieval vetorial que a consome continua desligado por flag |
+| `products.embedding` | **Vazia no banco atual** | Medido em 19/09/2026: **0 de 235**. Os 235 vetores da Fase 6 foram carregados em 28/08 no projeto Supabase de `us-east-1`, que foi **substituído** pelo de `sa-east-1` em 18/09. A recriação aplicou migrations, seed e rotulagem de `use_case`, mas não a carga de vetores. Sem impacto hoje, porque `vector_enabled=false`; ligar a busca vetorial exige rodar `python -m app.search.vector_load` antes, ou o retrieval devolve vazio |
 | `searches` | **Preenchida** | O `SearchService` grava consulta, intenção interpretada e total de resultados a cada busca com texto. Sem identificação de usuário: não há `users`, nem IP, nem sessão. Falha ao registrar nunca derruba a busca |
 | `price_history` | Preenchida pela ingestão | Recebe ponto novo apenas quando o preço muda de verdade, o que mantém a reexecução idempotente |
 | `reviews` | **Vazia por decisão** | RF-05 é `Could`. A API do Mercado Livre não expõe avaliação para token de aplicação: `/reviews/item` responde 404, `/products/{id}/reviews` responde 500 e `rating_average` veio nulo em 44 de 44 produtos amostrados. O que destrava é um ator do Apify sobre a página do produto; a coluna `source` existe para distinguir a procedência |

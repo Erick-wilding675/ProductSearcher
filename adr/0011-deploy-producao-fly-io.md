@@ -243,6 +243,41 @@ Ficam registradas porque nenhuma delas aparece em documentação de fornecedor:
   registro do Fly é privado e o risco é baixo, mas a higiene pede trocar a senha e
   atualizar só o secret do Fly — que não vai para a imagem.
 
+### Adendo de 19/09/2026: o que a recriação do banco deixou para trás
+
+Ao aplicar a primeira migration posterior ao deploy (`e4f6a8b0c2d3`, do ADR-0012),
+inventariamos o banco de produção e achamos uma lacuna que a execução de 18/09 não
+registrou.
+
+**`products.embedding` está zerada: 0 de 235.** A carga de vetores de 28/08 (ADR-0010) foi
+feita no projeto Supabase de `us-east-1`. O D3 desta ADR criou um projeto **novo** em
+`sa-east-1` e o runbook cobriu migrations, seed e re-rotulagem de `use_case`, mas não a
+carga de vetores, que é um passo separado e vive em outro documento
+([`api/README-vector.md`](../api/README-vector.md)).
+
+Não há efeito hoje, porque `vector_enabled=false` e nada consulta a coluna. O risco é
+futuro e silencioso: ligar a flag sem rodar a carga faz o retrieval vetorial devolver
+vazio, sem erro, exatamente o tipo de falha muda que esta ADR e a 0010 já encontraram duas
+vezes.
+
+A lição generaliza o item 3 de "Quatro coisas que a proposta não previa": **trocar de
+banco não é migrar o schema, é reproduzir todo o estado derivado.** Aqui esse estado tem
+três pedaços com donos diferentes, e o runbook só conhecia dois:
+
+| Estado derivado | Quem produz | Coberto pelo runbook de 18/09 |
+| --- | --- | --- |
+| Catálogo (produtos, specs, ofertas) | `ingestion.pipeline` | Sim |
+| Rótulos de `use_case` | `tools.seedbuilder.label_use_cases` | Sim, depois de custar uma consulta vazia no pitch |
+| Vetores de `products.embedding` | `app.search.vector_load` | **Não** |
+
+O runbook do `supabase-sa-east-1.md` ganhou o passo, marcado como condicional à flag.
+
+**Estado do banco em 19/09/2026**, medido e não estimado: 235 produtos, 1397 ofertas (todas
+`quality_status = 'valid'` após a migration), 235 `product_specs`, 213 produtos com
+`use_case`, 32 linhas em `searches` (as primeiras consultas reais de produção, que são o
+insumo que o ADR-0010 D4.1 espera para reavaliar o vetorial) e 0 embeddings.
+
+
 ## Impacto futuro
 
 - **Código/infra:** `api/fly.toml` (deploy + health check do keep-alive);

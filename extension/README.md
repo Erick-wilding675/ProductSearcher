@@ -131,10 +131,14 @@ uvicorn app.main:app --reload --port 8000 --app-dir api
 
 ```bash
 docker compose up -d db     # só o Postgres
+export DATABASE_URL='postgresql+psycopg://postgres:postgres@localhost:5432/productsearcher'
 make migrate                # cria o schema; o compose NÃO faz isso
 make seed                   # carrega o catálogo
 docker compose up -d api
 ```
+
+> A `DATABASE_URL` exportada não é decoração: sem ela, `make migrate` e `make seed` usam
+> `api/.env` e `worker/.env`, que podem apontar para produção.
 
 > O serviço `api` do compose aponta para o Postgres do próprio compose e
 > **ignora** o `DATABASE_URL` do `.env`. Misturar as duas opções é a forma mais

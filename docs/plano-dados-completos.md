@@ -219,7 +219,7 @@ O plano foi aprovado e executado. O que aconteceu com cada item:
 | --- | --- |
 | D1, `reviews` mantida vazia | Mantida. Continua vazia por decisão, com a rota de povoamento documentada em [data-model.md](data-model.md) |
 | D2, escrever em `searches` | Implementada. O `SearchService` grava consulta, intenção e total de resultados, e falha ao registrar não derruba a busca |
-| D3, `embedding` na Fase 6 | Cumprida e superada: a Fase 6 preencheu 235 de 235 produtos em produção. O retrieval que consome a coluna permanece desligado por flag, por medição (ADR-0010 D4) |
+| D3, `embedding` na Fase 6 | Cumprida na época: a Fase 6 preencheu 235 de 235 em 28/08. Esses vetores ficaram no projeto Supabase antigo, substituído em 18/09; o banco atual tem **0**. O retrieval que consome a coluna segue desligado por flag (ADR-0010 D4), então não há efeito hoje |
 | D4, os 64 despublicados | Mantidos, com marca de procedência no seed |
 
 ### O que o plano não previu

@@ -28,7 +28,7 @@
 
    ```bash
    flyctl secrets set \
-     DATABASE_URL='postgresql+psycopg://postgres.<ref>:<senha>@aws-1-sa-east-1.pooler.supabase.com:6543/postgres' \
+     DATABASE_URL='postgresql+psycopg://postgres.<ref>:<senha>@aws-<n>-sa-east-1.pooler.supabase.com:6543/postgres' \
      CORS_ORIGINS=https://product-searcher-tawny.vercel.app
    ```
 
@@ -58,10 +58,45 @@
    `db":"down"` = app no ar e banco inacessível: confira a `DATABASE_URL` (porta, senha,
    região) com `flyctl logs`.
 
-5. **Automatizar:** gere um token de deploy (`flyctl tokens create deploy -x 999999h`) e
-   grave como secret **`FLY_API_TOKEN`** no GitHub (Settings → Secrets and variables →
-   Actions). A partir daí, todo push na `main` com CI verde republica o backend
+5. **Automatizar:** gere um token **com escopo de deploy** e grave-o como secret
+   `FLY_API_TOKEN` no GitHub:
+
+   ```bash
+   flyctl tokens create deploy -a productsearcher-api -n "github-actions-deploy" -x 8760h
+   ```
+
+   Use `tokens create deploy`, nunca `auth token`. O primeiro só consegue publicar nesta
+   app e expira; o segundo é a credencial da sua conta inteira, sem escopo e sem prazo.
+
+   No GitHub: **Settings → Secrets and variables → Actions → New repository secret**,
+   nome `FLY_API_TOKEN`, valor colado inteiro (o token começa com `FlyV1 ` e **tem um
+   espaço** depois do `FlyV1`; cortar a partir do espaço invalida o token).
+
+   A partir daí, todo push na `main` com CI verde republica o backend
    (`.github/workflows/deploy-backend.yml`).
+
+   Para conferir antes de colar:
+
+   ```bash
+   FLY_API_TOKEN='<token>' flyctl status -a productsearcher-api
+   ```
+
+> ### `FLY_API_TOKEN` **não** é variável de ambiente da aplicação
+>
+> Ele não entra em nenhum `.env` nem no `.env.example`, e o código nunca o lê. Ele é uma
+> credencial de **CI**: vive apenas nos secrets do GitHub e só existe dentro do runner do
+> workflow de deploy.
+>
+> São três lugares distintos, e confundi-los é como um segredo acaba onde não devia:
+>
+> | Onde vive | O quê | Quem lê |
+> | --- | --- | --- |
+> | `.env` local (ignorado pelo Git) | `DATABASE_URL`, `CORS_ORIGINS` | A API e o Alembic na sua máquina |
+> | `flyctl secrets` | `DATABASE_URL`, `CORS_ORIGINS` | A API em produção. Não vai para a imagem |
+> | GitHub Actions secrets | `FLY_API_TOKEN` | Apenas o workflow de deploy |
+>
+> O `.env.example` documenta só a primeira linha da tabela, porque é a única que descreve
+> a configuração da aplicação.
 
 ## Operação do dia a dia
 
