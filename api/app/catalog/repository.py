@@ -9,7 +9,7 @@ from typing import Annotated, Protocol
 from uuid import UUID
 
 from fastapi import Depends
-from sqlalchemy import func, select
+from sqlalchemy import and_, func, select
 from sqlalchemy.orm import Session
 
 from app.catalog.schemas import (
@@ -173,7 +173,10 @@ class SqlCatalogRepository:
                 offers.c.url,
             )
             .join(stores, stores.c.id == offers.c.store_id)
-            .where(offers.c.product_id == pid)
+            .where(
+                offers.c.product_id == pid,
+                offers.c.quality_status == "valid",
+            )
             .order_by(offers.c.price)
         ).all()
 
@@ -208,7 +211,13 @@ class SqlCatalogRepository:
             )
             .select_from(products)
             .join(categories, categories.c.id == products.c.category_id)
-            .outerjoin(offers, offers.c.product_id == products.c.id)
+            .outerjoin(
+                offers,
+                and_(
+                    offers.c.product_id == products.c.id,
+                    offers.c.quality_status == "valid",
+                ),
+            )
             .where(products.c.id.in_(pids))
             .group_by(products.c.id, products.c.name, categories.c.slug)
         ).all()

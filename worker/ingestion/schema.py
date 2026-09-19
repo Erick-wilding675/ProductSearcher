@@ -77,6 +77,8 @@ offers = sa.Table(
     sa.Column("price", sa.Numeric, nullable=False),
     sa.Column("currency", sa.Text, nullable=False),
     sa.Column("url", sa.Text),
+    sa.Column("quality_status", sa.Text, nullable=False),
+    sa.Column("quality_reason", sa.Text),
 )
 
 price_history = sa.Table(

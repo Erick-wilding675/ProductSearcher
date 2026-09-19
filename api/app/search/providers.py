@@ -68,7 +68,10 @@ class VectorProvider(Protocol):
     ) -> list[str]: ...
 
 
-def _condicoes_duras(intent: Intent, filters: dict | None) -> tuple[list, float | None]:
+def _condicoes_duras(
+    intent: Intent,
+    filters: dict | None,
+) -> tuple[list, float | None]:
     """Filtros duros que valem para os **dois** braços da busca híbrida.
 
     Extraído para função por uma razão de correção, não de estilo: o braço
@@ -87,7 +90,11 @@ def _condicoes_duras(intent: Intent, filters: dict | None) -> tuple[list, float 
     # não extrai (ex.: marca escolhida na UI).
     category = intent.category or filters.get("category")
     brand = filters.get("brand")
-    price_max = intent.price_max if intent.price_max is not None else filters.get("price_max")
+    price_max = (
+        intent.price_max
+        if intent.price_max is not None
+        else filters.get("price_max")
+    )
     attributes = intent.attributes or filters.get("attributes")
 
     conditions = []
@@ -101,7 +108,11 @@ def _condicoes_duras(intent: Intent, filters: dict | None) -> tuple[list, float 
     # Filtro estruturado por atributos (RF-12): containment JSONB (@>),
     # servido pelo índice GIN jsonb_path_ops.
     if attributes:
-        conditions.append(product_specs.c.attributes.op("@>")(cast(attributes, JSONB)))
+        conditions.append(
+            product_specs.c.attributes.op("@>")(
+                cast(attributes, JSONB)
+            )
+        )
 
     # Faixa numérica ("pelo menos 30 horas de bateria"). Não cabe no `@>`,
     # que é igualdade: um fone de 40h não *contém* 30h. Por isso é comparação,
@@ -119,10 +130,16 @@ def _condicoes_duras(intent: Intent, filters: dict | None) -> tuple[list, float 
     for chave, faixa in (intent.attribute_ranges or {}).items():
         valor = product_specs.c.attributes[chave]
         conditions.append(func.jsonb_typeof(valor) == "number")
+
         if (minimo := faixa.get("min")) is not None:
-            conditions.append(valor.op(">=")(_como_jsonb(minimo)))
+            conditions.append(
+                valor.op(">=")(_como_jsonb(minimo))
+            )
+
         if (maximo := faixa.get("max")) is not None:
-            conditions.append(valor.op("<=")(_como_jsonb(maximo)))
+            conditions.append(
+                valor.op("<=")(_como_jsonb(maximo))
+            )
 
     return conditions, price_max
 
@@ -132,8 +149,13 @@ def _consulta_base(rank_expr):
 
     Os dois têm de devolver o **mesmo formato de hit** (ADR-0007 D2), senão a
     fusão comparia linhas de formatos diferentes.
+
+    Somente ofertas com ``quality_status='valid'`` participam do cálculo de
+    preço. O filtro fica dentro do LEFT JOIN para que produtos sem oferta válida
+    continuem podendo existir como candidatos, com ``min_price=None``.
     """
     min_price = func.min(offers.c.price)
+
     return (
         select(
             products.c.id,
@@ -157,7 +179,10 @@ def _consulta_base(rank_expr):
         )
         .outerjoin(
             offers,
-            offers.c.product_id == products.c.id,
+            and_(
+                offers.c.product_id == products.c.id,
+                offers.c.quality_status == "valid",
+            ),
         )
         # LEFT JOIN: produto sem specs continua sendo candidato.
         # É 1:1 com produto (uq_product_specs_product), então não
@@ -204,12 +229,18 @@ class FtsSearchProvider:
         # coluna gerada. Consulta e documento processados por configurações
         # diferentes casam menos e não dão erro — falha silenciosa.
         texto = intent.text or intent.raw
-        tsquery = func.plainto_tsquery(FTS_CONFIG, texto) if texto else None
+        tsquery = (
+            func.plainto_tsquery(FTS_CONFIG, texto)
+            if texto
+            else None
+        )
 
         min_price = func.min(offers.c.price)
 
         if tsquery is not None:
-            conditions.append(products.c.search_vector.op("@@")(tsquery))
+            conditions.append(
+                products.c.search_vector.op("@@")(tsquery)
+            )
 
         rank_expr = (
             func.ts_rank(
@@ -246,7 +277,12 @@ def _como_jsonb(valor: float):
     O cast explícito para `numeric` é obrigatório: `to_jsonb` é polimórfica e um
     parâmetro sem tipo chega ao Postgres como `unknown`, que ela rejeita.
     """
-    return func.to_jsonb(cast(literal(float(valor)), Numeric))
+    return func.to_jsonb(
+        cast(
+            literal(float(valor)),
+            Numeric,
+        )
+    )
 
 
 def _row_to_hit(row) -> dict:
@@ -292,7 +328,11 @@ class PgVectorProvider:
     que permite a união do D4 sem duplicar a montagem do hit.
     """
 
-    def __init__(self, session: Session, embedder: object | None = None) -> None:
+    def __init__(
+        self,
+        session: Session,
+        embedder: object | None = None,
+    ) -> None:
         self._session = session
         # Injetável para teste; em produção resolve para a instância única.
         self._embedder = embedder
@@ -302,9 +342,14 @@ class PgVectorProvider:
             from app.search.embedding import get_embedder
 
             self._embedder = get_embedder()
+
         return self._embedder.embed_query(text)
 
-    def search(self, vector: list[float], k: int = 10) -> list[str]:
+    def search(
+        self,
+        vector: list[float],
+        k: int = 10,
+    ) -> list[str]:
         # `<=>` é distância de cosseno, e é o operador que o índice HNSW foi
         # criado para servir (`vector_cosine_ops`, migration 71ab0046068d).
         # Usar outro operador aqui não daria erro — só deixaria de usar o
@@ -320,7 +365,11 @@ class PgVectorProvider:
             .order_by(distancia)
             .limit(k)
         )
-        return [str(linha.id) for linha in self._session.execute(stmt).all()]
+
+        return [
+            str(linha.id)
+            for linha in self._session.execute(stmt).all()
+        ]
 
 
 def get_vector_provider(
@@ -388,6 +437,7 @@ class HybridSearchProvider:
         self._session = session
         self._fts = FtsSearchProvider(session)
         self._vector = vector
+
         # Constante clássica do RRF. Amortece o topo: sem ela, o 1º lugar de um
         # braço dominaria qualquer consenso entre os dois.
         self._k = k_rrf
@@ -398,48 +448,93 @@ class HybridSearchProvider:
         filters: dict | None = None,
         page: int = 1,
     ) -> list[dict]:
-        textuais = self._fts.search(intent, filters, page)
+        textuais = self._fts.search(
+            intent,
+            filters,
+            page,
+        )
 
         texto = intent.text or intent.raw
+
         if not texto:
             # Sem texto não há consulta a vetorizar — navegação por filtro puro
             # é caso do FTS, e chamar o modelo aqui só gastaria latência.
             return textuais
 
         try:
-            vetoriais = self._candidatos_vetoriais(intent, filters, texto)
+            vetoriais = self._candidatos_vetoriais(
+                intent,
+                filters,
+                texto,
+            )
         except Exception:  # pragma: no cover - degradação proposital
             # O braço vetorial é complementar: se o modelo não carregou ou o
             # índice falhou, a busca continua servindo o textual. Cair a busca
             # inteira por causa do braço opcional seria pior que não tê-lo.
-            logger.exception("Braço vetorial falhou; servindo só o textual")
+            logger.exception(
+                "Braço vetorial falhou; servindo só o textual"
+            )
             return textuais
 
-        return self._funde(textuais, vetoriais)
+        return self._funde(
+            textuais,
+            vetoriais,
+        )
 
-    def _candidatos_vetoriais(self, intent: Intent, filters: dict | None, texto: str) -> list[dict]:
+    def _candidatos_vetoriais(
+        self,
+        intent: Intent,
+        filters: dict | None,
+        texto: str,
+    ) -> list[dict]:
         """Vizinhos mais próximos, sob os **mesmos filtros duros** do braço textual.
 
         Reaproveitar `_condicoes_duras` é o que impede a união de devolver
         produto que contradiz um filtro explícito do usuário.
         """
-        vetor = (self._vector or PgVectorProvider(self._session)).embed_query(texto)
-        conditions, price_max = _condicoes_duras(intent, filters)
+        vetor = (
+            self._vector
+            or PgVectorProvider(self._session)
+        ).embed_query(texto)
+
+        conditions, price_max = _condicoes_duras(
+            intent,
+            filters,
+        )
 
         distancia = products.c.embedding.cosine_distance(vetor)
+
         # `fts_rank` zero: quem entra só pelo vetor não tem score textual. O
         # ranking já trata 0 como "sem sinal textual".
-        stmt = _consulta_base(literal(0.0)).where(products.c.embedding.isnot(None))
+        stmt = _consulta_base(
+            literal(0.0)
+        ).where(
+            products.c.embedding.isnot(None)
+        )
 
         if conditions:
             stmt = stmt.where(and_(*conditions))
+
         if price_max is not None:
-            stmt = stmt.having(func.min(offers.c.price) <= price_max)
+            stmt = stmt.having(
+                func.min(offers.c.price) <= price_max
+            )
 
-        stmt = stmt.order_by(distancia).limit(settings.vector_top_k)
-        return [_row_to_hit(linha) for linha in self._session.execute(stmt).all()]
+        stmt = (
+            stmt.order_by(distancia)
+            .limit(settings.vector_top_k)
+        )
 
-    def _funde(self, textuais: list[dict], vetoriais: list[dict]) -> list[dict]:
+        return [
+            _row_to_hit(linha)
+            for linha in self._session.execute(stmt).all()
+        ]
+
+    def _funde(
+        self,
+        textuais: list[dict],
+        vetoriais: list[dict],
+    ) -> list[dict]:
         """Reciprocal Rank Fusion: `score = Σ 1 / (k + posição)`.
 
         Anota `vector_rank` no hit para o ranking poder consumir a posição
@@ -450,18 +545,35 @@ class HybridSearchProvider:
 
         for posicao, hit in enumerate(textuais):
             pid = hit["id"]
-            score[pid] = score.get(pid, 0.0) + 1.0 / (self._k + posicao + 1)
+
+            score[pid] = (
+                score.get(pid, 0.0)
+                + 1.0 / (self._k + posicao + 1)
+            )
+
             hits[pid] = hit
 
         for posicao, hit in enumerate(vetoriais):
             pid = hit["id"]
-            score[pid] = score.get(pid, 0.0) + 1.0 / (self._k + posicao + 1)
+
+            score[pid] = (
+                score.get(pid, 0.0)
+                + 1.0 / (self._k + posicao + 1)
+            )
+
             # O hit textual vence como base: ele traz o `fts_rank` de verdade.
             hits.setdefault(pid, hit)
             hits[pid]["vector_rank"] = posicao + 1
 
-        ordenados = sorted(hits.values(), key=lambda h: score[h["id"]], reverse=True)
-        return ordenados[: settings.search_candidate_pool]
+        ordenados = sorted(
+            hits.values(),
+            key=lambda hit: score[hit["id"]],
+            reverse=True,
+        )
+
+        return ordenados[
+            : settings.search_candidate_pool
+        ]
 
 
 def get_search_provider(
@@ -479,4 +591,5 @@ def get_search_provider(
 
     if settings.hybrid_enabled:
         return HybridSearchProvider(session)
+
     return FtsSearchProvider(session)

@@ -106,3 +106,14 @@ class Rejection(BaseModel):
 
     name: str
     reasons: list[str]
+
+
+class OfferRejection(BaseModel):
+    """Oferta classificada como suspeita por regra de qualidade."""
+
+    product_slug: str
+    product_name: str
+    store_slug: str
+    store_name: str
+    price: Decimal
+    reason: str

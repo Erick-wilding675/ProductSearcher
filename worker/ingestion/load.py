@@ -25,7 +25,7 @@ from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.engine import Connection
 
 from ingestion import schema
-from ingestion.models import Category, NormalizedProduct
+from ingestion.models import Category, NormalizedProduct, OfferRejection
 
 logger = logging.getLogger(__name__)
 
@@ -186,18 +186,29 @@ def _load_offers(
     conn: Connection,
     product_ids: dict[str, UUID],
     products: list[NormalizedProduct],
+    rejected_offers: Iterable[OfferRejection] = (),
 ) -> tuple[int, int]:
     """Carrega lojas, ofertas e histórico de preço do lote inteiro.
 
-    Quatro instruções no total: lojas, leitura dos preços atuais, ofertas e
-    histórico. O histórico só recebe ponto onde o preço mudou de verdade — é o que
-    mantém a reexecução idempotente.
+    Ofertas classificadas como suspeitas são preservadas no banco com
+    ``quality_status='rejected'`` e o respectivo motivo. Ofertas normais são
+    persistidas como ``quality_status='valid'``.
+
+    O histórico só recebe um novo ponto quando o preço muda de verdade,
+    mantendo a reexecução idempotente.
     """
+    rejected_by_key = {
+        (rejection.product_slug, rejection.store_slug): rejection
+        for rejection in rejected_offers
+    }
+
     # 1) Lojas — deduplicadas por slug, preferindo a ocorrência que traz URL.
     lojas: dict[str, dict] = {}
+
     for product in products:
         for offer in product.offers:
             atual = lojas.get(offer.store_slug)
+
             if atual is None or (offer.store_url and not atual["url"]):
                 lojas[offer.store_slug] = {
                     "slug": offer.store_slug,
@@ -220,10 +231,20 @@ def _load_offers(
 
     # 2) Ofertas — dedup por (produto, loja), que é a chave de conflito.
     ofertas: dict[tuple[UUID, UUID], dict] = {}
+
     for product in products:
         product_id = product_ids[product.slug]
+
         for offer in product.offers:
-            chave = (product_id, store_ids[offer.store_slug])
+            chave = (
+                product_id,
+                store_ids[offer.store_slug],
+            )
+
+            rejection = rejected_by_key.get(
+                (product.slug, offer.store_slug)
+            )
+
             ofertas.setdefault(
                 chave,
                 {
@@ -232,16 +253,32 @@ def _load_offers(
                     "price": offer.price,
                     "currency": offer.currency,
                     "url": offer.url,
+                    "quality_status": (
+                        "rejected"
+                        if rejection is not None
+                        else "valid"
+                    ),
+                    "quality_reason": (
+                        rejection.reason
+                        if rejection is not None
+                        else None
+                    ),
                 },
             )
 
-    # 3) Preços atuais, de uma vez, para saber o que mudou.
+    # 3) Lê preços atuais para descobrir quais realmente mudaram.
     anteriores = {
         (row.product_id, row.store_id): row.price
         for row in conn.execute(
             sa.select(
-                schema.offers.c.product_id, schema.offers.c.store_id, schema.offers.c.price
-            ).where(schema.offers.c.product_id.in_(list(product_ids.values())))
+                schema.offers.c.product_id,
+                schema.offers.c.store_id,
+                schema.offers.c.price,
+            ).where(
+                schema.offers.c.product_id.in_(
+                    list(product_ids.values())
+                )
+            )
         ).all()
     }
 
@@ -250,21 +287,41 @@ def _load_offers(
         schema.offers,
         list(ofertas.values()),
         ["product_id", "store_id"],
-        ["price", "currency", "url"],
-        ["id", "product_id", "store_id"],
+        [
+            "price",
+            "currency",
+            "url",
+            "quality_status",
+            "quality_reason",
+        ],
+        [
+            "id",
+            "product_id",
+            "store_id",
+        ],
     )
 
-    # 4) Histórico só onde o preço mudou (ou é oferta nova).
+    # 4) Histórico só onde o preço mudou (ou é uma oferta nova).
     pontos = []
+
     for row in gravadas:
         chave = (row.product_id, row.store_id)
         anterior = anteriores.get(chave)
         preco = ofertas[chave]["price"]
+
         if anterior is None or Decimal(anterior) != preco:
-            pontos.append({"id": uuid4(), "offer_id": row.id, "price": preco})
+            pontos.append(
+                {
+                    "id": uuid4(),
+                    "offer_id": row.id,
+                    "price": preco,
+                }
+            )
 
     if pontos:
-        conn.execute(pg_insert(schema.price_history).values(pontos))
+        conn.execute(
+            pg_insert(schema.price_history).values(pontos)
+        )
 
     return len(gravadas), len(pontos)
 
@@ -273,25 +330,49 @@ def load(
     conn: Connection,
     products: Iterable[NormalizedProduct],
     categories: Iterable[Category],
+    rejected_offers: Iterable[OfferRejection] = (),
 ) -> dict[str, int]:
-    """Persiste categorias e produtos (com specs e ofertas) de forma idempotente."""
+    """Persiste categorias e produtos com specs e ofertas de forma idempotente."""
+
     category_ids = _load_categories(conn, categories)
     products = list(products)
 
     # Marcas: uma instrução para o lote todo.
-    marcas = {p.brand_slug: {"slug": p.brand_slug, "name": p.brand_name} for p in products}
+    marcas = {
+        product.brand_slug: {
+            "slug": product.brand_slug,
+            "name": product.brand_name,
+        }
+        for product in products
+    }
+
     brand_ids = {
         row.slug: row.id
         for row in _upsert_lote(
-            conn, schema.brands, list(marcas.values()), ["slug"], ["name"], ["id", "slug"]
+            conn,
+            schema.brands,
+            list(marcas.values()),
+            ["slug"],
+            ["name"],
+            ["id", "slug"],
         )
     }
 
-    # `validate()` já garante categoria conhecida; a checagem aqui é defensiva.
-    conhecidos = [p for p in products if p.category_slug in category_ids]
-    for p in products:
-        if p.category_slug not in category_ids:
-            logger.warning("Categoria sem id para %s: %s", p.name, p.category_slug)
+    # `validate()` já garante categoria conhecida;
+    # a checagem aqui é defensiva.
+    conhecidos = [
+        product
+        for product in products
+        if product.category_slug in category_ids
+    ]
+
+    for product in products:
+        if product.category_slug not in category_ids:
+            logger.warning(
+                "Categoria sem id para %s: %s",
+                product.name,
+                product.category_slug,
+            )
 
     product_ids = {
         row.slug: row.id
@@ -300,30 +381,41 @@ def load(
             schema.products,
             [
                 {
-                    "category_id": category_ids[p.category_slug],
-                    "brand_id": brand_ids[p.brand_slug],
-                    "slug": p.slug,
-                    "name": p.name,
-                    "model": p.model,
-                    "description": p.description,
+                    "category_id": category_ids[product.category_slug],
+                    "brand_id": brand_ids[product.brand_slug],
+                    "slug": product.slug,
+                    "name": product.name,
+                    "model": product.model,
+                    "description": product.description,
                 }
-                for p in conhecidos
+                for product in conhecidos
             ],
             ["slug"],
-            ["category_id", "brand_id", "name", "model", "description"],
+            [
+                "category_id",
+                "brand_id",
+                "name",
+                "model",
+                "description",
+            ],
             ["id", "slug"],
-            # Uma carga a partir de um seed ainda não enriquecido não pode zerar
-            # o `model`/`description` que o enriquecimento já trouxe.
+            # Uma carga a partir de um seed ainda não enriquecido não pode
+            # zerar `model`/`description` que o enriquecimento já trouxe.
             keep_if_null=["model", "description"],
         )
     }
 
     specs_do_lote = [
-        {"product_id": product_ids[p.slug], "attributes": p.specs}
-        for p in conhecidos
-        if p.slug in product_ids
+        {
+            "product_id": product_ids[product.slug],
+            "attributes": product.specs,
+        }
+        for product in conhecidos
+        if product.slug in product_ids
     ]
+
     _avisa_specs_orfas(conn, specs_do_lote)
+
     _upsert_lote(
         conn,
         schema.product_specs,
@@ -331,14 +423,17 @@ def load(
         ["product_id"],
         ["attributes"],
         ["id"],
-        # O seed não é dono exclusivo de `attributes`: o rotulador de `use_case`
-        # (ADR-010 D2) grava ali, offline, o que nenhum YAML tem. Substituir a
-        # coluna inteira apagava a rotulagem a cada carga — em silêncio, e o
-        # filtro de caso de uso voltava a não casar com nada.
+        # O seed não é dono exclusivo de `attributes`: o rotulador de
+        # `use_case` (ADR-010 D2) também grava nessa coluna.
         merge_jsonb=["attributes"],
     )
 
-    offers_count, price_points = _load_offers(conn, product_ids, conhecidos)
+    offers_count, price_points = _load_offers(
+        conn,
+        product_ids,
+        conhecidos,
+        rejected_offers,
+    )
 
     return {
         "categories": len(category_ids),
