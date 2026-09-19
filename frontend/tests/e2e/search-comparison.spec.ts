@@ -37,6 +37,6 @@ test("busca produtos e abre comparação", async ({ page }) => {
   await expect(page).toHaveURL(/\/compare\?ids=/);
 
   await expect(
-    page.getByText("Compare preços e especificações dos produtos selecionados."),
+    page.getByText("Compare preços e especificações dos produtos selecionados.")
   ).toBeVisible();
 });

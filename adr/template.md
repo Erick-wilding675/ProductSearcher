@@ -1,4 +1,4 @@
-# ADR-XXXX — Título da decisão
+# ADR-XXXX. Título da decisão
 
 - **Status:** Proposto | Aceito | Substituído por ADR-YYYY
 - **Data:** AAAA-MM-DD

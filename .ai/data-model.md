@@ -1,28 +1,51 @@
 # Modelo de dados (resumo)
 
-> Esquema **provisório e aberto** (pode ganhar/perder colunas). Detalhe em `docs/data-model.md`.
+> Resumo para contexto rápido. Detalhe em [`docs/data-model.md`](../docs/data-model.md).
 
 ## Tabelas
 
-- `categories` — categorias de produto
-- `category_attribute_schema` — quais specs existem por categoria (specs *category-aware*)
-- `brands` — marcas
-- `products` — produto base; inclui `search_vector` (tsvector/FTS) e `embedding` (pgvector)
-- `product_specs` — specs do produto em **JSONB** (flexível)
-- `stores` — lojas/varejistas
-- `offers` — oferta de um produto numa loja (preço, link, moeda, timestamp)
-- `price_history` — histórico de preço por oferta
-- `reviews` — avaliações resumidas (opcional no MVP)
-- `searches` — log de buscas (analytics/relevância)
+| Tabela | Conteúdo |
+| --- | --- |
+| `categories` | Categorias de produto |
+| `category_attribute_schema` | Quais specs existem por categoria, com tipo, unidade, valores permitidos e obrigatoriedade |
+| `brands` | Marcas |
+| `products` | Produto base, com `search_vector` (tsvector) e `embedding` (pgvector, 768 dimensões) |
+| `product_specs` | Specs em JSONB |
+| `stores` | Lojas e varejistas |
+| `offers` | Oferta de um produto numa loja, com `quality_status` e `quality_reason` |
+| `price_history` | Histórico de preço por oferta |
+| `reviews` | Avaliações resumidas; vazia por decisão no MVP |
+| `searches` | Log de buscas (analytics e relevância) |
 
 ## Princípios
 
-- **Postgres-only**: FTS + pgvector no mesmo banco.
-- Specs flexíveis via JSONB, validadas contra `category_attribute_schema`.
-- Comparação só entre produtos da **mesma categoria**.
-- Sem `users` no MVP (sem auth).
+- Postgres-only: FTS e pgvector no mesmo banco.
+- Specs flexíveis em JSONB, validadas contra `category_attribute_schema`.
+- Comparação só entre produtos da mesma categoria.
+- Sem `users`: não há autenticação.
 - IDs `uuid`, timestamps `timestamptz`.
+
+## `product_specs.attributes` tem três donos
+
+Specs da ficha técnica (ingestão), `use_case` (rotulagem offline por LLM, ADR-0010 D2) e
+`_embedding` (carimbo da carga de vetores). **Toda escrita precisa ser merge (`||`), nunca
+substituição:** substituir a coluna apaga o trabalho dos outros donos sem erro e sem log.
+Já aconteceu em produção e deixou "notebook gamer" voltando vazio.
+
+## Qualidade de ofertas
+
+`quality_status` vale `valid` ou `rejected`. A triagem é estatística, por categoria, na
+ingestão; nada é corrigido nem apagado. Busca, detalhe e comparação filtram por `valid`.
+Ver [ADR-0012](../adr/0012-qualidade-de-ofertas-na-ingestao.md).
+
+## Estado
+
+`products.embedding` está preenchida (235 de 235 em produção), mas o retrieval que a
+consome está desligado por flag. `searches` recebe escrita a cada busca com texto, sem
+identificação de usuário. `reviews` está vazia por decisão: a API do Mercado Livre não
+expõe avaliação para token de aplicação.
 
 ## Em aberto
 
-`product_specs` separado vs. embutido em `products`; granularidade de `reviews`; índices (GIN/IVFFlat/HNSW). APIFY como possível fonte futura de `offers`/`price_history`.
+Expurgo por idade em `searches`; granularidade de `reviews` quando for povoada; Apify como
+fonte futura de `offers` e `price_history`.

@@ -9,7 +9,7 @@
 - Mesmos tokens entre web app e extensão.
 - Acessível por padrão; tokenizado (light/dark).
 
-## Hero — Violet
+## Hero: Violet
 
 | Token | Hex | Uso |
 | --- | --- | --- |

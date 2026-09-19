@@ -1,4 +1,4 @@
-# Backend em produção — Fly.io (runbook)
+# Backend em produção: Fly.io (runbook)
 
 > Decisão: [ADR-0011](../../adr/0011-deploy-producao-fly-io.md). Configuração versionada em [`api/fly.toml`](../../api/fly.toml).
 > **Nenhum segredo entra no Git.** `DATABASE_URL` e `CORS_ORIGINS` vivem em `flyctl secrets`; o token do Fly, nas secrets do GitHub.
@@ -7,7 +7,7 @@
 
 - Conta no Fly.io com cartão cadastrado (o free tier acabou; o serviço custa ~US$2/mês).
 - `flyctl` instalado (`iwr https://fly.io/install.ps1 -useb | iex` no Windows) e `flyctl auth login`.
-- Projeto Supabase em **sa-east-1** já provisionado, com migrations e seed aplicados —
+- Projeto Supabase em **sa-east-1** já provisionado, com migrations e seed aplicados,
   ver [`supabase-sa-east-1.md`](supabase-sa-east-1.md). Faça isso **antes** do primeiro deploy.
 
 ## Primeiro deploy
@@ -24,7 +24,7 @@
    smoke em `.github/workflows/deploy-backend.yml`, `NEXT_PUBLIC_API_URL` na Vercel e
    `API_BASE_URL` da extensão.
 
-2. **Gravar os segredos** (o `<...>` é literal — substitua):
+2. **Gravar os segredos** (o `<...>` é literal, substitua):
 
    ```bash
    flyctl secrets set \
@@ -37,7 +37,7 @@
    - `CORS_ORIGINS` recebe **a origem exata** do web app, sem curinga (ADR-0011 D5).
      Confirme o domínio que a Vercel atribuiu antes de gravar. Várias origens: separe
      por vírgula (`a,b`). **Evite a forma JSON aqui**: no PowerShell as aspas duplas
-     somem, o container recebe `[https://...]` e a API entra em loop de restart — foi
+     somem, o container recebe `[https://...]` e a API entra em loop de restart; foi
      o que aconteceu no primeiro deploy.
    - `CORS_ORIGIN_REGEX` não precisa ser definido: o default do código já cobre
      `chrome-extension://` e `moz-extension://`.
@@ -89,6 +89,6 @@
 - [ ] App `productsearcher-api` criado na região `gru`.
 - [ ] Segredos `DATABASE_URL` (6543) e `CORS_ORIGINS` gravados.
 - [ ] `/health` respondendo `{"status":"ok", ..., "db":"ok"}` pela URL pública.
-- [ ] Health check do Fly ativo (`flyctl status` mostra a máquina *passing*) — é ele que
+- [ ] Health check do Fly ativo (`flyctl status` mostra a máquina *passing*), porque é ele que
       segura a pausa do Supabase (ADR-0011 D4).
 - [ ] `FLY_API_TOKEN` no GitHub e um deploy automático verificado ponta a ponta.

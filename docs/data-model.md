@@ -1,13 +1,17 @@
 # Modelagem de dados
 
-> **Esquema provisório e aberto** — pode ganhar/perder colunas. Flexibilidade de specs via JSONB (`product_specs.attributes`).
+O esquema é relacional com um ponto de flexibilidade deliberado: as specs do produto vivem
+em JSONB (`product_specs.attributes`), porque o conjunto de specs válido depende da
+categoria e muda quando uma categoria nova entra.
 
 ## Princípios
 
-- **Postgres-only**: FTS + pgvector no mesmo banco.
-- Specs **category-aware** (`category_attribute_schema`), valores em JSONB.
-- Ofertas normalizadas; preço ao longo do tempo em `price_history`.
-- Sem `users` no MVP. IDs `uuid`; timestamps `timestamptz`.
+- **Postgres-only.** FTS e pgvector no mesmo banco, sem datastore adicional (ADR-0002).
+- Specs **category-aware**: `category_attribute_schema` declara quais atributos existem por
+  categoria, e a validação da ingestão cobra os obrigatórios.
+- Ofertas normalizadas, com preço ao longo do tempo em `price_history`.
+- Sem `users`: não há autenticação no MVP.
+- IDs `uuid`, timestamps `timestamptz`.
 
 ## Diagrama ER
 
@@ -33,6 +37,7 @@ erDiagram
     text attribute_key
     text label
     text data_type
+    jsonb allowed_values
     text unit
     boolean required
   }
@@ -72,6 +77,8 @@ erDiagram
     numeric price
     text currency
     text url
+    text quality_status
+    text quality_reason
     timestamptz captured_at
   }
   PRICE_HISTORY {
@@ -97,34 +104,74 @@ erDiagram
   }
 ```
 
-`SEARCHES` é um log de consultas (analytics/relevância), sem relação forte com as demais.
+`SEARCHES` é log de consultas (analytics e relevância), sem relação forte com as demais.
 
-## Colunas intencionalmente vazias
+## `product_specs.attributes`: três donos, uma coluna
 
-Nem toda coluna vazia é lacuna. Estas são **estado correto** no MVP — a distinção
-está aqui para não serem lidas como esquecimento (ver ADR-0009 D7):
+O JSONB de specs é escrito por três caminhos diferentes, e a distinção importa porque já
+causou perda silenciosa de dado em produção:
 
-| Onde | Por quê | O que a destrava |
+| Chave | Quem escreve | O que é |
 | --- | --- | --- |
-| `PRODUCTS.embedding` | O sistema funciona 100% sem IA; a busca vetorial é reforço opcional atrás do `VectorProvider` (ADR-0002) | Fase 6 — `VectorProvider` com pgvector |
-| `REVIEWS` (tabela) | RF-05 é `Could` no PRD. A API do ML **não expõe avaliação** para token de aplicação: `/reviews/item` responde 404, `/products/{id}/reviews` responde 500 e `rating_average` veio nulo em 44/44 produtos amostrados | Ator do **Apify** sobre a página do produto (mesma fonte do ADR-0001), colhendo `rating` e `rating_count`. A coluna `source` existe para distinguir a procedência |
+| Specs da ficha técnica (`ram_gb`, `cpu`, `anc`, ...) | Ingestão do seed | Declaradas em `category_attribute_schema`; as obrigatórias são cobradas na validação |
+| `use_case` | Rotulagem offline por LLM (ADR-0010 D2) | Lista de rótulos de um conjunto **fechado**, declarado por categoria em `worker/seed/categories.json`. Em runtime é filtro JSONB comum, sem modelo no caminho |
+| `_embedding` | Carga de vetores (`app.search.vector_load`) | Carimbo com `model`, `dim` e `at`. Serve para detectar produto vetorizado por outro modelo |
 
-`SEARCHES` **deixou de ser vazia**: o `SearchService` registra consulta, intent
-interpretado e total de resultados a cada busca com texto. Serve para achar
-busca que volta vazia e termo que o `IntentParser` não entende. Gravamos o texto
-da consulta **sem identificação de usuário** — não há `users` no MVP, nem IP nem
-sessão. Falha ao registrar nunca derruba a busca.
+> **Toda escrita nessa coluna precisa ser merge (`||`), nunca substituição.** Substituir
+> `attributes` inteiro apaga o que os outros donos gravaram, sem erro e sem log. Foi
+> exatamente o que aconteceu ao recarregar o seed em produção: os rótulos de `use_case`
+> sumiram, "notebook" continuou respondendo e "notebook gamer" passou a voltar vazio. O
+> defeito está registrado no ADR-0010 e o runbook de recarga do seed inclui o passo de
+> re-rotulagem.
+
+## Qualidade de ofertas
+
+`offers.quality_status` classifica a oferta em `valid` ou `rejected`, e `quality_reason`
+guarda o motivo em texto livre. A triagem acontece na ingestão, por limite estatístico
+dentro da própria categoria; nenhuma oferta é corrigida nem apagada.
+
+Toda leitura que envolve preço (busca, detalhe de produto, comparação) filtra por
+`quality_status = 'valid'`. O default da coluna é `valid`, então dado antigo continua
+visível. Critério, limites e trade-offs em
+[ADR-0012](../adr/0012-qualidade-de-ofertas-na-ingestao.md).
+
+## Índices
+
+| Índice | Onde | Para quê |
+| --- | --- | --- |
+| GIN sobre `search_vector` | `products` | Full Text Search (RF-10) |
+| GIN `jsonb_path_ops` | `product_specs.attributes` | Filtro por atributos com containment `@>` (RF-12) |
+| HNSW | `products.embedding` | Busca vetorial, hoje desligada por flag |
+| B-tree | `products.category_id`, `products.brand_id`, `offers.store_id`, `price_history.offer_id`, `reviews.product_id` | Junções do caminho de leitura |
+
+A configuração de FTS usa `unaccent` (migration `d2e4f6a8b0c1`). Consulta e documento
+precisam passar pela **mesma** configuração: processados por configurações diferentes eles
+casam menos e não dão erro, o que é falha silenciosa. Dobrar o acento foi a mudança isolada
+que levou a cobertura@5 de 27% para 55%, antes de qualquer IA (ADR-0010 D8).
+
+## Estado das tabelas no MVP
+
+Nem toda tabela vazia é lacuna. A distinção está aqui para que nenhuma seja lida como
+esquecimento:
+
+| Tabela ou coluna | Estado | Observação |
+| --- | --- | --- |
+| `products.embedding` | **Preenchida** | 235 de 235 produtos em produção, 768 dimensões, carimbados com o id do modelo (28/08/2026). O retrieval vetorial que a consome continua desligado por flag |
+| `searches` | **Preenchida** | O `SearchService` grava consulta, intenção interpretada e total de resultados a cada busca com texto. Sem identificação de usuário: não há `users`, nem IP, nem sessão. Falha ao registrar nunca derruba a busca |
+| `price_history` | Preenchida pela ingestão | Recebe ponto novo apenas quando o preço muda de verdade, o que mantém a reexecução idempotente |
+| `reviews` | **Vazia por decisão** | RF-05 é `Could`. A API do Mercado Livre não expõe avaliação para token de aplicação: `/reviews/item` responde 404, `/products/{id}/reviews` responde 500 e `rating_average` veio nulo em 44 de 44 produtos amostrados. O que destrava é um ator do Apify sobre a página do produto; a coluna `source` existe para distinguir a procedência |
 
 ## Identidade do produto
 
-A chave natural é o `slug`, derivado de **marca + modelo + SKU do fabricante**.
-Variantes de cor do mesmo produto (mesmo `parent_id` no catálogo da fonte) são
-**fundidas em um produto só**, somando as ofertas. Ver ADR-0009 D3.
+A chave natural é o `slug`, derivado de marca, modelo e SKU do fabricante. Variantes de cor
+do mesmo produto (mesmo `parent_id` no catálogo da fonte) são fundidas em um produto só,
+somando as ofertas. Detalhe e casos de borda em
+[ADR-0009](../adr/0009-enriquecimento-pela-api-e-identidade-do-produto.md) D3.
 
 ## Decisões em aberto
 
-- `product_specs` separado vs. embutido em `products`.
-- Granularidade de `reviews`.
-- Índices: GIN (FTS/JSONB) e IVFFlat/HNSW (embedding).
-- APIFY como possível fonte futura de `offers`/`price_history` (ver ADR-0001).
-- Expurgo por idade em `searches` (hoje cresce sem limite).
+- Expurgo por idade em `searches`, que hoje cresce sem limite.
+- Granularidade de `reviews`, quando a tabela for povoada.
+- `product_specs` separado de `products` continua sendo o desenho; embutir só faria sentido
+  se a leitura de specs virasse gargalo, o que não aconteceu.
+- Apify como fonte futura de `offers` e `price_history` (ADR-0001).

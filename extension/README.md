@@ -1,7 +1,7 @@
-# extension/ — Extensão Chrome (Manifest V3)
+# extension: extensão Chrome (Manifest V3)
 
 Cliente fino da **mesma API** do web app (ADR-0003). Na SERP do Google, mostra o top-N
-do catálogo para a busca — **apenas** quando a categoria é coberta.
+do catálogo para a busca, **apenas** quando a categoria é coberta.
 
 Ver [`../docs/wireframes.md`](../docs/wireframes.md) (tela 03) e
 [`../docs/design-system.md`](../docs/design-system.md).
@@ -14,7 +14,7 @@ src/
   shared/
     config.js           # URLs da API e do web app, TOP_N, TTL do cache
     coverage.js         # decide cobertura + extrai a query da URL (puro, testável)
-    api.js              # cliente da API — SÓ para o service worker
+    api.js              # cliente da API, SÓ para o service worker
   background/
     service-worker.js   # único ponto que fala com a API; cache de cobertura
   content/
@@ -42,7 +42,7 @@ SERP  ──lê ?q= da URL──▶  content.js
 ### Por que a rede passa toda pelo service worker
 
 Um `fetch` disparado do content script sai com a **origem da página** (`google.com`),
-que o CORS da API não libera — o regex do backend só aceita `chrome-extension://`.
+que o CORS da API não libera: o regex do backend só aceita `chrome-extension://`.
 O service worker tem a origem da extensão, então é ele quem chama a API. De quebra,
 content script e popup compartilham o mesmo cache de cobertura.
 
@@ -50,7 +50,7 @@ content script e popup compartilham o mesmo cache de cobertura.
 
 A decisão é **local**: baixamos as categorias cobertas uma vez (`GET /categories`,
 cache de 1h) e comparamos com a busca em `coverage.js`. Consultar a API a cada SERP
-exporia buscas que nada têm a ver com produto — e a extensão roda em toda SERP.
+exporia buscas que nada têm a ver com produto, e a extensão roda em toda SERP.
 
 As palavras-chave saem do `slug` e do `name` que a API devolve, mais uma tabela local
 de sinônimos (`fone`, `headset`, `laptop`…). Uma categoria nova no catálogo já funciona
@@ -63,7 +63,7 @@ casos como "fone" para "Fones de ouvido" precisam entrar em `SINONIMOS`.
 
 ## Privacidade (RNF-09)
 
-**Só a busca sai do navegador — e só quando a categoria é coberta.**
+**Só a busca sai do navegador, e só quando a categoria é coberta.**
 
 O que é enviado à API:
 
@@ -73,7 +73,7 @@ O que é enviado à API:
 
 O que **não** é enviado, lido nem armazenado:
 
-- Nenhum outro parâmetro da URL da SERP (`ei`, `sclient`, etc. são descartados —
+- Nenhum outro parâmetro da URL da SERP (`ei`, `sclient`, etc. são descartados:
   `queryDaSerp` lê exclusivamente `q`)
 - Conteúdo, DOM ou resultados da página do Google
 - Histórico, outras abas, cookies, `localStorage` do Google
@@ -86,36 +86,52 @@ Permissões pedidas, e por quê:
 | ---------------------------------- | --------------------------------------------------------------------- |
 | `storage`                          | Guardar o cache das categorias cobertas (não guarda buscas)           |
 | `activeTab`                        | Ler a URL da aba **no clique** do usuário, para o popup saber a busca |
-| `host_permissions: localhost:8000` | Falar com a API do ProductSearcher                                    |
+| `host_permissions`                 | Falar com a API do ProductSearcher: `https://productsearcher-api.fly.dev/*` em produção e `http://localhost:8000/*` para desenvolvimento |
 
 Não pedimos `tabs` (que daria acesso a todas as abas) nem `history`. `activeTab` é
-concedida pelo Chrome só no gesto do usuário e expira — é o menor privilégio que
+concedida pelo Chrome só no gesto do usuário e expira, e é o menor privilégio que
 atende ao caso.
 
 O `content_scripts.matches` restringe a execução a `google.com/search` e
 `google.com.br/search`: em qualquer outro site a extensão nem carrega.
 
-## Rodar em dev
+## Rodar contra produção (o caminho curto)
+
+A extensão **já vem apontada para produção** (ADR-0011 D6), porque quem carrega a
+extensão para ver a demo não tem backend local nenhum. Para usá-la assim, basta
+carregá-la e buscar no Google:
+
+1. `chrome://extensions` → ative **Modo do desenvolvedor**
+2. **Carregar sem compactação** → aponte para esta pasta (`extension/`)
+3. Busque "melhor notebook gamer" no Google
+
+Não é preciso subir nada localmente.
+
+## Rodar em dev (contra API local)
+
+Para desenvolver, troque `API_BASE_URL` e `WEB_APP_URL` em `src/shared/config.js` pelos
+endereços locais que estão comentados no próprio arquivo. O `manifest.json` já permite
+as duas origens, então não é preciso mexer nele.
 
 A extensão só aparece quando a API responde **com catálogo**. Sem produtos,
 `/categories` volta vazio, nenhuma busca cai em cobertura (RF-51) e a extensão
-fica calada de propósito — o que parece defeito e não é. Então garanta a API
+fica calada de propósito, o que parece defeito e não é. Então garanta a API
 primeiro.
 
 ### 1. Suba a API com dados
 
-**Opção A — contra o Supabase** (mais rápida; o catálogo já está lá):
+**Opção A, contra o Supabase** (mais rápida, porque o catálogo já está lá):
 
 ```bash
 # na raiz, com o DATABASE_URL do Supabase no .env
 uvicorn app.main:app --reload --port 8000 --app-dir api
 ```
 
-**Opção B — tudo local:**
+**Opção B, tudo local:**
 
 ```bash
 docker compose up -d db     # só o Postgres
-make migrate                # cria o schema — o compose NÃO faz isso
+make migrate                # cria o schema; o compose NÃO faz isso
 make seed                   # carrega o catálogo
 docker compose up -d api
 ```
@@ -124,7 +140,7 @@ docker compose up -d api
 > **ignora** o `DATABASE_URL` do `.env`. Misturar as duas opções é a forma mais
 > fácil de subir uma API conectada num banco vazio.
 
-Confira antes de seguir — tem que vir `product_count > 0`:
+Confira antes de seguir. Tem que vir `product_count > 0`:
 
 ```bash
 curl localhost:8000/categories
@@ -142,7 +158,7 @@ curl localhost:8000/categories
 | --- | --- |
 | `melhor notebook gamer` | painel com o top 3 de notebooks |
 | `fone bluetooth com anc` | painel com o top 3 de fones |
-| `receita de bolo` | **nada** — fora de cobertura, nem chega à API |
+| `receita de bolo` | **nada**: fora de cobertura, nem chega à API |
 
 Se nada aparecer, abra o console do service worker em `chrome://extensions` →
 **Service worker**. Falha de `/categories` é logada lá com o motivo.
@@ -150,11 +166,11 @@ Se nada aparecer, abra o console do service worker em `chrome://extensions` →
 ### Apontando para outro backend
 
 Ajuste `API_BASE_URL` em `src/shared/config.js` **e** `host_permissions` no
-`manifest.json` — trocar só um dos dois faz toda requisição falhar por permissão.
+`manifest.json`. Trocar só um dos dois faz toda requisição falhar por permissão.
 
 ## Testes
 
-`npm test` (ou `node --test`) — cobre a decisão de cobertura e a extração da query,
+`npm test` (ou `node --test`) cobre a decisão de cobertura e a extração da query,
 que é onde mora a regra de negócio. O resto é DOM e rede, verificados carregando a
 extensão.
 
@@ -163,6 +179,9 @@ extensão.
 - **Seletores da SERP são frágeis.** O Google muda o DOM sem aviso; por isso o
   fallback de botão flutuante existe (RF-53).
 - **Só Google.** Outros buscadores exigiriam novos `matches` e âncoras.
-- `API_BASE_URL` aponta para `localhost`. Publicar exige o host de produção aqui e em
-  `host_permissions` (Fase 7).
+- **Não publicada na Chrome Web Store** (RF-55, `Could`). Hoje o uso é por carga sem
+  compactação. Publicar exigiria revisão de política de privacidade e conta de
+  desenvolvedor.
+- **Chrome estável bloqueia `--load-extension` por linha de comando.** Para automatizar a
+  verificação, use Edge ou carregue a extensão pela interface.
 - `package.json` existe só para os testes (`type: module`); o Chrome o ignora.

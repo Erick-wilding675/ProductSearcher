@@ -1,7 +1,20 @@
 # Provisionamento do Supabase (Postgres + pgvector)
 
-> Tarefa Fase 1 · Referência: [ADR-0002](../../adr/0002-datastore-postgres-only.md) e [ADR-0004](../../adr/0004-deploy-free-tier.md).
-> Banco gerenciado free-tier com `pgvector`. **Nenhum segredo entra no Git** — a connection string vai só no `.env` local / nas secrets do provedor.
+> ## ⚠️ O projeto descrito aqui foi desativado em 18/09/2026
+>
+> O banco de produção vive em **`sa-east-1`**, junto do backend no Fly
+> ([ADR-0011](../../adr/0011-deploy-producao-fly-io.md) D3). O runbook vigente é
+> [`supabase-sa-east-1.md`](supabase-sa-east-1.md).
+>
+> **A connection string da seção "Valores deste projeto" não vale mais.** Este documento
+> continua aqui por dois motivos: o procedimento de provisionamento (seções 1 a 4) é o
+> mesmo para qualquer projeto Supabase novo, e o registro do projeto anterior explica de
+> onde a topologia veio.
+
+> Origem: tarefa da Fase 1. Referências: [ADR-0002](../../adr/0002-datastore-postgres-only.md)
+> e [ADR-0004](../../adr/0004-deploy-free-tier.md). Banco gerenciado free-tier com
+> `pgvector`. **Nenhum segredo entra no Git:** a connection string vive apenas no `.env`
+> local e nas secrets do provedor.
 
 ## Pré-requisitos
 
@@ -27,7 +40,7 @@
 
 3. **Obter a connection string**
    - Topo do dashboard → **Connect** (ou **Project Settings → Database → Connection string**).
-   - Use a string do **Connection pooler** (modo *Transaction*, porta `6543`) — recomendada para free-tier (limite de conexões e compatibilidade IPv4).
+   - Use a string do **Connection pooler** (modo *Transaction*, porta `6543`), recomendada para free-tier (limite de conexões e compatibilidade IPv4).
    - Formato típico:
      ```
      postgres://postgres.<ref>:<SUA_SENHA>@aws-0-<region>.pooler.supabase.com:6543/postgres
@@ -45,7 +58,7 @@
      cp .env.example .env
      ```
    - Em `.env`, defina `DATABASE_URL` com a string adaptada acima.
-   - `.env` já está no `.gitignore` — confirme com `git status` que ele **não** aparece.
+   - `.env` já está no `.gitignore`; confirme com `git status` que ele **não** aparece.
 
 ## Critério de conclusão (definition of done)
 
@@ -54,12 +67,7 @@
 - [ ] Connection string (pooler) adaptada para `postgresql+psycopg://` e gravada no `.env` local.
 - [ ] Segredo fora do Git (`.env` ignorado).
 
-> ⚠️ **Obsoleto desde 18/09/2026.** O projeto abaixo (`us-east-1`) foi substituído por
-> um em **`sa-east-1`**, junto do backend no Fly ([ADR-0011](../../adr/0011-deploy-producao-fly-io.md) D3).
-> A reconstrução está em [`supabase-sa-east-1.md`](supabase-sa-east-1.md). O que segue vale como
-> histórico e como referência do procedimento de provisionamento — **a connection string não vale mais**.
-
-## Valores deste projeto (provisionado em 24/06/2026)
+## Valores do projeto anterior, desativado (provisionado em 24/06/2026)
 
 Projeto Supabase reaproveitado (org `Erick-wilding675's Org`, Free Plan), região **us-east-1**. `pgvector` confirmado: `vector` v0.8.0.
 
@@ -72,7 +80,7 @@ Conexão via **Transaction pooler** (porta 6543):
 | database | `postgres` |
 | user | `postgres.fzbaamyeyffnprinrkva` |
 
-`DATABASE_URL` para o `.env` (driver psycopg v3 — substitua `[SUA_SENHA]` pela senha do banco; **não commitar**):
+`DATABASE_URL` para o `.env` (driver psycopg v3; substitua `[SUA_SENHA]` pela senha do banco; **não commitar**):
 
 ```
 postgresql+psycopg://postgres.fzbaamyeyffnprinrkva:[SUA_SENHA]@aws-1-us-east-1.pooler.supabase.com:6543/postgres
@@ -82,11 +90,11 @@ postgresql+psycopg://postgres.fzbaamyeyffnprinrkva:[SUA_SENHA]@aws-1-us-east-1.p
 
 > **Nota para Fase 2/3 (pgbouncer):** o Transaction pooler roda o pgbouncer em modo *transaction*, que não suporta prepared statements persistentes. Ao conectar via SQLAlchemy/psycopg em `api/app/core/db.py`, desabilite o cache de prepared statements (psycopg v3: `connect_args={"prepare_threshold": None}`). Para migrations (Alembic), prefira a **Direct connection** (porta 5432).
 
-## Keep-alive (free-tier) — decidido na Fase 7
+## Keep-alive do plano free, decidido na Fase 7
 
 O Supabase Free **pausa o projeto após 7 dias de inatividade**. A escolha está no
 [ADR-0011](../../adr/0011-deploy-producao-fly-io.md) D4: **não há cron**. Quem mantém o
-banco ativo é o health check do Fly batendo em `/health` a cada 30 s — endpoint que já
+banco ativo é o health check do Fly batendo em `/health` a cada 30 s, endpoint que já
 executa um `SELECT 1`, então a mesma sondagem serve de prova de vida do serviço e de
 atividade no banco, sem serviço extra nem segredo.
 

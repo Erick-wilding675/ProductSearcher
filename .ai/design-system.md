@@ -4,7 +4,7 @@
 
 ## Diretrizes
 
-- **Hero color: Roxo/Lilás (Violet)** — comunica inovação/IA + premium.
+- **Hero color: Roxo/Lilás (Violet)**, comunica inovação/IA + premium.
 - Aplicação **60-30-10** (fundo neutro dominante; cor em CTAs/destaques).
 - **Light + dark** desde o MVP.
 - Tipografia **Inter** (sans geométrica).

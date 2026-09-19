@@ -55,7 +55,7 @@ flowchart LR
   UC07 --> llm
 ```
 
-## UC-01 — Buscar produtos
+## UC-01: Buscar produtos
 
 ```mermaid
 sequenceDiagram
@@ -77,7 +77,7 @@ sequenceDiagram
   W-->>U: lista rankeada
 ```
 
-## UC-02 — Comparar produtos
+## UC-02: Comparar produtos
 
 ```mermaid
 sequenceDiagram
@@ -94,7 +94,7 @@ sequenceDiagram
   W-->>U: comparação
 ```
 
-## UC-05 — Assistência contextual (extensão)
+## UC-05: Assistência contextual (extensão)
 
 ```mermaid
 sequenceDiagram
@@ -120,7 +120,7 @@ sequenceDiagram
   end
 ```
 
-## UC-06 — Curar catálogo (ingestão)
+## UC-06: Curar catálogo (ingestão)
 
 ```mermaid
 sequenceDiagram
