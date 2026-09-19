@@ -18,6 +18,7 @@ gatilho de revisão**.
 | [0010](0010-fase-6-onde-a-ia-entra.md) | Fase 6: onde a IA entra (e onde não entra) | Aceito; fase fechada em 28/08/2026 |
 | [0011](0011-deploy-producao-fly-io.md) | Deploy de produção: Fly.io em `gru`, banco em `sa-east-1`, keep-alive por health check | Aceito; executado em 18/09/2026 |
 | [0012](0012-qualidade-de-ofertas-na-ingestao.md) | Qualidade de ofertas na ingestão: classificar, não descartar | Aceito |
+| [0013](0013-kpi-de-relevancia-fora-da-ci.md) | O KPI de relevância sai da CI enquanto os rótulos não forem reproduzíveis | Aceito, com gatilho de revisão |
 
 ## Como ler estes documentos
 

@@ -89,8 +89,19 @@ Duas exceções, que se **pulam** em vez de falhar em falso quando o ambiente n�
 
 | Suíte | Exige | Comportamento sem o requisito |
 | --- | --- | --- |
-| `tests/test_relevance.py` | Postgres com o seed carregado | Pulada. Mede o KPI de relevância top-5 do PRD |
+| `tests/test_relevance.py` e `tests/test_relevance_use_cases.py` | Postgres com o seed **e** os rótulos de `use_case` | Pulada. Medem o KPI de relevância do PRD. Ver o aviso abaixo |
 | `tests/test_embedding_real.py` | Pesos ONNX presentes | Pulada. Ver [`README-vector.md`](README-vector.md) |
+
+> ### O KPI de relevância não é medido pela CI
+>
+> As consultas do KPI viram filtro duro de `use_case` (ADR-0010 D2), e os rótulos que esse
+> filtro procura são produzidos por LLM offline: **eles não estão no seed versionado**.
+> Um catálogo recém-carregado não os tem, então essas consultas voltariam zero e o teste
+> mediria a ausência dos rótulos, não a busca. A suíte pula, com a razão na mensagem.
+>
+> Consequência: **uma regressão de relevância passa pela CI sem ser notada.** Antes de
+> mexer em relevância, ranking ou `IntentParser`, meça com rótulos presentes. Decisão,
+> custo e gatilho de revisão no [ADR-0013](../adr/0013-kpi-de-relevancia-fora-da-ci.md).
 
 Para exercitar o KPI de verdade:
 
@@ -104,6 +115,12 @@ cd api    && pytest -q                       # agora a relevância roda
 
 A mesma exportação vale aqui, e por um motivo a mais: **`pytest` também lê `api/.env`**.
 Sem a variável, a suíte de relevância mede o catálogo de produção em vez do local.
+
+Para o KPI rodar de verdade, o catálogo precisa ainda dos rótulos de `use_case`:
+
+```bash
+cd worker && python -m tools.seedbuilder.label_use_cases --executar   # exige GROQ_API_KEY
+```
 
 Ao trocar o seed, recalibre os casos de `test_relevance.py`. Um produto esperado que saiu
 do catálogo derruba o KPI sem que a busca tenha piorado.

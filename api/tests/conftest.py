@@ -16,7 +16,7 @@ from sqlalchemy import create_engine, func, select
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, sessionmaker
 
-from app.catalog.tables import products
+from app.catalog.tables import product_specs, products
 from app.core.config import settings
 from app.search.intent import RuleBasedIntentParser
 from app.search.providers import FtsSearchProvider
@@ -66,3 +66,46 @@ def search_service(db_session: Session) -> SearchService:
         FtsSearchProvider(db_session),
         DeterministicRanking(),
     )
+
+
+@pytest.fixture(scope="session")
+def catalogo_tem_use_case(db_session: Session) -> bool:
+    """O catálogo carregado tem rótulos de `use_case`?
+
+    Os rótulos são produzidos **offline, por LLM** (ADR-0010 D2) e gravados
+    direto em `product_specs.attributes`. Eles **não estão no seed versionado**,
+    então um banco recém-carregado pela ingestão não os tem: CI, máquina nova ou
+    projeto Supabase recriado começam todos sem rótulo nenhum.
+    """
+    total = db_session.execute(
+        select(func.count())
+        .select_from(product_specs)
+        .where(product_specs.c.attributes.has_key("use_case"))
+    ).scalar_one()
+    return bool(total)
+
+
+def pula_sem_rotulo_de_uso(query: str, tem_rotulos: bool) -> None:
+    """Pula a consulta que depende de `use_case` quando o catálogo não tem rótulo.
+
+    Por que isto existe, e por que é um remendo consciente: desde o ADR-0010 D2 o
+    `RuleBasedIntentParser` converte necessidade ("gamer", "para jogos") em
+    **filtro duro** de `use_case`. Contra um catálogo sem rótulos esse filtro não
+    casa com nada e a consulta devolve zero, então o teste mediria a ausência dos
+    rótulos, não a qualidade da busca. Falhar aqui seria falha em falso, no mesmo
+    sentido em que `db_session` pula sem Postgres.
+
+    O preço é real e está registrado: onde isto pula, o KPI de relevância do PRD
+    **não é verificado**, e era exatamente para verificá-lo em todo merge que a CI
+    ganhou um serviço Postgres. A correção de raiz é versionar os rótulos no seed,
+    o que tornaria este helper desnecessário. Ver ADR-0013.
+    """
+    if tem_rotulos:
+        return
+    intent = RuleBasedIntentParser().parse(query)
+    if (intent.attributes or {}).get("use_case"):
+        pytest.skip(
+            f"'{query}' vira filtro duro de use_case, e o catálogo carregado não tem "
+            "rótulos (eles não vêm no seed). Rode tools.seedbuilder.label_use_cases "
+            "para medir o KPI de verdade."
+        )

@@ -26,6 +26,7 @@ quer. Consulta de **necessidade** ("notebook para edição de vídeo"), cujo gab
 import pytest
 
 from app.search.service import SearchService
+from tests.conftest import pula_sem_rotulo_de_uso
 
 # (consulta do usuário, trecho que identifica o produto esperado)
 TEST_CASES: list[tuple[str, str]] = [
@@ -56,8 +57,18 @@ def _acertou(service: SearchService, query: str, esperado: str) -> bool:
     return any(alvo in item.name.lower() for item in resposta.results[:TOP_N])
 
 
-def test_relevancia_top5(search_service: SearchService) -> None:
-    """KPI agregado: ≥80% das consultas com o produto esperado no top-5."""
+def test_relevancia_top5(search_service: SearchService, catalogo_tem_use_case: bool) -> None:
+    """KPI agregado: ≥80% das consultas com o produto esperado no top-5.
+
+    O agregado exige **todas** as consultas mensuráveis. Três delas contêm
+    "gamer", que o parser converte em filtro duro de `use_case` (ADR-0010 D2);
+    sem rótulos no catálogo elas voltam zero e o KPI mediria a ausência dos
+    rótulos. Excluir só essas mudaria o denominador e o número deixaria de ser
+    comparável com o histórico, então o agregado inteiro pula.
+    """
+    for query, _ in TEST_CASES:
+        pula_sem_rotulo_de_uso(query, catalogo_tem_use_case)
+
     faltaram = [
         f"{query!r} (esperava {esperado!r})"
         for query, esperado in TEST_CASES
@@ -72,8 +83,14 @@ def test_relevancia_top5(search_service: SearchService) -> None:
 
 
 @pytest.mark.parametrize(("query", "esperado"), TEST_CASES, ids=lambda v: v)
-def test_consulta_individual(search_service: SearchService, query: str, esperado: str) -> None:
-    """Cada consulta isolada — aponta exatamente qual regrediu."""
+def test_consulta_individual(
+    search_service: SearchService,
+    catalogo_tem_use_case: bool,
+    query: str,
+    esperado: str,
+) -> None:
+    """Cada consulta isolada, para apontar exatamente qual regrediu."""
+    pula_sem_rotulo_de_uso(query, catalogo_tem_use_case)
     assert _acertou(search_service, query, esperado), (
         f"{esperado!r} não apareceu no top-{TOP_N} de {query!r}"
     )

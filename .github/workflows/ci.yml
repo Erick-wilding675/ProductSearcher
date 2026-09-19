@@ -75,9 +75,13 @@ jobs:
           commit_message: "style: auto-fix de lint e formatação"
 
   # ------------------------------------------------------------------- api
-  # Postgres real com pgvector: sem serviço de banco, a suíte de relevância
-  # (KPI Top-5 ≥80% do PRD) era PULADA no CI e só rodava na máquina do dev —
-  # ou seja, o KPI não era verificado em nenhum merge.
+  # Postgres real com pgvector, para que a suíte rode contra o banco de verdade
+  # (`plainto_tsquery` e `ts_rank` não têm equivalente fiel em fake).
+  #
+  # ATENÇÃO ao que este job NÃO verifica: o KPI de relevância do PRD fica
+  # **pulado** aqui. Ele depende dos rótulos de `use_case`, que são produzidos
+  # por LLM offline e não estão no seed versionado, então o catálogo que este job
+  # carrega não os tem. Decisão e gatilho de revisão no ADR-0013.
   api:
     runs-on: ubuntu-latest
     needs: lint

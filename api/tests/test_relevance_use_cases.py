@@ -71,6 +71,7 @@ import pytest
 
 from app.search.schemas import SearchResultItem
 from app.search.service import SearchService
+from tests.conftest import pula_sem_rotulo_de_uso
 
 TOP_N = 5
 META = 0.80
@@ -290,13 +291,16 @@ def acaso(db_session) -> dict[str, float]:
 
 
 @pytest.mark.parametrize("caso", CASOS, ids=lambda c: c.rotulo)
-def test_caso_de_uso_mede(search_service: SearchService, caso: CasoDeUso) -> None:
+def test_caso_de_uso_mede(
+    search_service: SearchService, catalogo_tem_use_case: bool, caso: CasoDeUso
+) -> None:
     """Registra a medição de cada caso. Só falha nos **controles**.
 
     Os casos semânticos não afirmam nada isoladamente: quem julga é o agregado,
     porque uma consulta ruim isolada é ruído — o KPI do PRD é sobre o conjunto.
     Os controles, sim, afirmam: eles não dependem de semântica alguma.
     """
+    pula_sem_rotulo_de_uso(caso.query, catalogo_tem_use_case)
     medicao = _medir(search_service, caso)
 
     if caso.controle:
@@ -307,8 +311,13 @@ def test_caso_de_uso_mede(search_service: SearchService, caso: CasoDeUso) -> Non
         )
 
 
-def test_cobertura_casos_de_uso(search_service: SearchService, acaso) -> None:
+def test_cobertura_casos_de_uso(
+    search_service: SearchService, catalogo_tem_use_case: bool, acaso
+) -> None:
     """KPI: ≥80% dos casos com ao menos um resultado útil no top-5."""
+    for caso in CASOS:
+        pula_sem_rotulo_de_uso(caso.query, catalogo_tem_use_case)
+
     medicoes = [_medir(search_service, caso) for caso in CASOS if not caso.controle]
     cobertos = [m for m in medicoes if m.cobriu]
     taxa = len(cobertos) / len(medicoes)
@@ -318,12 +327,17 @@ def test_cobertura_casos_de_uso(search_service: SearchService, acaso) -> None:
     )
 
 
-def test_precisao_casos_de_uso(search_service: SearchService, acaso) -> None:
-    """Precisão média@5 acima do acaso com folga — o topo tem que ser do caso de uso.
+def test_precisao_casos_de_uso(
+    search_service: SearchService, catalogo_tem_use_case: bool, acaso
+) -> None:
+    """Precisão média@5 acima do acaso com folga: o topo tem que ser do caso de uso.
 
     Meta deliberadamente mais dura que "acima do acaso": um top-5 em que 3 de 5
     servem ainda faz o usuário garimpar. O alvo é a maioria do topo servir.
     """
+    for caso in CASOS:
+        pula_sem_rotulo_de_uso(caso.query, catalogo_tem_use_case)
+
     medicoes = [_medir(search_service, caso) for caso in CASOS if not caso.controle]
     media = sum(m.precisao for m in medicoes) / len(medicoes)
     media_acaso = sum(acaso.get(m.caso.query, 0.0) for m in medicoes) / len(medicoes)
