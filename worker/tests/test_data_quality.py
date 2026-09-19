@@ -137,11 +137,7 @@ def test_calcula_limite_por_categoria():
     assert len(rejected) == 1
     assert rejected[0].product_name == "Notebook outlier"
 
-    fones = [
-        product
-        for product in detected_products
-        if product.category_slug == "headphones"
-    ]
+    fones = [product for product in detected_products if product.category_slug == "headphones"]
 
     assert all(product.offers for product in fones)
 

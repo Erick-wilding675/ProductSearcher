@@ -198,8 +198,7 @@ def _load_offers(
     mantendo a reexecução idempotente.
     """
     rejected_by_key = {
-        (rejection.product_slug, rejection.store_slug): rejection
-        for rejection in rejected_offers
+        (rejection.product_slug, rejection.store_slug): rejection for rejection in rejected_offers
     }
 
     # 1) Lojas — deduplicadas por slug, preferindo a ocorrência que traz URL.
@@ -241,9 +240,7 @@ def _load_offers(
                 store_ids[offer.store_slug],
             )
 
-            rejection = rejected_by_key.get(
-                (product.slug, offer.store_slug)
-            )
+            rejection = rejected_by_key.get((product.slug, offer.store_slug))
 
             ofertas.setdefault(
                 chave,
@@ -253,16 +250,8 @@ def _load_offers(
                     "price": offer.price,
                     "currency": offer.currency,
                     "url": offer.url,
-                    "quality_status": (
-                        "rejected"
-                        if rejection is not None
-                        else "valid"
-                    ),
-                    "quality_reason": (
-                        rejection.reason
-                        if rejection is not None
-                        else None
-                    ),
+                    "quality_status": ("rejected" if rejection is not None else "valid"),
+                    "quality_reason": (rejection.reason if rejection is not None else None),
                 },
             )
 
@@ -274,11 +263,7 @@ def _load_offers(
                 schema.offers.c.product_id,
                 schema.offers.c.store_id,
                 schema.offers.c.price,
-            ).where(
-                schema.offers.c.product_id.in_(
-                    list(product_ids.values())
-                )
-            )
+            ).where(schema.offers.c.product_id.in_(list(product_ids.values())))
         ).all()
     }
 
@@ -319,9 +304,7 @@ def _load_offers(
             )
 
     if pontos:
-        conn.execute(
-            pg_insert(schema.price_history).values(pontos)
-        )
+        conn.execute(pg_insert(schema.price_history).values(pontos))
 
     return len(gravadas), len(pontos)
 
@@ -360,11 +343,7 @@ def load(
 
     # `validate()` já garante categoria conhecida;
     # a checagem aqui é defensiva.
-    conhecidos = [
-        product
-        for product in products
-        if product.category_slug in category_ids
-    ]
+    conhecidos = [product for product in products if product.category_slug in category_ids]
 
     for product in products:
         if product.category_slug not in category_ids:

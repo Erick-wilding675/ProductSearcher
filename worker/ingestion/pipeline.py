@@ -20,9 +20,7 @@ from ingestion.validate import read_categories, validate
 logger = logging.getLogger(__name__)
 
 SEED_DIR = Path(__file__).resolve().parent.parent / "seed"
-DEFAULT_DATABASE_URL = (
-    "postgresql+psycopg://postgres:postgres@db:5432/productsearcher"
-)
+DEFAULT_DATABASE_URL = "postgresql+psycopg://postgres:postgres@db:5432/productsearcher"
 
 
 def run(
@@ -37,10 +35,7 @@ def run(
     )
 
     categories = read_categories(seed_dir)
-    schemas = {
-        category.slug: category.attributes
-        for category in categories
-    }
+    schemas = {category.slug: category.attributes for category in categories}
 
     raw = SeedIngestionSource(seed_dir).fetch()
 
@@ -55,18 +50,15 @@ def run(
     try:
         with engine.begin() as conn:
             report = load(
-            conn,
-            valid,
-            categories,
-            rejected_prices,
-        )
+                conn,
+                valid,
+                categories,
+                rejected_prices,
+            )
     finally:
         engine.dispose()
 
-    report["rejected"] = (
-        len(rejected_norm)
-        + len(rejected_specs)
-    )
+    report["rejected"] = len(rejected_norm) + len(rejected_specs)
 
     report["rejected_offers"] = len(rejected_prices)
 

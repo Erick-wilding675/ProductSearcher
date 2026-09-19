@@ -29,9 +29,7 @@ def _percentile(values: list[Decimal], percentile: Decimal) -> Decimal:
     """Calcula percentil pelo método nearest-rank."""
     ordered = sorted(values)
 
-    rank = math.ceil(
-        float(percentile) * len(ordered)
-    )
+    rank = math.ceil(float(percentile) * len(ordered))
 
     index = max(0, rank - 1)
 
@@ -60,17 +58,14 @@ def detect_price_outliers(
     for product in products:
         for offer in product.offers:
             if offer.price > 0:
-                prices_by_category[product.category_slug].append(
-                    offer.price
-                )
+                prices_by_category[product.category_slug].append(offer.price)
 
     thresholds: dict[str, Decimal] = {}
 
     for category, prices in prices_by_category.items():
         if len(prices) < MIN_PRICE_SAMPLE_SIZE:
             logger.info(
-                "Qualidade de preço não aplicada à categoria %s: "
-                "amostra insuficiente (%d < %d)",
+                "Qualidade de preço não aplicada à categoria %s: amostra insuficiente (%d < %d)",
                 category,
                 len(prices),
                 MIN_PRICE_SAMPLE_SIZE,
@@ -83,15 +78,9 @@ def detect_price_outliers(
             Decimal("0.99"),
         )
 
-        median_threshold = (
-            category_median
-            * PRICE_OUTLIER_MEDIAN_MULTIPLIER
-        )
+        median_threshold = category_median * PRICE_OUTLIER_MEDIAN_MULTIPLIER
 
-        p99_threshold = (
-            category_p99
-            * PRICE_OUTLIER_P99_MULTIPLIER
-        )
+        p99_threshold = category_p99 * PRICE_OUTLIER_P99_MULTIPLIER
 
         threshold = max(
             median_threshold,
@@ -101,8 +90,7 @@ def detect_price_outliers(
         thresholds[category] = threshold
 
         logger.info(
-            "Limite de qualidade para %s: "
-            "mediana=%s, p99=%s, threshold=%s",
+            "Limite de qualidade para %s: mediana=%s, p99=%s, threshold=%s",
             category,
             category_median,
             category_p99,
@@ -112,9 +100,7 @@ def detect_price_outliers(
     rejected: list[OfferRejection] = []
 
     for product in products:
-        threshold = thresholds.get(
-            product.category_slug
-        )
+        threshold = thresholds.get(product.category_slug)
 
         if threshold is None:
             continue
@@ -130,8 +116,7 @@ def detect_price_outliers(
             )
 
             logger.warning(
-                "Oferta classificada como suspeita "
-                "(produto=%s, loja=%s, preço=%s): %s",
+                "Oferta classificada como suspeita (produto=%s, loja=%s, preço=%s): %s",
                 product.name,
                 offer.store_name,
                 offer.price,
