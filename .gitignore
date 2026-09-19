@@ -33,3 +33,8 @@ Thumbs.db
 .obsidian/
 frontend/test-results/
 frontend/playwright-report/
+
+# Backups de .env gerados na migracao de ambiente (contem segredos).
+# O padrao `*.env` acima nao pega nomes como `.env.bak_20260918212234`.
+.env.*
+!.env.example

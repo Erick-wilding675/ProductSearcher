@@ -90,11 +90,7 @@ def _condicoes_duras(
     # não extrai (ex.: marca escolhida na UI).
     category = intent.category or filters.get("category")
     brand = filters.get("brand")
-    price_max = (
-        intent.price_max
-        if intent.price_max is not None
-        else filters.get("price_max")
-    )
+    price_max = intent.price_max if intent.price_max is not None else filters.get("price_max")
     attributes = intent.attributes or filters.get("attributes")
 
     conditions = []
@@ -108,11 +104,7 @@ def _condicoes_duras(
     # Filtro estruturado por atributos (RF-12): containment JSONB (@>),
     # servido pelo índice GIN jsonb_path_ops.
     if attributes:
-        conditions.append(
-            product_specs.c.attributes.op("@>")(
-                cast(attributes, JSONB)
-            )
-        )
+        conditions.append(product_specs.c.attributes.op("@>")(cast(attributes, JSONB)))
 
     # Faixa numérica ("pelo menos 30 horas de bateria"). Não cabe no `@>`,
     # que é igualdade: um fone de 40h não *contém* 30h. Por isso é comparação,
@@ -132,14 +124,10 @@ def _condicoes_duras(
         conditions.append(func.jsonb_typeof(valor) == "number")
 
         if (minimo := faixa.get("min")) is not None:
-            conditions.append(
-                valor.op(">=")(_como_jsonb(minimo))
-            )
+            conditions.append(valor.op(">=")(_como_jsonb(minimo)))
 
         if (maximo := faixa.get("max")) is not None:
-            conditions.append(
-                valor.op("<=")(_como_jsonb(maximo))
-            )
+            conditions.append(valor.op("<=")(_como_jsonb(maximo)))
 
     return conditions, price_max
 
@@ -229,18 +217,12 @@ class FtsSearchProvider:
         # coluna gerada. Consulta e documento processados por configurações
         # diferentes casam menos e não dão erro — falha silenciosa.
         texto = intent.text or intent.raw
-        tsquery = (
-            func.plainto_tsquery(FTS_CONFIG, texto)
-            if texto
-            else None
-        )
+        tsquery = func.plainto_tsquery(FTS_CONFIG, texto) if texto else None
 
         min_price = func.min(offers.c.price)
 
         if tsquery is not None:
-            conditions.append(
-                products.c.search_vector.op("@@")(tsquery)
-            )
+            conditions.append(products.c.search_vector.op("@@")(tsquery))
 
         rank_expr = (
             func.ts_rank(
@@ -366,10 +348,7 @@ class PgVectorProvider:
             .limit(k)
         )
 
-        return [
-            str(linha.id)
-            for linha in self._session.execute(stmt).all()
-        ]
+        return [str(linha.id) for linha in self._session.execute(stmt).all()]
 
 
 def get_vector_provider(
@@ -471,9 +450,7 @@ class HybridSearchProvider:
             # O braço vetorial é complementar: se o modelo não carregou ou o
             # índice falhou, a busca continua servindo o textual. Cair a busca
             # inteira por causa do braço opcional seria pior que não tê-lo.
-            logger.exception(
-                "Braço vetorial falhou; servindo só o textual"
-            )
+            logger.exception("Braço vetorial falhou; servindo só o textual")
             return textuais
 
         return self._funde(
@@ -492,10 +469,7 @@ class HybridSearchProvider:
         Reaproveitar `_condicoes_duras` é o que impede a união de devolver
         produto que contradiz um filtro explícito do usuário.
         """
-        vetor = (
-            self._vector
-            or PgVectorProvider(self._session)
-        ).embed_query(texto)
+        vetor = (self._vector or PgVectorProvider(self._session)).embed_query(texto)
 
         conditions, price_max = _condicoes_duras(
             intent,
@@ -506,29 +480,17 @@ class HybridSearchProvider:
 
         # `fts_rank` zero: quem entra só pelo vetor não tem score textual. O
         # ranking já trata 0 como "sem sinal textual".
-        stmt = _consulta_base(
-            literal(0.0)
-        ).where(
-            products.c.embedding.isnot(None)
-        )
+        stmt = _consulta_base(literal(0.0)).where(products.c.embedding.isnot(None))
 
         if conditions:
             stmt = stmt.where(and_(*conditions))
 
         if price_max is not None:
-            stmt = stmt.having(
-                func.min(offers.c.price) <= price_max
-            )
+            stmt = stmt.having(func.min(offers.c.price) <= price_max)
 
-        stmt = (
-            stmt.order_by(distancia)
-            .limit(settings.vector_top_k)
-        )
+        stmt = stmt.order_by(distancia).limit(settings.vector_top_k)
 
-        return [
-            _row_to_hit(linha)
-            for linha in self._session.execute(stmt).all()
-        ]
+        return [_row_to_hit(linha) for linha in self._session.execute(stmt).all()]
 
     def _funde(
         self,
@@ -546,20 +508,14 @@ class HybridSearchProvider:
         for posicao, hit in enumerate(textuais):
             pid = hit["id"]
 
-            score[pid] = (
-                score.get(pid, 0.0)
-                + 1.0 / (self._k + posicao + 1)
-            )
+            score[pid] = score.get(pid, 0.0) + 1.0 / (self._k + posicao + 1)
 
             hits[pid] = hit
 
         for posicao, hit in enumerate(vetoriais):
             pid = hit["id"]
 
-            score[pid] = (
-                score.get(pid, 0.0)
-                + 1.0 / (self._k + posicao + 1)
-            )
+            score[pid] = score.get(pid, 0.0) + 1.0 / (self._k + posicao + 1)
 
             # O hit textual vence como base: ele traz o `fts_rank` de verdade.
             hits.setdefault(pid, hit)
@@ -571,9 +527,7 @@ class HybridSearchProvider:
             reverse=True,
         )
 
-        return ordenados[
-            : settings.search_candidate_pool
-        ]
+        return ordenados[: settings.search_candidate_pool]
 
 
 def get_search_provider(
